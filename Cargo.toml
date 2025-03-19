@@ -1,11 +1,15 @@
 [package]
-name = "ui"
+name = "holt"
+version = "0.0.0"
+edition = "2021"
 
-version.workspace = true
-edition.workspace = true
-description.workspace = true
-repository.workspace = true
+description = "A UI toolkit for Leptos"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/aonyx-rs/holt.git"
+
+# The transient dependencies `litemap` and `zerofrom` require at least 1.81.
+rust-version = "1.81"
 
 [dependencies]
-leptos = { workspace = true }
-tailwind_fuse = { version = "0.3.0", features = ["variant"] }
+leptos = ">=0.7.0"
+tailwind_fuse = { version = ">=0.3.0", features = ["variant"] }

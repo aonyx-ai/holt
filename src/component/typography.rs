@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use tailwind_fuse::tw_merge;
 
 #[component]

@@ -1,0 +1,27 @@
+---
+name: Release
+
+"on":
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Publish to crates.io
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install earthly
+        uses: earthly/actions-setup@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 0.8
+
+      - name: Publish with Earthly
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}
+          EARTHLY_TOKEN: ${{ secrets.EARTHLY_TOKEN }}
+        run: earthly --ci --push --remote-cache=ghcr.io/aonyx-rs/holt-earthly-cache:publish-crate --secret CARGO_REGISTRY_TOKEN  +publish-crate

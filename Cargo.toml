@@ -6,8 +6,16 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
+version = "0.0.0"
 edition = "2021"
 
+description = "A UI toolkit for Leptos"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/aonyx-rs/holt.git"
+
+# The transient dependencies `litemap` and `zerofrom` require at least 1.81.
+rust-version = "1.81"
+
 [workspace.dependencies]
-leptos = { version = "0.7.3" }
+leptos = ">=0.7.0"
+tailwind_fuse = { version = ">=0.3.0", features = ["variant"] }

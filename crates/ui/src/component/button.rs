@@ -1,6 +1,7 @@
 use leptos::children::Children;
 use leptos::web_sys::MouseEvent;
-use leptos::{html, prelude::*};
+use leptos::prelude::*;
+use leptos::html;
 use tailwind_fuse::*;
 
 #[derive(TwClass)]

@@ -1,11 +1,13 @@
-[package]
-name = "ui"
+[workspace]
+members = ["crates/*"]
 
-version.workspace = true
-edition.workspace = true
-description.workspace = true
-repository.workspace = true
+# Opt-in to the new feature resolver introduced in Rust 1.51 and Edition 2021.
+# https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+resolver = "2"
 
-[dependencies]
-leptos = { workspace = true }
-tailwind_fuse = { version = "0.3.0", features = ["variant"] }
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+
+[workspace.dependencies]
+leptos = { version = "0.7.3" }

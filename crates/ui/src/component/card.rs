@@ -1,4 +1,5 @@
-use leptos::*;
+use leptos::children::Children;
+use leptos::prelude::*;
 use tailwind_fuse::tw_merge;
 
 #[component]

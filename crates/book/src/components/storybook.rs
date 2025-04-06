@@ -2,10 +2,9 @@ use holt_ui::component::*;
 use holt_ui::container::*;
 use leptos::prelude::*;
 
-use crate::registry::Story;
 use crate::registry::AllStories;
 use crate::registry::ButtonStory;
-
+use crate::registry::Story;
 
 /// Main storybook layout component
 #[component]

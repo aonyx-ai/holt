@@ -1,12 +1,9 @@
-use leptos::prelude::*;
 use leptos::children::Children;
+use leptos::prelude::*;
 
 /// The main breadcrumb container
 #[component]
-pub fn Breadcrumb(
-    #[prop(optional)] class: &'static str,
-    children: Children,
-) -> impl IntoView {
+pub fn Breadcrumb(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
         if class.is_empty() {
             "flex".to_string()
@@ -24,13 +21,11 @@ pub fn Breadcrumb(
 
 /// Contains all breadcrumb items
 #[component]
-pub fn BreadcrumbList(
-    #[prop(optional)] class: &'static str,
-    children: Children,
-) -> impl IntoView {
+pub fn BreadcrumbList(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
         if class.is_empty() {
-            "flex flex-wrap items-center gap-1 overflow-hidden text-sm text-muted-foreground".to_string()
+            "flex flex-wrap items-center gap-1 overflow-hidden text-sm text-muted-foreground"
+                .to_string()
         } else {
             format!("flex flex-wrap items-center gap-1 overflow-hidden text-sm text-muted-foreground {}", class)
         }
@@ -45,10 +40,7 @@ pub fn BreadcrumbList(
 
 /// A single breadcrumb item
 #[component]
-pub fn BreadcrumbItem(
-    #[prop(optional)] class: &'static str,
-    children: Children,
-) -> impl IntoView {
+pub fn BreadcrumbItem(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
         if class.is_empty() {
             "inline-flex items-center gap-1".to_string()
@@ -88,10 +80,7 @@ pub fn BreadcrumbLink(
 
 /// The current/active breadcrumb item
 #[component]
-pub fn BreadcrumbPage(
-    #[prop(optional)] class: &'static str,
-    children: Children,
-) -> impl IntoView {
+pub fn BreadcrumbPage(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
         if class.is_empty() {
             "font-medium text-foreground".to_string()
@@ -109,9 +98,7 @@ pub fn BreadcrumbPage(
 
 /// The separator between breadcrumb items
 #[component]
-pub fn BreadcrumbSeparator(
-    #[prop(optional)] class: &'static str,
-) -> impl IntoView {
+pub fn BreadcrumbSeparator(#[prop(optional)] class: &'static str) -> impl IntoView {
     let classes = move || {
         if class.is_empty() {
             "mx-1 text-muted-foreground".to_string()

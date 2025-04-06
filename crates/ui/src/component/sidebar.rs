@@ -1,5 +1,5 @@
-use leptos::prelude::*;
 use leptos::children::Children;
+use leptos::prelude::*;
 
 use crate::container::SidebarContext;
 
@@ -10,10 +10,9 @@ pub fn Sidebar(
     #[prop(optional, default = "left")] side: &'static str,
     #[prop(optional, default = "sidebar")] variant: &'static str,
     #[prop(optional, default = "icon")] collapsible: &'static str,
-    children: Children
+    children: Children,
 ) -> impl IntoView {
-    let context = use_context::<SidebarContext>()
-        .expect("SidebarProvider must be an ancestor");
+    let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
     let classes = move || {
         let mut classes = "h-full flex flex-col bg-sidebar-background text-sidebar-foreground border-sidebar-border transition-all duration-200 ease-in-out".to_string();
@@ -57,12 +56,11 @@ pub fn Sidebar(
 
 /// The header component of the sidebar, shown at the top
 #[component]
-pub fn SidebarHeader(
-    #[prop(optional)] class: &'static str,
-    children: Children
-) -> impl IntoView {
+pub fn SidebarHeader(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
-        let mut classes = "sticky top-0 h-[60px] flex items-center border-b border-sidebar-border px-4 py-2".to_string();
+        let mut classes =
+            "sticky top-0 h-[60px] flex items-center border-b border-sidebar-border px-4 py-2"
+                .to_string();
         if !class.is_empty() {
             classes.push(' ');
             classes.push_str(class);
@@ -79,10 +77,7 @@ pub fn SidebarHeader(
 
 /// The content area of the sidebar, typically containing groups and navigation items
 #[component]
-pub fn SidebarContent(
-    #[prop(optional)] class: &'static str,
-    children: Children
-) -> impl IntoView {
+pub fn SidebarContent(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
         let mut classes = "flex-1 overflow-auto py-2".to_string();
         if !class.is_empty() {
@@ -101,10 +96,7 @@ pub fn SidebarContent(
 
 /// A group within the sidebar content, used to organize menu items
 #[component]
-pub fn SidebarGroup(
-    #[prop(optional)] class: &'static str,
-    children: Children
-) -> impl IntoView {
+pub fn SidebarGroup(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
         let mut classes = "px-3 py-2".to_string();
         if !class.is_empty() {
@@ -125,7 +117,7 @@ pub fn SidebarGroup(
 #[component]
 pub fn SidebarGroupLabel(
     #[prop(optional)] class: &'static str,
-    children: Children
+    children: Children,
 ) -> impl IntoView {
     let classes = move || {
         let mut classes = "text-xs font-medium text-sidebar-foreground/70 mb-2".to_string();
@@ -147,7 +139,7 @@ pub fn SidebarGroupLabel(
 #[component]
 pub fn SidebarGroupContent(
     #[prop(optional)] class: &'static str,
-    children: Children
+    children: Children,
 ) -> impl IntoView {
     let classes = move || {
         let mut classes = "space-y-1".to_string();
@@ -167,10 +159,7 @@ pub fn SidebarGroupContent(
 
 /// A menu component within the sidebar
 #[component]
-pub fn SidebarMenu(
-    #[prop(optional)] class: &'static str,
-    children: Children
-) -> impl IntoView {
+pub fn SidebarMenu(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
         let mut classes = "space-y-1".to_string();
         if !class.is_empty() {
@@ -189,10 +178,7 @@ pub fn SidebarMenu(
 
 /// A menu item within the sidebar menu
 #[component]
-pub fn SidebarMenuItem(
-    #[prop(optional)] class: &'static str,
-    children: Children
-) -> impl IntoView {
+pub fn SidebarMenuItem(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
         let mut classes = "relative".to_string();
         if !class.is_empty() {
@@ -214,7 +200,7 @@ pub fn SidebarMenuItem(
 pub fn SidebarMenuButton(
     #[prop(optional)] class: &'static str,
     #[prop(optional)] is_active: bool,
-    children: Children
+    children: Children,
 ) -> impl IntoView {
     let classes = move || {
         let mut classes = "group flex items-center w-full rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer transition-colors peer/menu-button".to_string();
@@ -243,12 +229,11 @@ pub fn SidebarMenuButton(
 
 /// The footer component of the sidebar, shown at the bottom
 #[component]
-pub fn SidebarFooter(
-    #[prop(optional)] class: &'static str,
-    children: Children
-) -> impl IntoView {
+pub fn SidebarFooter(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
-        let mut classes = "sticky bottom-0 h-[60px] flex items-center border-t border-sidebar-border px-4 py-2".to_string();
+        let mut classes =
+            "sticky bottom-0 h-[60px] flex items-center border-t border-sidebar-border px-4 py-2"
+                .to_string();
         if !class.is_empty() {
             classes.push(' ');
             classes.push_str(class);
@@ -265,9 +250,7 @@ pub fn SidebarFooter(
 
 /// A separator line within the sidebar
 #[component]
-pub fn SidebarSeparator(
-    #[prop(optional)] class: &'static str,
-) -> impl IntoView {
+pub fn SidebarSeparator(#[prop(optional)] class: &'static str) -> impl IntoView {
     let classes = move || {
         let mut classes = "h-px bg-sidebar-border my-2".to_string();
         if !class.is_empty() {
@@ -284,11 +267,8 @@ pub fn SidebarSeparator(
 
 /// A button that toggles the sidebar visibility
 #[component]
-pub fn SidebarTrigger(
-    #[prop(optional)] class: &'static str,
-) -> impl IntoView {
-    let context = use_context::<SidebarContext>()
-        .expect("SidebarProvider must be an ancestor");
+pub fn SidebarTrigger(#[prop(optional)] class: &'static str) -> impl IntoView {
+    let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
     let toggle_sidebar = move |_| {
         context.set_open.update(|open| *open = !*open);

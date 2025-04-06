@@ -1,6 +1,6 @@
-use leptos::{ev, prelude::*};
 use leptos::children::Children;
 use leptos::web_sys::KeyboardEvent;
+use leptos::{ev, prelude::*};
 
 // Define a context type for our sidebar
 #[derive(Clone)]
@@ -22,7 +22,7 @@ pub fn SidebarProvider(
     #[prop(optional)] open: Option<ReadSignal<bool>>,
     #[prop(optional)] set_open_prop: Option<WriteSignal<bool>>,
     // #[prop(optional)] style: Option<&'static str>,
-    children: Children
+    children: Children,
 ) -> impl IntoView {
     let initial_state = initial_state.unwrap_or(true);
     let (is_open_local, set_open_local) = signal(initial_state);
@@ -32,10 +32,7 @@ pub fn SidebarProvider(
     let set_open = set_open_prop.unwrap_or(set_open_local);
 
     // Create and provide a unified context
-    let context = SidebarContext {
-        is_open,
-        set_open,
-    };
+    let context = SidebarContext { is_open, set_open };
 
     provide_context(context);
 
@@ -69,8 +66,7 @@ pub fn SidebarProvider(
 /// Keyboard shortcut handler for sidebar toggle
 #[component]
 pub fn SidebarKeyboardShortcut() -> impl IntoView {
-    let context = use_context::<SidebarContext>()
-        .expect("SidebarProvider must be an ancestor");
+    let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
     let handle_keydown = move |ev: KeyboardEvent| {
         // Check for Cmd+B or Ctrl+B

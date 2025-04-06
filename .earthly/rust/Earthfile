@@ -70,7 +70,7 @@ FEATURES:
     DO rust+CARGO --args="install cargo-hack"
 
     # Test combinations of features in workspace crates
-    DO rust+CARGO --args="hack --workspace --feature-powerset check --lib --tests"
+    DO rust+CARGO --args="hack --workspace --feature-powerset check --tests"
 
 FORMAT:
     FUNCTION

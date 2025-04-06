@@ -7,8 +7,9 @@ edition.workspace = true
 [dependencies]
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
+holt-ui = { path = "../ui" }
+inventory = "0.3.20"
 leptos = { workspace = true, features = ["csr"] }
 leptos_meta = "0.7.3"
 log = "0.4.22"
 tailwind_fuse = { version = "0.3.0", features = ["variant"] }
-holt-ui = { path = "../ui" }

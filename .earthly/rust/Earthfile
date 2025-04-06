@@ -18,8 +18,8 @@ COPY_RUST_SOURCES:
     FUNCTION
 
     # Copy the source code in a cache-friendly way
-    COPY --keep-ts Cargo.toml Cargo.lock ./
-    COPY --keep-ts --dir src ./
+    COPY --keep-ts --if-exists Cargo.toml Cargo.lock ./
+    COPY --keep-ts --dir crates ./
 
 DEPS_LATEST:
     FUNCTION
@@ -69,8 +69,8 @@ FEATURES:
     # Install cargo-hack
     DO rust+CARGO --args="install cargo-hack"
 
-    # Test combinations of features
-    DO rust+CARGO --args="hack --feature-powerset check --lib --tests"
+    # Test combinations of features in workspace crates
+    DO rust+CARGO --args="hack --workspace --feature-powerset check --lib --tests"
 
 FORMAT:
     FUNCTION
@@ -92,7 +92,7 @@ LINT:
     DO +SOURCES
 
     # Check the code for linting errors
-    DO rust+CARGO --args="clippy --all-targets --all-features -- -D warnings"
+    DO rust+CARGO --args="clippy --workspace --all-targets --all-features -- -D warnings"
 
 MSRV:
     FUNCTION
@@ -108,10 +108,12 @@ MSRV:
     DO +COPY_RUST_SOURCES
 
     # Check that the project compiles with the MSRV
-    DO rust+CARGO --args="+$MSRV check --all-features --all-targets"
+    DO rust+CARGO --args="+$MSRV check --workspace --all-features --all-targets"
 
 PUBLISH:
     FUNCTION
+
+    ARG CRATE=""
 
     DO +SOURCES
 
@@ -119,7 +121,13 @@ PUBLISH:
     COPY README.md .
 
     # Publish the crate to crates.io
-    DO rust+CARGO --secret CARGO_REGISTRY_TOKEN --args="cargo publish -v --all-features --token $CARGO_REGISTRY_TOKEN"
+    IF [ "$CRATE" = "" ]
+        # If no specific crate is specified, publish from workspace root
+        DO rust+CARGO --secret CARGO_REGISTRY_TOKEN --args="publish -v --all-features --token $CARGO_REGISTRY_TOKEN"
+    ELSE
+        # If a specific crate is specified, publish that crate
+        DO rust+CARGO --secret CARGO_REGISTRY_TOKEN --args="publish -v --all-features --token $CARGO_REGISTRY_TOKEN -p $CRATE"
+    END
 
 SOURCES:
     FUNCTION
@@ -136,4 +144,4 @@ TEST:
     DO +SOURCES
 
     # Run the tests and measure the code coverage
-    DO rust+CARGO --args="test --all-features --all-targets --locked"
+    DO rust+CARGO --args="test --workspace --all-features --all-targets --locked"

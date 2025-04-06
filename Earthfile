@@ -121,7 +121,8 @@ prettier:
     DO ./.earthly/prettier+PRETTIER --FIX="$FIX"
 
 publish-crate:
-    DO ./.earthly/rust+PUBLISH
+    ARG CRATE=""
+    DO ./.earthly/rust+PUBLISH --CRATE="$CRATE"
 
 test-rust:
     DO ./.earthly/rust+TEST

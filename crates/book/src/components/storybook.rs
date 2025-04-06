@@ -74,5 +74,5 @@ fn StorybookNavigation() -> impl IntoView {
 fn ComponentDisplay() -> impl IntoView {
     let button_story = StoredValue::new(AllStories::ButtonStory(ButtonStory::new()));
 
-    button_story.read_value().into_view()
+    button_story.read_value().as_view()
 }

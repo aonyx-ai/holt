@@ -21,7 +21,7 @@ pub fn SidebarProvider(
     #[prop(optional)] initial_state: Option<bool>,
     #[prop(optional)] open: Option<ReadSignal<bool>>,
     #[prop(optional)] set_open_prop: Option<WriteSignal<bool>>,
-    #[prop(optional)] style: Option<&'static str>,
+    // #[prop(optional)] style: Option<&'static str>,
     children: Children
 ) -> impl IntoView {
     let initial_state = initial_state.unwrap_or(true);

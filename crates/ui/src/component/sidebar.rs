@@ -35,7 +35,7 @@ pub fn Sidebar(
 
         // Add custom classes
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
 
@@ -64,7 +64,7 @@ pub fn SidebarHeader(
     let classes = move || {
         let mut classes = "sticky top-0 h-[60px] flex items-center border-b border-sidebar-border px-4 py-2".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes
@@ -86,7 +86,7 @@ pub fn SidebarContent(
     let classes = move || {
         let mut classes = "flex-1 overflow-auto py-2".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes
@@ -108,7 +108,7 @@ pub fn SidebarGroup(
     let classes = move || {
         let mut classes = "px-3 py-2".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes
@@ -130,7 +130,7 @@ pub fn SidebarGroupLabel(
     let classes = move || {
         let mut classes = "text-xs font-medium text-sidebar-foreground/70 mb-2".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes
@@ -152,7 +152,7 @@ pub fn SidebarGroupContent(
     let classes = move || {
         let mut classes = "space-y-1".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes
@@ -174,7 +174,7 @@ pub fn SidebarMenu(
     let classes = move || {
         let mut classes = "space-y-1".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes
@@ -196,7 +196,7 @@ pub fn SidebarMenuItem(
     let classes = move || {
         let mut classes = "relative".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes
@@ -224,7 +224,7 @@ pub fn SidebarMenuButton(
         }
 
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
 
@@ -250,7 +250,7 @@ pub fn SidebarFooter(
     let classes = move || {
         let mut classes = "sticky bottom-0 h-[60px] flex items-center border-t border-sidebar-border px-4 py-2".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes
@@ -271,7 +271,7 @@ pub fn SidebarSeparator(
     let classes = move || {
         let mut classes = "h-px bg-sidebar-border my-2".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes
@@ -297,7 +297,7 @@ pub fn SidebarTrigger(
     let classes = move || {
         let mut classes = "inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9 px-0 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring".to_string();
         if !class.is_empty() {
-            classes.push_str(" ");
+            classes.push(' ');
             classes.push_str(class);
         }
         classes

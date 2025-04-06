@@ -7,9 +7,9 @@ pub struct ButtonStory();
 
 impl Story for ButtonStory {
     fn new() -> Self { ButtonStory() }
-    fn title(&self) -> &str { "Button" }
+    // fn title(&self) -> &str { "Button" }
 
-    fn into_view(&self) -> AnyView {
+    fn as_view(&self) -> AnyView {
         view! {
             <Button>"Click me!"</Button>
         }.into_any()
@@ -22,13 +22,13 @@ pub enum AllStories {
 }
 
 impl AllStories {
-    pub fn title(&self) -> &str { match self {
-        AllStories::ButtonStory(_) => "Button",
-    }}
+    // pub fn title(&self) -> &str { match self {
+    //     AllStories::ButtonStory(_) => "Button",
+    // }}
 
-    pub fn into_view(&self) -> AnyView {
+    pub fn as_view(&self) -> AnyView {
         match self {
-            AllStories::ButtonStory(story) => story.into_view(),
+            AllStories::ButtonStory(story) => story.as_view(),
         }
     }
 }

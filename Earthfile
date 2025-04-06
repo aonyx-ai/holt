@@ -1,5 +1,42 @@
 VERSION 0.8
 
+IMPORT github.com/earthly/lib/rust AS rust
+
+FROM rust:1.84.0-slim
+WORKDIR /holt
+
+COPY_RUST_SOURCES:
+    FUNCTION
+
+    # Copy the source code in a cache-friendly way
+    COPY --keep-ts --if-exists Cargo.toml Cargo.lock ./
+    COPY --keep-ts --dir crates ./
+
+webapp-container:
+    # Install system-level dependencies
+    RUN apt update && apt upgrade -y && apt install -y curl libssl-dev pkg-config
+
+    # Initialize Rust
+    DO rust+INIT --keep_fingerprints=true
+
+    # Add the WASM target
+    RUN rustup target add wasm32-unknown-unknown
+
+    # Install trunk to compile the web application
+    RUN cargo install trunk
+
+    # Explicitly cache the container at this point
+    SAVE IMAGE --cache-hint
+
+webapp-build:
+    FROM +webapp-container
+
+    # Copy the source code in a cache-friendly way
+    DO +COPY_RUST_SOURCES
+
+    # Build the web application
+    RUN cd crates/book && trunk build
+
 # This project's continuous integration pipeline executes all Earthly targets
 # that start with the prefixes `check-`, `format-`, `lint-`, and `test-`. Fixing
 # formatting issues is disabled to prevent parallely running targets from
@@ -84,7 +121,8 @@ prettier:
     DO ./.earthly/prettier+PRETTIER --FIX="$FIX"
 
 publish-crate:
-    DO ./.earthly/rust+PUBLISH
+    ARG CRATE=""
+    DO ./.earthly/rust+PUBLISH --CRATE="$CRATE"
 
 test-rust:
     DO ./.earthly/rust+TEST

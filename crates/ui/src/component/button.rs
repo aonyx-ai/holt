@@ -1,5 +1,7 @@
-use leptos::ev::MouseEvent;
+use leptos::children::Children;
+use leptos::html;
 use leptos::prelude::*;
+use leptos::web_sys::MouseEvent;
 use tailwind_fuse::*;
 
 #[derive(TwClass)]
@@ -52,7 +54,7 @@ pub fn Button(
     children: Children,
 ) -> impl IntoView {
     let final_class = ButtonStyle { variant, size }.with_class(class);
-    let element: NodeRef<leptos::html::Button> = NodeRef::new();
+    let element: NodeRef<html::Button> = NodeRef::new();
 
     let on_click = move |e: MouseEvent| {
         element.get().map(|el| el.dispatch_event(&e));

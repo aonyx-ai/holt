@@ -1,5 +1,11 @@
-[package]
-name = "holt"
+[workspace]
+members = ["crates/*"]
+
+# Opt-in to the new feature resolver introduced in Rust 1.51 and Edition 2021.
+# https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+resolver = "2"
+
+[workspace.package]
 version = "0.0.0"
 edition = "2021"
 
@@ -10,6 +16,6 @@ repository = "https://github.com/aonyx-rs/holt.git"
 # The transient dependencies `litemap` and `zerofrom` require at least 1.81.
 rust-version = "1.81"
 
-[dependencies]
-leptos = ">=0.7.0"
+[workspace.dependencies]
+leptos = ">=0.7.3"
 tailwind_fuse = { version = ">=0.3.0", features = ["variant"] }

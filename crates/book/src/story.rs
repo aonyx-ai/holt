@@ -1,5 +1,19 @@
 use leptos::prelude::AnyView;
 
+pub trait StoryNew {
+    fn new() -> Self
+    where
+        Self: Sized;
+}
+
+pub trait StoryAsView: Send + Sync {
+    fn as_view(&self) -> AnyView;
+}
+
+pub trait StoryTitle: Send + Sync {
+    fn title() -> &'static str;
+}
+
 pub trait Story: Send + Sync {
     fn new() -> Self
     where
@@ -8,27 +22,39 @@ pub trait Story: Send + Sync {
     fn as_view(&self) -> AnyView;
 }
 
+impl<T> Story for T where T: StoryNew + StoryTitle + StoryAsView {
+    fn new() -> Self
+    where
+        Self: Sized {
+        T::new()
+    }
+
+    #[inline(always)]
+    fn title(&self) -> &str {
+        T::title()
+    }
+
+    fn as_view(&self) -> AnyView {
+        T::as_view(self)
+    }
+}
+
 inventory::collect!(&'static dyn Story);
 
-macro_rules! build_story {
-    ($name:ident, $title:expr, $view:expr) => {
-        #[derive(Debug, Clone, Copy)]
-        struct $name;
-
-        impl crate::story::Story for $name {
+macro_rules! register_story {
+    ($name:ident, $title:expr) => {
+        impl crate::story::StoryNew for $name {
             fn new() -> Self
             where
                 Self: Sized,
             {
                 $name
             }
+        }
 
-            fn title(&self) -> &str {
+        impl crate::story::StoryTitle for $name {
+            fn title() -> &'static str {
                 $title
-            }
-
-            fn as_view(&self) -> AnyView {
-                leptos::prelude::IntoAny::into_any($view)
             }
         }
 
@@ -36,4 +62,4 @@ macro_rules! build_story {
     };
 }
 
-pub(crate) use build_story;
+pub(crate) use register_story;

@@ -543,6 +543,7 @@ dependencies = [
  "leptos",
  "leptos_meta",
  "log",
+ "paste",
  "tailwind_fuse",
 ]
 

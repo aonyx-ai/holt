@@ -10,6 +10,7 @@ console_log = "1.0.0"
 holt-ui = { path = "../ui" }
 inventory = "0.3.20"
 leptos = { workspace = true, features = ["csr"] }
+leptos_router = "0.7.3"
 leptos_meta = "0.7.3"
 log = "0.4.22"
 paste = "1.0.15"

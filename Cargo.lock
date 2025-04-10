@@ -539,9 +539,11 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "holt-ui",
+ "inventory",
  "leptos",
  "leptos_meta",
  "log",
+ "paste",
  "tailwind_fuse",
 ]
 
@@ -747,6 +749,15 @@ name = "interpolator"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71dd52191aae121e8611f1e8dc3e324dd0dd1dee1e6dd91d10ee07a3cfb4d9d8"
+
+[[package]]
+name = "inventory"
+version = "0.3.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab08d7cd2c5897f2c949e5383ea7c7db03fb19130ffcfbf7eda795137ae3cb83"
+dependencies = [
+ "rustversion",
+]
 
 [[package]]
 name = "itertools"

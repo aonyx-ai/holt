@@ -1,5 +1,6 @@
 use leptos::prelude::*;
 use leptos_meta::*;
+use leptos_router::components::Router;
 
 use crate::components::Storybook;
 
@@ -19,6 +20,8 @@ pub fn App() -> impl IntoView {
         <Meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link data-trunk rel="tailwind" />
 
-        <Storybook />
+        <Router>
+            <Storybook />
+        </Router>
     }
 }

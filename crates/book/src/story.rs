@@ -10,7 +10,8 @@ pub trait StoryAsView: Send + Sync {
     fn as_view(&self) -> AnyView;
 }
 
-pub trait StoryTitle: Send + Sync {
+pub trait StoryMetadata: Send + Sync {
+    fn id() -> &'static str;
     fn title() -> &'static str;
 }
 
@@ -18,19 +19,25 @@ pub trait Story: Send + Sync {
     fn new() -> Self
     where
         Self: Sized;
+    fn id(&self) -> &str;
     fn title(&self) -> &str;
     fn as_view(&self) -> AnyView;
 }
 
 impl<T> Story for T
 where
-    T: StoryNew + StoryTitle + StoryAsView,
+    T: StoryNew + StoryMetadata + StoryAsView,
 {
     fn new() -> Self
     where
         Self: Sized,
     {
         T::new()
+    }
+
+    #[inline(always)]
+    fn id(&self) -> &str {
+        T::id()
     }
 
     #[inline(always)]
@@ -56,7 +63,13 @@ macro_rules! register_story {
             }
         }
 
-        impl crate::story::StoryTitle for $name {
+        impl crate::story::StoryMetadata for $name {
+            #[inline(always)]
+            fn id() -> &'static str {
+                stringify!($name)
+            }
+
+            #[inline(always)]
             fn title() -> &'static str {
                 $title
             }

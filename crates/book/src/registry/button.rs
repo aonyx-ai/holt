@@ -1,4 +1,4 @@
-use crate::story::{StoryAsView, register_story};
+use crate::story::{register_story, StoryAsView};
 use holt_ui::component::Button;
 use leptos::prelude::*;
 

@@ -22,10 +22,14 @@ pub trait Story: Send + Sync {
     fn as_view(&self) -> AnyView;
 }
 
-impl<T> Story for T where T: StoryNew + StoryTitle + StoryAsView {
+impl<T> Story for T
+where
+    T: StoryNew + StoryTitle + StoryAsView,
+{
     fn new() -> Self
     where
-        Self: Sized {
+        Self: Sized,
+    {
         T::new()
     }
 

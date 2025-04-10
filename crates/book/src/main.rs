@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use story::init_story_registry;
 
 use crate::app::App;
 
@@ -12,20 +13,14 @@ mod components;
 mod registry;
 mod story;
 
-extern "C" {
-    fn __wasm_call_ctors();
-}
-
 fn main() {
-    unsafe { __wasm_call_ctors() };
+    init_story_registry();
 
     // Set up logging
     let _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        view! {
-            <App />
-        }
+        view! { <App /> }
     })
 }

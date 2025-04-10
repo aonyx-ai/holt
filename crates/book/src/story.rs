@@ -63,3 +63,13 @@ macro_rules! register_story {
 }
 
 pub(crate) use register_story;
+
+extern "C" {
+    fn __wasm_call_ctors();
+}
+
+pub fn init_story_registry() {
+    unsafe {
+        __wasm_call_ctors();
+    }
+}

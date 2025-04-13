@@ -1,3 +1,2 @@
-pub mod component;
-pub mod container;
-pub mod layout;
+pub mod visual;
+pub mod behavior;

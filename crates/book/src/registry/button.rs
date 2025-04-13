@@ -1,5 +1,5 @@
 use crate::story::{register_story, StoryAsView};
-use holt_ui::component::Button;
+use holt_ui::visual::Button;
 use leptos::prelude::*;
 
 struct ButtonStory;

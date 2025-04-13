@@ -1,7 +1,7 @@
 use leptos::children::Children;
 use leptos::prelude::*;
 
-use crate::container::SidebarContext;
+use crate::behavior::SidebarContext;
 
 /// The sidebar component that displays on the left side of the layout
 #[component]

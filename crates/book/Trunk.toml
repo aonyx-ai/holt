@@ -60,3 +60,6 @@ open = false
 # tls_cert_path = "self_signed_certs/cert.pem"
 # Additional headers to send. NOTE: header names must be valid HTTP headers.
 # headers = { "X-Foo" = "bar" }
+
+[tools]
+tailwindcss = "4.1.4"

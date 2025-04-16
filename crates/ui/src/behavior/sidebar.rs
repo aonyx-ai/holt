@@ -1,12 +1,14 @@
 use leptos::children::Children;
+use leptos::web_sys::window;
 use leptos::web_sys::KeyboardEvent;
 use leptos::{ev, prelude::*};
 
-// Define a context type for our sidebar
+/// The sidebar context keeps state and behavior
 #[derive(Clone)]
 pub struct SidebarContext {
     pub is_open: ReadSignal<bool>,
     pub set_open: WriteSignal<bool>,
+    pub is_mobile: ReadSignal<bool>,
 }
 
 impl SidebarContext {
@@ -15,70 +17,54 @@ impl SidebarContext {
     }
 }
 
-/// Provides the sidebar state management context
 #[component]
 pub fn SidebarProvider(
     #[prop(optional)] initial_state: Option<bool>,
     #[prop(optional)] open: Option<ReadSignal<bool>>,
     #[prop(optional)] set_open_prop: Option<WriteSignal<bool>>,
-    // #[prop(optional)] style: Option<&'static str>,
     children: Children,
 ) -> impl IntoView {
     let initial_state = initial_state.unwrap_or(true);
-    let (is_open_local, set_open_local) = signal(initial_state);
 
-    // Use provided signals if available, otherwise use local ones
+    let (is_open_local, set_open_local) = signal(initial_state);
     let is_open = open.unwrap_or(is_open_local);
     let set_open = set_open_prop.unwrap_or(set_open_local);
 
-    // Create and provide a unified context
-    let context = SidebarContext { is_open, set_open };
+    // Detect mobile size (simple window width check)
+    let (is_mobile, set_is_mobile) = signal(false);
+    Effect::new(move |_| {
+        if let Some(win) = window() {
+            let width = win.inner_width().unwrap().as_f64().unwrap_or(9999.0);
+            set_is_mobile.set(width < 768.0);
+        }
+    });
+
+    let context = SidebarContext {
+        is_open,
+        set_open,
+        is_mobile,
+    };
 
     provide_context(context);
-
-    // // Default CSS variables for theming
-    // let css_vars = r#"
-    //     --sidebar-width: 16rem;
-    //     --sidebar-width-mobile: 18rem;
-    //     --sidebar-background: 0 0% 98%;
-    //     --sidebar-foreground: 240 5.3% 26.1%;
-    //     --sidebar-primary: 240 5.9% 10%;
-    //     --sidebar-primary-foreground: 0 0% 98%;
-    //     --sidebar-accent: 240 4.8% 95.9%;
-    //     --sidebar-accent-foreground: 240 5.9% 10%;
-    //     --sidebar-border: 220 13% 91%;
-    //     --sidebar-ring: 217.2 91.2% 59.8%;
-    // "#;
-
-    // let styles = move || {
-    //     if let Some(custom_style) = style {
-    //         format!("{}; {}", css_vars, custom_style)
-    //     } else {
-    //         css_vars.to_string()
-    //     }
-    // };
 
     view! {
         {children()}
     }
 }
 
-/// Keyboard shortcut handler for sidebar toggle
+// Keyboard shortcut for toggle
 #[component]
 pub fn SidebarKeyboardShortcut() -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
     let handle_keydown = move |ev: KeyboardEvent| {
-        // Check for Cmd+B or Ctrl+B
         if (ev.meta_key() || ev.ctrl_key()) && ev.key() == "b" {
             ev.prevent_default();
             context.set_open.update(|open| *open = !*open);
         }
     };
 
-    // Add global event listener
     window_event_listener(ev::keydown, handle_keydown);
 
-    // No visible UI
     view! { <div class="hidden"></div> }
 }

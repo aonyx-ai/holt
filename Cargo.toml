@@ -17,5 +17,7 @@ repository = "https://github.com/aonyx-rs/holt.git"
 rust-version = "1.81"
 
 [workspace.dependencies]
-leptos = ">=0.7.3"
+leptos = "0.7.3"
+leptos_router = "0.7.3"
+leptos_meta = "0.7.3"
 tailwind_fuse = { version = ">=0.3.0", features = ["variant"] }

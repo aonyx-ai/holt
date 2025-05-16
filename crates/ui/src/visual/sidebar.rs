@@ -6,7 +6,7 @@ use crate::behavior::SidebarContext;
 
 #[derive(TwClass)]
 #[tw(
-    class = "h-full flex flex-col bg-sidebar-background text-sidebar-foreground border-sidebar-border transition-all duration-200 ease-in-out"
+    class = "h-full flex flex-col bg-sidebar text-sidebar-foreground transition-all duration-200 ease-in-out"
 )]
 struct SidebarStyle {
     variant: SidebarVariant,
@@ -34,58 +34,191 @@ pub enum SidebarSide {
 
 #[derive(TwVariant, PartialEq)]
 pub enum SidebarCollapsible {
-    #[tw(default, class = "w-[60px] md:w-[60px]")]
-    Icon,
-    #[tw(class = "-translate-x-full")]
+    #[tw(class = "")]
     OffCanvas,
+    #[tw(default, class = "")]
+    Icon,
     #[tw(class = "")]
     None,
 }
 
-/// The sidebar component that displays on the left side of the layout
+/// The sidebar component that displays on the left or right side of the layout
 #[component]
 pub fn Sidebar(
     #[prop(optional)] class: &'static str,
-    #[prop(optional)] side: SidebarSide,
-    #[prop(optional)] variant: SidebarVariant,
-    #[prop(optional)] collapsible: SidebarCollapsible,
+    #[prop(optional, default = SidebarSide::Left)] side: SidebarSide,
+    #[prop(optional, default = SidebarVariant::Sidebar)] variant: SidebarVariant,
+    #[prop(optional, default = SidebarCollapsible::OffCanvas)] collapsible: SidebarCollapsible,
     children: Children,
 ) -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
-    let classes = SidebarStyle {
-        side,
-        variant,
-        collapsible,
-    }
-    .with_class(class);
+    // Handle the case when collapsible is None
+    if collapsible == SidebarCollapsible::None {
+        let simple_classes = move || {
+            let mut classes = "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground".to_string();
+            if !class.is_empty() {
+                classes.push(' ');
+                classes.push_str(class);
+            }
+            classes
+        };
 
-    view! {
-        <aside
-            class=classes
-            class:hidden=move || collapsible != SidebarCollapsible::None && !context.is_open() && context.is_mobile.get()
-            data-side=move || match side {
-                SidebarSide::Left => "left",
-                SidebarSide::Right => "right",
+        return view! {
+            <div class=simple_classes>
+                {children()}
+            </div>
+        }.into_any();
+    }
+
+    // Handle mobile view
+    let is_mobile = context.is_mobile.get();
+    if is_mobile {
+        // For mobile, we don't have Sheet component in this codebase
+        // So we'll create a simplified mobile view
+        let mobile_classes = move || {
+            let mut classes = "fixed inset-y-0 z-50 flex h-svh w-[var(--sidebar-width-mobile)] flex-col bg-sidebar p-0 text-sidebar-foreground transition-transform".to_string();
+
+            if !context.is_open() {
+                match side {
+                    SidebarSide::Left => classes.push_str(" -translate-x-full"),
+                    SidebarSide::Right => classes.push_str(" translate-x-full"),
+                }
             }
-            data-variant=move || match variant {
-                SidebarVariant::Sidebar => "sidebar",
-                SidebarVariant::Floating => "floating",
-                SidebarVariant::Inset => "inset",
+
+            match side {
+                SidebarSide::Left => classes.push_str(" left-0"),
+                SidebarSide::Right => classes.push_str(" right-0"),
             }
-            data-collapsible=move || match collapsible {
+
+            if !class.is_empty() {
+                classes.push(' ');
+                classes.push_str(class);
+            }
+
+            classes
+        };
+
+        return view! {
+            <div
+                data-sidebar="sidebar"
+                data-mobile="true"
+                class=mobile_classes
+                style="var(--sidebar-width): SIDEBAR_WIDTH_MOBILE"
+            >
+                <div class="flex h-full w-full flex-col">
+                    {children()}
+                </div>
+            </div>
+        }.into_any();
+    }
+
+    // Desktop view
+    let state = move || if context.is_open() { "expanded" } else { "collapsed" };
+    let other_state = state.clone();
+    let collapsible_value = move || {
+        if other_state() == "collapsed" {
+            match collapsible {
                 SidebarCollapsible::Icon => "icon",
                 SidebarCollapsible::OffCanvas => "offcanvas",
-                SidebarCollapsible::None => "none",
+                SidebarCollapsible::None => "",
             }
+        } else {
+            ""
+        }
+    };
+
+    let variant_value = move || {
+        match variant {
+            SidebarVariant::Sidebar => "sidebar",
+            SidebarVariant::Floating => "floating",
+            SidebarVariant::Inset => "inset",
+        }
+    };
+
+    let side_value = move || {
+        match side {
+            SidebarSide::Left => "left",
+            SidebarSide::Right => "right",
+        }
+    };
+
+    // Outer container classes
+    let outer_classes = "group peer hidden text-sidebar-foreground md:block";
+
+    // Gap div classes
+    let gap_classes = move || {
+        let base = "relative w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear".to_string();
+        let mut classes = vec![base];
+
+        classes.push(String::from("group-data-[collapsible=offcanvas]:w-0"));
+        classes.push(String::from("group-data-[side=right]:rotate-180"));
+
+        match variant {
+            SidebarVariant::Floating | SidebarVariant::Inset => {
+                classes.push("group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+_theme(spacing.4))]".to_string());
+            },
+            _ => {
+                classes.push("group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]".to_string());
+            }
+        }
+
+        classes.join(" ")
+    };
+
+    // Main sidebar container classes
+    let sidebar_container_classes = move || {
+        let mut classes = vec![
+            "fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex".to_string()
+        ];
+
+        match side {
+            SidebarSide::Left => {
+                classes.push("left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]".to_string());
+            },
+            SidebarSide::Right => {
+                classes.push("right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]".to_string());
+            }
+        }
+
+        match variant {
+            SidebarVariant::Floating | SidebarVariant::Inset => {
+                classes.push("p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+theme(spacing.4)+2px)]".to_string());
+            },
+            _ => {
+                classes.push("group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l".to_string());
+            }
+        }
+
+        if !class.is_empty() {
+            classes.push(class.to_string());
+        }
+
+        classes.join(" ")
+    };
+
+    // Inner content classes
+    let content_classes = "flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow";
+
+    view! {
+        <div
+            class=outer_classes
+            data-state=state
+            data-collapsible=collapsible_value
+            data-variant=variant_value
+            data-side=side_value
         >
-            {children()}
-        </aside>
-    }
-    // data-state=move || match *context.is_open.read() {
-    //     true => "expanded",
-    //     false => "collapsed",
-    // }
+            // Gap div
+            <div class=gap_classes></div>
+
+            // Main sidebar container
+            <div class=sidebar_container_classes>
+                <div data-sidebar="sidebar" class=content_classes>
+                    {children()}
+                </div>
+            </div>
+        </div>
+    }.into_any()
 }
 
 /// A rail can be used to toggle the sidebar
@@ -350,7 +483,13 @@ pub fn SidebarTrigger(#[prop(optional)] class: &'static str) -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
     let toggle_sidebar = move |_| {
-        context.set_open.update(|open| *open = !*open);
+        if context.is_mobile.get() {
+            // For mobile views
+            context.set_open.update(|open| *open = !*open);
+        } else {
+            // For desktop views
+            context.set_open.update(|open| *open = !*open);
+        }
     };
 
     let classes = move || {
@@ -368,8 +507,35 @@ pub fn SidebarTrigger(#[prop(optional)] class: &'static str) -> impl IntoView {
             on:click=toggle_sidebar
             title="Toggle sidebar"
             aria-label="Toggle sidebar"
+            data-state=move || if context.is_open() { "open" } else { "closed" }
         >
-            "≡"
+            <span class="sr-only">Toggle sidebar</span>
+            <span aria-hidden="true">"≡"</span>
         </button>
+    }
+}
+
+/// A component to provide content for an inset sidebar layout
+#[component]
+pub fn SidebarInset(
+    #[prop(optional)] class: &'static str,
+    children: Children,
+) -> impl IntoView {
+    let classes = move || {
+        let mut classes = "relative flex w-full flex-1 flex-col bg-background".to_string();
+        classes.push_str(" md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow");
+
+        if !class.is_empty() {
+            classes.push(' ');
+            classes.push_str(class);
+        }
+
+        classes
+    };
+
+    view! {
+        <main class=classes>
+            {children()}
+        </main>
     }
 }

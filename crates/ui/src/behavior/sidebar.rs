@@ -48,7 +48,12 @@ pub fn SidebarProvider(
     provide_context(context);
 
     view! {
-        {children()}
+        <div
+            class="group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar"
+            style="--sidebar-width: 16rem; --sidebar-width-icon: 3rem"
+        >
+            {children()}
+        </div>
     }
 }
 

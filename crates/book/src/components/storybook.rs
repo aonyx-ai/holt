@@ -19,15 +19,16 @@ pub fn Storybook() -> impl IntoView {
     view! {
         <div class="flex h-screen w-screen overflow-hidden">
             <SidebarProvider>
-                <Sidebar>
-                    <SidebarHeader class="w-64 bg-background p-4">
-                        <h1 class="text-xl font-bold mb-4">Holt UI</h1>
+                <Sidebar collapsible=SidebarCollapsible::Icon variant=SidebarVariant::Sidebar>
+                    <SidebarHeader>
+                        <H1>H</H1>
                     </SidebarHeader>
                     <SidebarContent>
                         <StorybookNavigation />
                     </SidebarContent>
                 </Sidebar>
-                <div class="w-screen">
+
+                <SidebarInset>
                     <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
                         <SidebarTrigger class="-ml-1" />
                         "Components"
@@ -38,7 +39,7 @@ pub fn Storybook() -> impl IntoView {
                             <Route path=path!("/story/:story_id") view=StorybookStory />
                         </Routes>
                     </div>
-                </div>
+                </SidebarInset>
             </SidebarProvider>
         </div>
     }

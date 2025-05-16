@@ -16,4 +16,11 @@
   dockerfile: {
     fileMatch: ["^Earthfile$"],
   },
+
+  packageRules: [
+    {
+      matchPackagePatterns: ["^leptos"],
+      groupName: "Leptos",
+    },
+  ],
 }

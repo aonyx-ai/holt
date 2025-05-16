@@ -1,56 +1,135 @@
 use leptos::children::Children;
 use leptos::prelude::*;
+use tailwind_fuse::*;
 
 use crate::behavior::SidebarContext;
+
+#[derive(TwClass)]
+#[tw(
+    class = "h-full flex flex-col bg-sidebar-background text-sidebar-foreground border-sidebar-border transition-all duration-200 ease-in-out"
+)]
+struct SidebarStyle {
+    variant: SidebarVariant,
+    side: SidebarSide,
+    collapsible: SidebarCollapsible,
+}
+
+#[derive(TwVariant)]
+pub enum SidebarVariant {
+    #[tw(default, class = "")]
+    Sidebar,
+    #[tw(class = "")]
+    Floating,
+    #[tw(class = "")]
+    Inset,
+}
+
+#[derive(TwVariant)]
+pub enum SidebarSide {
+    #[tw(default, class = "border-r")]
+    Left,
+    #[tw(class = "border-l")]
+    Right,
+}
+
+#[derive(TwVariant, PartialEq)]
+pub enum SidebarCollapsible {
+    #[tw(default, class = "w-[60px] md:w-[60px]")]
+    Icon,
+    #[tw(class = "-translate-x-full")]
+    OffCanvas,
+    #[tw(class = "")]
+    None,
+}
 
 /// The sidebar component that displays on the left side of the layout
 #[component]
 pub fn Sidebar(
     #[prop(optional)] class: &'static str,
-    #[prop(optional, default = "left")] side: &'static str,
-    #[prop(optional, default = "sidebar")] variant: &'static str,
-    #[prop(optional, default = "icon")] collapsible: &'static str,
+    #[prop(optional)] side: SidebarSide,
+    #[prop(optional)] variant: SidebarVariant,
+    #[prop(optional)] collapsible: SidebarCollapsible,
     children: Children,
 ) -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
-    let classes = move || {
-        let mut classes = "h-full flex flex-col bg-sidebar-background text-sidebar-foreground border-sidebar-border transition-all duration-200 ease-in-out".to_string();
-
-        // Add side-specific classes
-        if side == "left" {
-            classes.push_str(" border-r");
-        } else if side == "right" {
-            classes.push_str(" border-l");
-        }
-
-        // Add variant-specific classes
-        match variant {
-            "sidebar" => classes.push_str(" w-[16rem] md:w-[16rem]"),
-            "floating" => classes.push_str(" rounded-lg shadow-lg"),
-            "inset" => classes.push_str(" rounded-lg"),
-            _ => classes.push_str(" w-[16rem] md:w-[16rem]"),
-        }
-
-        // Add custom classes
-        if !class.is_empty() {
-            classes.push(' ');
-            classes.push_str(class);
-        }
-
-        classes
-    };
+    let classes = SidebarStyle {
+        side,
+        variant,
+        collapsible,
+    }
+    .with_class(class);
 
     view! {
         <aside
             class=classes
-            class:hidden=move || !context.is_open()
-            data-side=side
-            data-variant=variant
-            data-collapsible=collapsible
+            class:hidden=move || collapsible != SidebarCollapsible::None && !context.is_open() && context.is_mobile.get()
+            data-side=move || match side {
+                SidebarSide::Left => "left",
+                SidebarSide::Right => "right",
+            }
+            data-variant=move || match variant {
+                SidebarVariant::Sidebar => "sidebar",
+                SidebarVariant::Floating => "floating",
+                SidebarVariant::Inset => "inset",
+            }
+            data-collapsible=move || match collapsible {
+                SidebarCollapsible::Icon => "icon",
+                SidebarCollapsible::OffCanvas => "offcanvas",
+                SidebarCollapsible::None => "none",
+            }
         >
             {children()}
         </aside>
+    }
+    // data-state=move || match *context.is_open.read() {
+    //     true => "expanded",
+    //     false => "collapsed",
+    // }
+}
+
+/// A rail can be used to toggle the sidebar
+#[component]
+pub fn SidebarRail(#[prop(optional)] class: &'static str) -> impl IntoView {
+    let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
+
+    let classes = move || {
+        let mut classes =
+            "absolute top-0 right-0 h-full w-1 bg-sidebar-border cursor-ew-resize".to_string();
+        if !class.is_empty() {
+            classes.push(' ');
+            classes.push_str(class);
+        }
+        classes
+    };
+
+    view! {
+        <div
+            class=classes
+            on:click=move |_| context.set_open.update(|open| *open = !*open)
+        ></div>
+    }
+}
+
+/// Badge component for menu items
+#[component]
+pub fn SidebarMenuBadge(
+    #[prop(optional)] class: &'static str,
+    children: Children,
+) -> impl IntoView {
+    let classes = move || {
+        let mut classes = "ml-auto flex h-5 items-center justify-center rounded-full bg-sidebar-accent px-2 text-xs font-medium text-sidebar-accent-foreground".to_string();
+        if !class.is_empty() {
+            classes.push(' ');
+            classes.push_str(class);
+        }
+        classes
+    };
+
+    view! {
+        <span class=classes>
+            {children()}
+        </span>
     }
 }
 

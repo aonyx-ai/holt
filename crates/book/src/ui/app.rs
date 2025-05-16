@@ -2,7 +2,7 @@ use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::components::Router;
 
-use crate::components::Storybook;
+use crate::ui::components::Storybook;
 
 #[component]
 pub fn App() -> impl IntoView {

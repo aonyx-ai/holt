@@ -52,9 +52,10 @@ where
 
 inventory::collect!(&'static dyn Story);
 
+#[macro_export]
 macro_rules! register_story {
     ($name:ident, $title:expr) => {
-        impl crate::story::StoryNew for $name {
+        impl holt_book::StoryNew for $name {
             fn new() -> Self
             where
                 Self: Sized,
@@ -63,7 +64,7 @@ macro_rules! register_story {
             }
         }
 
-        impl crate::story::StoryMetadata for $name {
+        impl holt_book::StoryMetadata for $name {
             #[inline(always)]
             fn id() -> &'static str {
                 stringify!($name)
@@ -75,11 +76,9 @@ macro_rules! register_story {
             }
         }
 
-        inventory::submit!(&$name as &dyn crate::story::Story);
+        holt_book::submit!(&$name as &dyn holt_book::Story);
     };
 }
-
-pub(crate) use register_story;
 
 extern "C" {
     fn __wasm_call_ctors();

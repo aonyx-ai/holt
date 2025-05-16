@@ -1,7 +1,10 @@
-use crate::story::{register_story, StoryAsView};
+use holt_book::{register_story, StoryAsView};
 use holt_ui::visual::{Button, ButtonVariant, H1};
 use leptos::prelude::*;
 
+/// Represents a story for the Button component.
+///
+/// Buttons are for clicking
 struct ButtonStory;
 
 impl StoryAsView for ButtonStory {

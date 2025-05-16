@@ -5,13 +5,15 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+clap = { version = "4.5.38", features = ["derive"] }
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
 holt-ui = { path = "../ui" }
 inventory = "0.3.20"
 leptos = { workspace = true, features = ["csr"] }
-leptos_router = "0.7.3"
 leptos_meta = "0.7.3"
+leptos_router = "0.7.3"
 log = "0.4.22"
 paste = "1.0.15"
+serde_json = "1.0"
 tailwind_fuse = { version = "0.3.0", features = ["variant"] }

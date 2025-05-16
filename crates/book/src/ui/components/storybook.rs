@@ -6,7 +6,7 @@ use leptos_router::hooks::use_params;
 use leptos_router::params::Params;
 use leptos_router::path;
 
-use crate::story::Story;
+use crate::ui::story::Story;
 
 #[derive(Params, PartialEq)]
 struct StoryParams {

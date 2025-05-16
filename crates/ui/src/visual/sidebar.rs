@@ -56,7 +56,9 @@ pub fn Sidebar(
     // Handle the case when collapsible is None
     if collapsible == SidebarCollapsible::None {
         let simple_classes = move || {
-            let mut classes = "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground".to_string();
+            let mut classes =
+                "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground"
+                    .to_string();
             if !class.is_empty() {
                 classes.push(' ');
                 classes.push_str(class);
@@ -68,7 +70,8 @@ pub fn Sidebar(
             <div class=simple_classes>
                 {children()}
             </div>
-        }.into_any();
+        }
+        .into_any();
     }
 
     // Handle mobile view
@@ -110,11 +113,18 @@ pub fn Sidebar(
                     {children()}
                 </div>
             </div>
-        }.into_any();
+        }
+        .into_any();
     }
 
     // Desktop view
-    let state = move || if context.is_open() { "expanded" } else { "collapsed" };
+    let state = move || {
+        if context.is_open() {
+            "expanded"
+        } else {
+            "collapsed"
+        }
+    };
     let other_state = state.clone();
     let collapsible_value = move || {
         if other_state() == "collapsed" {
@@ -128,19 +138,15 @@ pub fn Sidebar(
         }
     };
 
-    let variant_value = move || {
-        match variant {
-            SidebarVariant::Sidebar => "sidebar",
-            SidebarVariant::Floating => "floating",
-            SidebarVariant::Inset => "inset",
-        }
+    let variant_value = move || match variant {
+        SidebarVariant::Sidebar => "sidebar",
+        SidebarVariant::Floating => "floating",
+        SidebarVariant::Inset => "inset",
     };
 
-    let side_value = move || {
-        match side {
-            SidebarSide::Left => "left",
-            SidebarSide::Right => "right",
-        }
+    let side_value = move || match side {
+        SidebarSide::Left => "left",
+        SidebarSide::Right => "right",
     };
 
     // Outer container classes
@@ -157,9 +163,11 @@ pub fn Sidebar(
         match variant {
             SidebarVariant::Floating | SidebarVariant::Inset => {
                 classes.push("group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+_theme(spacing.4))]".to_string());
-            },
+            }
             _ => {
-                classes.push("group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]".to_string());
+                classes.push(
+                    "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]".to_string(),
+                );
             }
         }
 
@@ -175,7 +183,7 @@ pub fn Sidebar(
         match side {
             SidebarSide::Left => {
                 classes.push("left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]".to_string());
-            },
+            }
             SidebarSide::Right => {
                 classes.push("right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]".to_string());
             }
@@ -184,7 +192,7 @@ pub fn Sidebar(
         match variant {
             SidebarVariant::Floating | SidebarVariant::Inset => {
                 classes.push("p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+theme(spacing.4)+2px)]".to_string());
-            },
+            }
             _ => {
                 classes.push("group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l".to_string());
             }
@@ -218,7 +226,8 @@ pub fn Sidebar(
                 </div>
             </div>
         </div>
-    }.into_any()
+    }
+    .into_any()
 }
 
 /// A rail can be used to toggle the sidebar
@@ -517,10 +526,7 @@ pub fn SidebarTrigger(#[prop(optional)] class: &'static str) -> impl IntoView {
 
 /// A component to provide content for an inset sidebar layout
 #[component]
-pub fn SidebarInset(
-    #[prop(optional)] class: &'static str,
-    children: Children,
-) -> impl IntoView {
+pub fn SidebarInset(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
     let classes = move || {
         let mut classes = "relative flex w-full flex-1 flex-col bg-background".to_string();
         classes.push_str(" md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow");

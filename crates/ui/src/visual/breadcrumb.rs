@@ -27,7 +27,10 @@ pub fn BreadcrumbList(#[prop(optional)] class: &'static str, children: Children)
             "flex flex-wrap items-center gap-1 overflow-hidden text-sm text-muted-foreground"
                 .to_string()
         } else {
-            format!("flex flex-wrap items-center gap-1 overflow-hidden text-sm text-muted-foreground {}", class)
+            format!(
+                "flex flex-wrap items-center gap-1 overflow-hidden text-sm text-muted-foreground {}",
+                class
+            )
         }
     };
 

@@ -1,10 +1,11 @@
 use holt_ui::behavior::*;
 use holt_ui::visual::*;
 use leptos::prelude::*;
-use leptos_router::components::{Route, Routes, A};
+use leptos_router::components::{A, Route, Routes};
 use leptos_router::hooks::use_params;
 use leptos_router::params::Params;
 use leptos_router::path;
+use phf::Map;
 
 use crate::ui::story::Story;
 
@@ -15,7 +16,7 @@ struct StoryParams {
 
 /// Main storybook layout component
 #[component]
-pub fn Storybook() -> impl IntoView {
+pub fn Storybook(docs: &'static Map<&'static str, &'static str>) -> impl IntoView {
     view! {
         <div class="flex h-screen w-screen overflow-hidden">
             <SidebarProvider>
@@ -36,7 +37,7 @@ pub fn Storybook() -> impl IntoView {
                     <div class="flex flex-1 flex-col gap-4 p-4 overflow-auto">
                         <Routes fallback=|| "not found">
                             <Route path=path!("/") view=|| "no story selected" />
-                            <Route path=path!("/story/:story_id") view=StorybookStory />
+                            <Route path=path!("/story/:story_id") view=move || view! { <StorybookStory docs={&docs} /> } />
                         </Routes>
                     </div>
                 </SidebarInset>
@@ -72,7 +73,7 @@ fn StorybookNavigation() -> impl IntoView {
 
 /// Component display area that shows the selected component and its variants
 #[component]
-fn StorybookStory() -> impl IntoView {
+fn StorybookStory(docs: &'static Map<&'static str, &'static str>) -> impl IntoView {
     let params = use_params::<StoryParams>();
 
     move || {
@@ -83,6 +84,8 @@ fn StorybookStory() -> impl IntoView {
             .and_then(|params| params.story_id.clone());
 
         if let Some(id) = id {
+            let docs = docs.get(&id).cloned();
+
             inventory::iter::<&'static dyn Story>
                 .into_iter()
                 .find(|story| story.id() == id)
@@ -95,7 +98,14 @@ fn StorybookStory() -> impl IntoView {
                         }
                         .into_any()
                     },
-                    |story| story.as_view().into_any(),
+                    |story| {
+                        view! {
+                            <p>{docs.as_ref().map_or("No docs", |docs| docs)}</p>
+
+                            {story.as_view()}
+                        }
+                        .into_any()
+                    },
                 )
         } else {
             view! {

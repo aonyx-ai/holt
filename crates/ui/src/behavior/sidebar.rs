@@ -1,6 +1,6 @@
 use leptos::children::Children;
-use leptos::web_sys::window;
 use leptos::web_sys::KeyboardEvent;
+use leptos::web_sys::window;
 use leptos::{ev, prelude::*};
 
 /// The sidebar context keeps state and behavior

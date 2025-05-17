@@ -1,21 +1,22 @@
 mod ui;
 
+use crate::ui::app::App;
+use crate::ui::story::init_story_registry;
 use leptos::mount::mount_to_body;
 use leptos::view;
-use crate::ui::story::init_story_registry;
-use crate::ui::app::App;
 
-pub use crate::ui::story::{StoryAsView, Story, StoryNew, StoryMetadata};
+pub use crate::ui::story::{Story, StoryAsView, StoryMetadata, StoryNew};
 pub use inventory::submit;
+pub use phf::Map;
 
-pub fn run_book() {
+pub fn run_book(story_docs: &'static Map<&'static str, &'static str>) {
     init_story_registry();
 
     // Set up logging
     let _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
 
-    mount_to_body(|| {
-        view! { <App /> }
+    mount_to_body(move || {
+        view! { <App docs=story_docs /> }
     })
 }

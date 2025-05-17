@@ -80,7 +80,7 @@ macro_rules! register_story {
     };
 }
 
-extern "C" {
+unsafe extern "C" {
     fn __wasm_call_ctors();
 }
 

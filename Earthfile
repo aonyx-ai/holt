@@ -71,19 +71,29 @@ pre-commit:
     BUILD +lint-rust
     BUILD +lint-yaml
 
+GENERATE_STORIES_DOCS:
+    FUNCTION
+
+    RUN cd crates/ui-book/ && cargo run -p holt-book run
+
 check-docs:
+    DO +GENERATE_STORIES_DOCS
     DO ./.earthly/rust+DOCS
 
 check-features:
+    DO +GENERATE_STORIES_DOCS
     DO ./.earthly/rust+FEATURES
 
 check-latest-deps:
+    DO +GENERATE_STORIES_DOCS
     DO ./.earthly/rust+DEPS_LATEST
 
 check-minimal-deps:
+    DO +GENERATE_STORIES_DOCS
     DO ./.earthly/rust+DEPS_MINIMAL
 
 check-msrv:
+    DO +GENERATE_STORIES_DOCS
     ARG MSRV="1.81.0"
     DO ./.earthly/rust+MSRV --MSRV="$MSRV"
 
@@ -97,6 +107,7 @@ format-markdown:
 
 format-rust:
     ARG FIX="false"
+    DO +GENERATE_STORIES_DOCS
     DO ./.earthly/rust+FORMAT --FIX="$FIX"
 
 format-toml:
@@ -111,6 +122,7 @@ lint-markdown:
     DO ./.earthly/markdown+LINT
 
 lint-rust:
+    DO +GENERATE_STORIES_DOCS
     DO ./.earthly/rust+LINT
 
 lint-yaml:
@@ -125,4 +137,5 @@ publish-crate:
     DO ./.earthly/rust+PUBLISH --CRATE="$CRATE"
 
 test-rust:
+    DO +GENERATE_STORIES_DOCS
     DO ./.earthly/rust+TEST

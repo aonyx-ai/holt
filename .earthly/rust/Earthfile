@@ -21,7 +21,7 @@ generate-stories-docs:
 GENERATE_STORIES_DOCS:
     FUNCTION
 
-    COPY +generate-stories-docs/stories_docs.rs /holt/crates/ui-book/
+    COPY +generate-stories-docs/stories_docs.rs /holt/crates/ui-book/src/
 
 CONTAINER:
     FUNCTION

@@ -94,7 +94,7 @@ check-minimal-deps:
     DO ./.earthly/rust+DEPS_MINIMAL
 
 check-msrv:
-    ARG MSRV="1.81.0"
+    ARG MSRV="1.85.0"
     DO ./.earthly/rust+MSRV --MSRV="$MSRV"
 
 format-json:

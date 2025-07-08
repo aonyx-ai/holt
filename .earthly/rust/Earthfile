@@ -46,6 +46,7 @@ DEPS_LATEST:
     FUNCTION
 
     DO +SOURCES
+    DO +GENERATE_STORIES_DOCS
 
     # Switch to beta toolchain
     RUN rustup default beta
@@ -61,6 +62,7 @@ DEPS_MINIMAL:
     FUNCTION
 
     DO +SOURCES
+    DO +GENERATE_STORIES_DOCS
 
     # Switch to nightly toolchain
     RUN rustup default nightly

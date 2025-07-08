@@ -127,6 +127,7 @@ MSRV:
     ARG MSRV
 
     FROM "rust:$MSRV-slim"
+    WORKDIR /holt
 
     # Initialize Rust
     DO rust+INIT --keep_fingerprints=true

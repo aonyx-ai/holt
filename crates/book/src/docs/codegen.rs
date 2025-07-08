@@ -22,7 +22,9 @@ impl CodeGenerator<StoryMetadata> for PhfMapGenerator {
         stories: Vec<StoryMetadata>,
         output_path: &Path,
     ) -> Result<(), Box<dyn Error>> {
-        let f = File::create(output_path)?;
+        let mut f = File::create(output_path)?;
+        f.flush()?;
+
         let mut codegen = phf_codegen::Map::new();
         codegen.phf_path("holt_book");
 

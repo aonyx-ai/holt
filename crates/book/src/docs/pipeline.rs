@@ -76,6 +76,8 @@ where
     }
 
     pub fn run(&self) -> Result<(), Box<dyn Error>> {
+        self.code_generator.ensure_file_exists(&self.output_path)?;
+
         self.generator.check_prerequisites()?;
 
         let doc_path = self.generator.generate()?;

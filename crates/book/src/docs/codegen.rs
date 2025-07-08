@@ -11,6 +11,9 @@ use crate::docs::extractor::StoryMetadata;
 pub trait CodeGenerator<T> {
     /// Generate code from the given input and write it to the specified output path
     fn generate(&self, input: Vec<T>, output_path: &Path) -> Result<(), Box<dyn Error>>;
+
+    /// Ensure that the output file exists
+    fn ensure_file_exists(&self, output_path: &Path) -> Result<(), Box<dyn Error>>;
 }
 
 /// Generator for PHF map of story documentation
@@ -22,8 +25,7 @@ impl CodeGenerator<StoryMetadata> for PhfMapGenerator {
         stories: Vec<StoryMetadata>,
         output_path: &Path,
     ) -> Result<(), Box<dyn Error>> {
-        let mut f = File::create(output_path)?;
-        f.flush()?;
+        let f = File::create(output_path)?;
 
         let mut codegen = phf_codegen::Map::new();
         codegen.phf_path("holt_book");
@@ -50,6 +52,11 @@ impl CodeGenerator<StoryMetadata> for PhfMapGenerator {
         f.write_all(buf.as_bytes())?;
 
         println!("Generated code at: {}", output_path.display());
+        Ok(())
+    }
+
+    fn ensure_file_exists(&self, output_path: &Path) -> Result<(), Box<dyn Error>> {
+        File::create(output_path)?;
         Ok(())
     }
 }

@@ -8,8 +8,12 @@ edition.workspace = true
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
 holt-ui = { path = "../ui" }
+icondata = { version = "0.6.0", default-features = false, features = [
+  "lucide",
+] }
 inventory = "0.3.20"
 leptos = { workspace = true, features = ["csr"] }
+leptos_icons = "0.6.1"
 leptos_router = { workspace = true }
 leptos_meta = { workspace = true }
 log = "0.4.22"

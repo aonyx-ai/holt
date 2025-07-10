@@ -21,9 +21,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             let output_path = PathBuf::from("src/stories_docs.rs");
 
             let pipeline = DocumentationPipeline::new(
-                RustdocGenerator::new(
-                    "json".to_string(),
-                ),
+                RustdocGenerator::new("json".to_string()),
                 DefaultRustdocParser,
                 DefaultStoryExtractor,
                 PhfMapGenerator,

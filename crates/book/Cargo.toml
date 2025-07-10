@@ -15,7 +15,7 @@ leptos_router = { workspace = true }
 leptos_meta = { workspace = true }
 log = "0.4.22"
 paste = "1.0.15"
-phf = { version = "0.11", default-features = false }
+phf = { version = "0.12", default-features = false }
 phf_codegen = "0.11"
 prettyplease = ">=0.2.25,<1"
 serde_json = ">=1.0.25,<2"

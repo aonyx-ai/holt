@@ -17,9 +17,9 @@ pub trait RustdocDataExtractor<T> {
 }
 
 /// Extractor specifically for Story implementations
-pub struct StoryExtractor;
+pub struct DefaultStoryExtractor;
 
-impl RustdocDataExtractor<StoryMetadata> for StoryExtractor {
+impl RustdocDataExtractor<StoryMetadata> for DefaultStoryExtractor {
     fn extract(&self, data: &RustdocData) -> Result<Vec<StoryMetadata>, Box<dyn Error>> {
         // Find the holt_book crate ID
         let holt_book_crate = data

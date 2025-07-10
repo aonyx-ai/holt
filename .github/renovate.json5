@@ -3,7 +3,7 @@
   extends: ["github>aonyx-rs/renovate-config"],
 
   dockerfile: {
-    fileMatch: ["^Earthfile$"],
+    fileMatch: ["Earthfile$"],
   },
 
   packageRules: [

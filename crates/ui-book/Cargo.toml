@@ -1,0 +1,10 @@
+[package]
+name = "holt-ui-book"
+
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+leptos = { workspace = true }
+holt-book = { path = "../book" }
+holt-ui = { path = "../ui" }

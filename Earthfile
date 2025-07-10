@@ -5,6 +5,16 @@ IMPORT github.com/earthly/lib/rust AS rust
 FROM rust:1.88.0-slim
 WORKDIR /holt
 
+root-rust-sources:
+    FROM scratch
+
+    COPY --keep-ts --if-exists Cargo.toml Cargo.lock ./
+    COPY --keep-ts --dir crates ./
+
+    SAVE ARTIFACT Cargo.toml
+    SAVE ARTIFACT Cargo.lock
+    SAVE ARTIFACT crates
+
 COPY_RUST_SOURCES:
     FUNCTION
 
@@ -84,7 +94,7 @@ check-minimal-deps:
     DO ./.earthly/rust+DEPS_MINIMAL
 
 check-msrv:
-    ARG MSRV="1.81.0"
+    ARG MSRV="1.85.0"
     DO ./.earthly/rust+MSRV --MSRV="$MSRV"
 
 format-json:

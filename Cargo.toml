@@ -7,14 +7,14 @@ resolver = "2"
 
 [workspace.package]
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 
 description = "A UI toolkit for Leptos"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/aonyx-rs/holt.git"
 
-# The transient dependencies `litemap` and `zerofrom` require at least 1.81.
-rust-version = "1.81"
+# Edition 2024 requires Rust 1.85 or later
+rust-version = "1.85"
 
 [workspace.dependencies]
 leptos = "0.8.0"

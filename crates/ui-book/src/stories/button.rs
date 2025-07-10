@@ -1,15 +1,16 @@
-use crate::story::{register_story, StoryAsView};
-use holt_ui::visual::{Button, ButtonVariant, H1};
+use holt_book::{StoryAsView, register_story};
+use holt_ui::visual::{Button, ButtonVariant};
 use leptos::prelude::*;
 
+/// Button
+///
+/// Buttons are for clicking
 struct ButtonStory;
 
 impl StoryAsView for ButtonStory {
     fn as_view(&self) -> AnyView {
         view! {
             <>
-                <H1>Variants</H1>
-
                 <p>Default</p>
                 <Button class="w-32">"Click me!"</Button>
 

@@ -210,7 +210,7 @@ mod tests {
             self.responses.get(&key).cloned().ok_or_else(|| {
                 std::io::Error::new(
                     std::io::ErrorKind::NotFound,
-                    format!("Command not found: {}", key),
+                    format!("Command not found: {key}"),
                 )
             })
         }

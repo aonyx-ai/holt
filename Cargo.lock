@@ -711,7 +711,9 @@ version = "0.0.0"
 dependencies = [
  "holt-book",
  "holt-ui",
+ "icondata",
  "leptos",
+ "leptos_icons",
 ]
 
 [[package]]

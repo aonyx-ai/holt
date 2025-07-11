@@ -8,3 +8,7 @@ edition.workspace = true
 leptos = { workspace = true }
 holt-book = { path = "../book" }
 holt-ui = { path = "../ui" }
+leptos_icons = "0.6.1"
+icondata = { version = "0.6.0", default-features = false, features = [
+  "lucide",
+] }

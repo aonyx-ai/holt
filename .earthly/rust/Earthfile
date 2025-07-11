@@ -26,7 +26,7 @@ GENERATE_STORIES_DOCS:
 CONTAINER:
     FUNCTION
 
-    FROM rust:1.85.1-slim
+    FROM rust:1.88.0-slim
     WORKDIR /holt
 
     # Initialize Rust

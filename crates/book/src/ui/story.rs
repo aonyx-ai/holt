@@ -85,6 +85,7 @@ unsafe extern "C" {
 }
 
 pub fn init_story_registry() {
+    #[cfg(target_family = "wasm")]
     unsafe {
         __wasm_call_ctors();
     }

@@ -699,9 +699,7 @@ dependencies = [
 name = "holt-ui"
 version = "0.0.0"
 dependencies = [
- "icondata",
  "leptos",
- "leptos_icons",
  "tailwind_fuse",
 ]
 

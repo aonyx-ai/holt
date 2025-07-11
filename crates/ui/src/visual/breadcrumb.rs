@@ -8,7 +8,7 @@ pub fn Breadcrumb(#[prop(optional)] class: &'static str, children: Children) -> 
         if class.is_empty() {
             "flex".to_string()
         } else {
-            format!("flex {}", class)
+            format!("flex {class}")
         }
     };
 
@@ -28,8 +28,7 @@ pub fn BreadcrumbList(#[prop(optional)] class: &'static str, children: Children)
                 .to_string()
         } else {
             format!(
-                "flex flex-wrap items-center gap-1 overflow-hidden text-sm text-muted-foreground {}",
-                class
+                "flex flex-wrap items-center gap-1 overflow-hidden text-sm text-muted-foreground {class}"
             )
         }
     };
@@ -48,7 +47,7 @@ pub fn BreadcrumbItem(#[prop(optional)] class: &'static str, children: Children)
         if class.is_empty() {
             "inline-flex items-center gap-1".to_string()
         } else {
-            format!("inline-flex items-center gap-1 {}", class)
+            format!("inline-flex items-center gap-1 {class}")
         }
     };
 
@@ -70,7 +69,7 @@ pub fn BreadcrumbLink(
         if class.is_empty() {
             "transition-colors hover:text-foreground".to_string()
         } else {
-            format!("transition-colors hover:text-foreground {}", class)
+            format!("transition-colors hover:text-foreground {class}")
         }
     };
 
@@ -88,7 +87,7 @@ pub fn BreadcrumbPage(#[prop(optional)] class: &'static str, children: Children)
         if class.is_empty() {
             "font-medium text-foreground".to_string()
         } else {
-            format!("font-medium text-foreground {}", class)
+            format!("font-medium text-foreground {class}")
         }
     };
 
@@ -106,7 +105,7 @@ pub fn BreadcrumbSeparator(#[prop(optional)] class: &'static str) -> impl IntoVi
         if class.is_empty() {
             "mx-1 text-muted-foreground".to_string()
         } else {
-            format!("mx-1 text-muted-foreground {}", class)
+            format!("mx-1 text-muted-foreground {class}")
         }
     };
 

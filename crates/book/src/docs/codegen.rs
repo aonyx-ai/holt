@@ -83,7 +83,7 @@ impl CodeGenerator<StoryMetadata> for PhfMapGenerator {
 
         let map_tokens: TokenStream = codegen.build().to_string().parse().map_err(|e| {
             CodegenError::TokenGenerationFailed {
-                reason: format!("Failed to parse PHF map tokens: {}", e),
+                reason: format!("Failed to parse PHF map tokens: {e}"),
             }
         })?;
 

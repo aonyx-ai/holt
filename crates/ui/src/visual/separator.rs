@@ -28,7 +28,7 @@ pub fn Separator(
         if class.is_empty() {
             base_class.to_string()
         } else {
-            format!("{} {}", base_class, class)
+            format!("{base_class} {class}")
         }
     };
 

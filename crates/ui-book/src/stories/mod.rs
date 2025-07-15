@@ -1,1 +1,2 @@
+mod badge;
 mod button;

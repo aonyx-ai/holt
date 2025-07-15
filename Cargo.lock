@@ -688,9 +688,7 @@ dependencies = [
 name = "holt-ui"
 version = "0.0.0"
 dependencies = [
- "icondata",
  "leptos",
- "leptos_icons",
  "tailwind_fuse",
 ]
 
@@ -700,7 +698,9 @@ version = "0.0.0"
 dependencies = [
  "holt-book",
  "holt-ui",
+ "icondata",
  "leptos",
+ "leptos_icons",
 ]
 
 [[package]]

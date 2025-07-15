@@ -7,7 +7,3 @@ edition.workspace = true
 [dependencies]
 leptos = { workspace = true }
 tailwind_fuse = { version = "0.3.0", features = ["variant"] }
-icondata = { version = "0.6.0", default-features = false, features = [
-  "lucide",
-] }
-leptos_icons = "0.6.1"

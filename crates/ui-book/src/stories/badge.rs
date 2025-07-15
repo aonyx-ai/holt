@@ -1,4 +1,4 @@
-use crate::story::{register_story, StoryAsView};
+use holt_book::{StoryAsView, register_story};
 use holt_ui::visual::{Badge, BadgeVariant, H1, H2};
 use leptos::prelude::*;
 use leptos_icons::Icon;

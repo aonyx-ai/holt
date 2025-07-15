@@ -89,6 +89,7 @@ impl CodeGenerator<StoryMetadata> for PhfMapGenerator {
 
         // Use quote macro for generating the full static definition
         let tokens = quote! {
+            #[rustfmt::skip]
             pub static STORY_DOCS: holt_book::Map<&'static str, &'static str> = #map_tokens;
         };
 

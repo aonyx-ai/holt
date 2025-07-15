@@ -60,5 +60,9 @@ pub fn Button(
         element.get().map(|el| el.dispatch_event(&e));
     };
 
-    view! { <button on:click=on_click node_ref=element class=final_class>{children()}</button> }
+    view! {
+        <button on:click=on_click node_ref=element class=final_class>
+            {children()}
+        </button>
+    }
 }

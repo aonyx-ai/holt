@@ -66,11 +66,7 @@ pub fn Sidebar(
             classes
         };
 
-        return view! {
-            <div class=simple_classes>
-                {children()}
-            </div>
-        }
+        return view! { <div class=simple_classes>{children()}</div> }
         .into_any();
     }
 
@@ -109,9 +105,7 @@ pub fn Sidebar(
                 class=mobile_classes
                 style="var(--sidebar-width): SIDEBAR_WIDTH_MOBILE"
             >
-                <div class="flex h-full w-full flex-col">
-                    {children()}
-                </div>
+                <div class="flex h-full w-full flex-col">{children()}</div>
             </div>
         }
         .into_any();
@@ -245,12 +239,7 @@ pub fn SidebarRail(#[prop(optional)] class: &'static str) -> impl IntoView {
         classes
     };
 
-    view! {
-        <div
-            class=classes
-            on:click=move |_| context.set_open.update(|open| *open = !*open)
-        ></div>
-    }
+    view! { <div class=classes on:click=move |_| context.set_open.update(|open| *open = !*open)></div> }
 }
 
 /// Badge component for menu items
@@ -268,11 +257,7 @@ pub fn SidebarMenuBadge(
         classes
     };
 
-    view! {
-        <span class=classes>
-            {children()}
-        </span>
-    }
+    view! { <span class=classes>{children()}</span> }
 }
 
 /// The header component of the sidebar, shown at the top
@@ -289,11 +274,7 @@ pub fn SidebarHeader(#[prop(optional)] class: &'static str, children: Children) 
         classes
     };
 
-    view! {
-        <div class=classes>
-            {children()}
-        </div>
-    }
+    view! { <div class=classes>{children()}</div> }
 }
 
 /// The content area of the sidebar, typically containing groups and navigation items
@@ -308,11 +289,7 @@ pub fn SidebarContent(#[prop(optional)] class: &'static str, children: Children)
         classes
     };
 
-    view! {
-        <div class=classes>
-            {children()}
-        </div>
-    }
+    view! { <div class=classes>{children()}</div> }
 }
 
 /// A group within the sidebar content, used to organize menu items
@@ -327,11 +304,7 @@ pub fn SidebarGroup(#[prop(optional)] class: &'static str, children: Children) -
         classes
     };
 
-    view! {
-        <div class=classes>
-            {children()}
-        </div>
-    }
+    view! { <div class=classes>{children()}</div> }
 }
 
 /// A label for a sidebar group
@@ -349,11 +322,7 @@ pub fn SidebarGroupLabel(
         classes
     };
 
-    view! {
-        <h3 class=classes>
-            {children()}
-        </h3>
-    }
+    view! { <h3 class=classes>{children()}</h3> }
 }
 
 /// Content container for sidebar group items
@@ -371,11 +340,7 @@ pub fn SidebarGroupContent(
         classes
     };
 
-    view! {
-        <div class=classes>
-            {children()}
-        </div>
-    }
+    view! { <div class=classes>{children()}</div> }
 }
 
 /// A menu component within the sidebar
@@ -390,11 +355,7 @@ pub fn SidebarMenu(#[prop(optional)] class: &'static str, children: Children) ->
         classes
     };
 
-    view! {
-        <nav class=classes>
-            {children()}
-        </nav>
-    }
+    view! { <nav class=classes>{children()}</nav> }
 }
 
 /// A menu item within the sidebar menu
@@ -409,11 +370,7 @@ pub fn SidebarMenuItem(#[prop(optional)] class: &'static str, children: Children
         classes
     };
 
-    view! {
-        <div class=classes>
-            {children()}
-        </div>
-    }
+    view! { <div class=classes>{children()}</div> }
 }
 
 /// A button within a sidebar menu item
@@ -439,10 +396,7 @@ pub fn SidebarMenuButton(
     };
 
     view! {
-        <button
-            class=classes
-            data-active=move || if is_active { "true" } else { "false" }
-        >
+        <button class=classes data-active=move || if is_active { "true" } else { "false" }>
             {children()}
         </button>
     }
@@ -462,11 +416,7 @@ pub fn SidebarFooter(#[prop(optional)] class: &'static str, children: Children) 
         classes
     };
 
-    view! {
-        <div class=classes>
-            {children()}
-        </div>
-    }
+    view! { <div class=classes>{children()}</div> }
 }
 
 /// A separator line within the sidebar
@@ -481,9 +431,7 @@ pub fn SidebarSeparator(#[prop(optional)] class: &'static str) -> impl IntoView 
         classes
     };
 
-    view! {
-        <div class=classes></div>
-    }
+    view! { <div class=classes></div> }
 }
 
 /// A button that toggles the sidebar visibility
@@ -539,9 +487,5 @@ pub fn SidebarInset(#[prop(optional)] class: &'static str, children: Children) -
         classes
     };
 
-    view! {
-        <main class=classes>
-            {children()}
-        </main>
-    }
+    view! { <main class=classes>{children()}</main> }
 }

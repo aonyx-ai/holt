@@ -37,11 +37,5 @@ pub fn Separator(
         Orientation::Vertical => "vertical",
     };
 
-    view! {
-        <div
-            class=classes
-            role="separator"
-            aria-orientation=orientation_attr
-        />
-    }
+    view! { <div class=classes role="separator" aria-orientation=orientation_attr /> }
 }

@@ -692,16 +692,23 @@ dependencies = [
  "syn",
  "tailwind_fuse",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.12",
+]
+
+[[package]]
+name = "holt-story-macro"
+version = "0.0.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "venial",
 ]
 
 [[package]]
 name = "holt-ui"
 version = "0.0.0"
 dependencies = [
- "icondata",
  "leptos",
- "leptos_icons",
  "tailwind_fuse",
 ]
 
@@ -710,8 +717,11 @@ name = "holt-ui-book"
 version = "0.0.0"
 dependencies = [
  "holt-book",
+ "holt-story-macro",
  "holt-ui",
+ "icondata",
  "leptos",
+ "leptos_icons",
 ]
 
 [[package]]
@@ -1457,9 +1467,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.94"
+version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a31971752e70b8b2686d7e46ec17fb38dad4051d94024c88df49b667caea9c84"
+checksum = "02b3e5e68a3a1a02aad3ec490a98007cbc13c37cbe84a3cd7b8e406d76e7f778"
 dependencies = [
  "unicode-ident",
 ]
@@ -2134,6 +2144,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "458f7a779bf54acc9f347480ac654f68407d3aab21269a6e3c9f922acd9e2da9"
 dependencies = [
  "getrandom 0.3.2",
+]
+
+[[package]]
+name = "venial"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a42528baceab6c7784446df2a10f4185078c39bf73dc614f154353f1a6b1229"
+dependencies = [
+ "proc-macro2",
+ "quote",
 ]
 
 [[package]]

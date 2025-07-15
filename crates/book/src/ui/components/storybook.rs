@@ -7,6 +7,7 @@ use leptos_router::params::Params;
 use leptos_router::path;
 use phf::Map;
 
+use crate::ui::story::StoryAsView;
 use crate::ui::story::Story;
 
 #[derive(Params, PartialEq)]
@@ -37,7 +38,10 @@ pub fn Storybook(docs: &'static Map<&'static str, &'static str>) -> impl IntoVie
                     <div class="flex flex-1 flex-col gap-4 p-4 overflow-auto">
                         <Routes fallback=|| "not found">
                             <Route path=path!("/") view=|| "no story selected" />
-                            <Route path=path!("/story/:story_id") view=move || view! { <StorybookStory docs={&docs} /> } />
+                            <Route
+                                path=path!("/story/:story_id")
+                                view=move || view! { <StorybookStory docs=&docs /> }
+                            />
                         </Routes>
                     </div>
                 </SidebarInset>
@@ -53,19 +57,22 @@ fn StorybookNavigation() -> impl IntoView {
         <nav class="space-y-1">
             <h2 class="mb-2 text-lg font-semibold">Stories</h2>
             <ul class="space-y-1">
-                { inventory::iter::<&'static dyn Story>.into_iter().map(|story| {
-                    view! {
-                        <li>
-                            <A
-                                href=move || format!("/story/{}", story.id())
-                                {..}
-                                class="block px-2 py-1 rounded hover:bg-muted"
-                            >
-                                {story.title()}
-                            </A>
-                        </li>
-                    }
-                }).collect_view() }
+                {inventory::iter::<Story>
+                    .into_iter()
+                    .map(|story| {
+                        view! {
+                            <li>
+                                <A
+                                    href=move || format!("/story/{}", story.id)
+                                    {..}
+                                    class="block px-2 py-1 rounded hover:bg-muted"
+                                >
+                                    {story.name}
+                                </A>
+                            </li>
+                        }
+                    })
+                    .collect_view()}
             </ul>
         </nav>
     }
@@ -86,9 +93,9 @@ fn StorybookStory(docs: &'static Map<&'static str, &'static str>) -> impl IntoVi
         if let Some(id) = id {
             let docs = docs.get(&id).cloned();
 
-            inventory::iter::<&'static dyn Story>
+            inventory::iter::<Story>
                 .into_iter()
-                .find(|story| story.id() == id)
+                .find(|story| story.id == id)
                 .map_or_else(
                     || {
                         view! {

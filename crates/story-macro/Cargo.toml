@@ -1,0 +1,13 @@
+[package]
+name = "holt-story-macro"
+
+version.workspace = true
+edition.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+venial = "0.6"
+quote = "1.0"
+proc-macro2 = "1.0"

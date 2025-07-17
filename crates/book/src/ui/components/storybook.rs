@@ -7,7 +7,6 @@ use leptos_router::params::Params;
 use leptos_router::path;
 
 use crate::ui::story::Story;
-use crate::ui::story::StoryAsView;
 
 #[derive(Params, PartialEq)]
 struct StoryParams {
@@ -104,7 +103,7 @@ fn StorybookStory() -> impl IntoView {
                     },
                     |story| {
                         view! {
-                            {story.as_view()}
+                            <StoryVariantDisplay story=story />
                         }
                         .into_any()
                     },
@@ -117,5 +116,46 @@ fn StorybookStory() -> impl IntoView {
             }
             .into_any()
         }
+    }
+}
+
+/// Component for displaying story variants with selection
+#[component]
+fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
+    let (selected_variant, set_selected_variant) = signal(0);
+
+    let variants = story.variants;
+
+    view! {
+        <div>
+            <h1>{story.name}</h1>
+            {story.description.map(|desc| view! { <p>{desc}</p> })}
+            <div>
+                <select on:change=move |ev| {
+                    let value = event_target_value(&ev);
+                    if let Ok(index) = value.parse::<usize>() {
+                        set_selected_variant.set(index);
+                    }
+                }>
+                    {variants.iter().enumerate().map(|(i, variant)| {
+                        view! {
+                            <option value=i.to_string() selected=move || selected_variant.get() == i>
+                                {variant.name}
+                            </option>
+                        }
+                    }).collect::<Vec<_>>()}
+                </select>
+            </div>
+            <div>
+                {move || {
+                    let index = selected_variant.get();
+                    if let Some(variant) = variants.get(index) {
+                        (variant.view)()
+                    } else {
+                        view! { <div>"No variant selected"</div> }.into_any()
+                    }
+                }}
+            </div>
+        </div>
     }
 }

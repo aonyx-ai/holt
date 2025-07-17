@@ -1,8 +1,4 @@
-use leptos::{prelude::*, view};
-
-pub trait StoryAsView {
-    fn as_view(&self) -> AnyView;
-}
+use leptos::prelude::*;
 
 pub struct StoryVariant {
     pub name: &'static str,
@@ -14,48 +10,6 @@ pub struct Story {
     pub name: &'static str,
     pub description: Option<&'static str>,
     pub variants: &'static [&'static StoryVariant],
-}
-
-impl StoryAsView for Story {
-    fn as_view(&self) -> AnyView {
-        let (selected_variant, set_selected_variant) = signal(0);
-
-        let variants = self.variants;
-
-        view! {
-            <div>
-                <h1>{self.name}</h1>
-                {self.description.map(|desc| view! { <p>{desc}</p> })}
-                <div>
-                    <select on:change=move |ev| {
-                        let value = event_target_value(&ev);
-                        if let Ok(index) = value.parse::<usize>() {
-                            set_selected_variant.set(index);
-                        }
-                    }>
-                        {variants.iter().enumerate().map(|(i, variant)| {
-                            view! {
-                                <option value=i.to_string() selected=move || selected_variant.get() == i>
-                                    {variant.name}
-                                </option>
-                            }
-                        }).collect::<Vec<_>>()}
-                    </select>
-                </div>
-                <div>
-                    {move || {
-                        let index = selected_variant.get();
-                        if let Some(variant) = variants.get(index) {
-                            (variant.view)()
-                        } else {
-                            view! { <div>"No variant selected"</div> }.into_any()
-                        }
-                    }}
-                </div>
-            </div>
-        }
-        .into_any()
-    }
 }
 
 inventory::collect!(&'static Story);

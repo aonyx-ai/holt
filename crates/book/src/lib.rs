@@ -5,7 +5,7 @@ use crate::ui::story::init_story_registry;
 use leptos::mount::mount_to_body;
 use leptos::view;
 
-pub use crate::ui::story::{Story, StoryAsView, StoryVariant};
+pub use crate::ui::story::{Story, StoryVariant};
 pub use inventory::submit;
 
 pub fn run_book() {

@@ -6,7 +6,7 @@ use phf::Map;
 use crate::ui::components::Storybook;
 
 #[component]
-pub fn App(docs: &'static Map<&'static str, &'static str>) -> impl IntoView {
+pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
@@ -21,7 +21,7 @@ pub fn App(docs: &'static Map<&'static str, &'static str>) -> impl IntoView {
         <Meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <Router>
-            <Storybook docs=docs />
+            <Storybook />
         </Router>
     }
 }

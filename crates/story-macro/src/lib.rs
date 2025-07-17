@@ -1,6 +1,6 @@
-use quote::quote;
 use proc_macro::TokenStream as TS1;
 use proc_macro2::{TokenStream, TokenTree};
+use quote::quote;
 use venial::{AttributeValue, Constant, Item, parse_item};
 
 #[proc_macro_attribute]
@@ -16,7 +16,9 @@ pub fn story(whatever: TS1, body: TS1) -> TS1 {
     let mut docs = Vec::new();
 
     parsed_body.attributes().iter().for_each(|attr| {
-        if let Some(TokenTree::Ident(x)) = attr.path.first() && *x != "doc" {
+        if let Some(TokenTree::Ident(x)) = attr.path.first()
+            && *x != "doc"
+        {
             return;
         }
 
@@ -35,5 +37,6 @@ pub fn story(whatever: TS1, body: TS1) -> TS1 {
         #ts2_ts
 
         holt_book::submit!(#const_name);
-    }.into()
+    }
+    .into()
 }

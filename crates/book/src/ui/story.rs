@@ -71,8 +71,8 @@ pub fn init_story_registry() {
 
 #[cfg(test)]
 mod test {
-    use crate::StoryVariant;
     use crate::Story;
+    use crate::StoryVariant;
 
     #[test]
     fn ensure_story_send_sync() {

@@ -66,8 +66,7 @@ pub fn Sidebar(
             classes
         };
 
-        return view! { <div class=simple_classes>{children()}</div> }
-        .into_any();
+        return view! { <div class=simple_classes>{children()}</div> }.into_any();
     }
 
     // Handle mobile view

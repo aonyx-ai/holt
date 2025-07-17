@@ -7,8 +7,8 @@ use leptos_router::params::Params;
 use leptos_router::path;
 use phf::Map;
 
-use crate::ui::story::StoryAsView;
 use crate::ui::story::Story;
+use crate::ui::story::StoryAsView;
 
 #[derive(Params, PartialEq)]
 struct StoryParams {
@@ -17,7 +17,7 @@ struct StoryParams {
 
 /// Main storybook layout component
 #[component]
-pub fn Storybook(docs: &'static Map<&'static str, &'static str>) -> impl IntoView {
+pub fn Storybook() -> impl IntoView {
     view! {
         <div class="flex h-screen w-screen overflow-hidden">
             <SidebarProvider>
@@ -40,7 +40,7 @@ pub fn Storybook(docs: &'static Map<&'static str, &'static str>) -> impl IntoVie
                             <Route path=path!("/") view=|| "no story selected" />
                             <Route
                                 path=path!("/story/:story_id")
-                                view=move || view! { <StorybookStory docs=&docs /> }
+                                view=move || view! { <StorybookStory /> }
                             />
                         </Routes>
                     </div>
@@ -80,7 +80,7 @@ fn StorybookNavigation() -> impl IntoView {
 
 /// Component display area that shows the selected component and its variants
 #[component]
-fn StorybookStory(docs: &'static Map<&'static str, &'static str>) -> impl IntoView {
+fn StorybookStory() -> impl IntoView {
     let params = use_params::<StoryParams>();
 
     move || {
@@ -91,8 +91,6 @@ fn StorybookStory(docs: &'static Map<&'static str, &'static str>) -> impl IntoVi
             .and_then(|params| params.story_id.clone());
 
         if let Some(id) = id {
-            let docs = docs.get(&id).cloned();
-
             inventory::iter::<Story>
                 .into_iter()
                 .find(|story| story.id == id)
@@ -107,7 +105,7 @@ fn StorybookStory(docs: &'static Map<&'static str, &'static str>) -> impl IntoVi
                     },
                     |story| {
                         view! {
-                            <p>{docs.as_ref().map_or("No docs", |docs| docs)}</p>
+                            <p>"wip"</p>
 
                             {story.as_view()}
                         }

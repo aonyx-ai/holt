@@ -8,6 +8,10 @@ edition.workspace = true
 proc-macro = true
 
 [dependencies]
-venial = "0.6"
+syn = { version = ">=2.0.95,<3", default-features = false, features = [
+  "parsing",
+  "full",
+  "proc-macro",
+] }
 quote = "1.0"
 proc-macro2 = "1.0"

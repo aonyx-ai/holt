@@ -701,7 +701,7 @@ version = "0.0.0"
 dependencies = [
  "proc-macro2",
  "quote",
- "venial",
+ "syn",
 ]
 
 [[package]]
@@ -2144,16 +2144,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "458f7a779bf54acc9f347480ac654f68407d3aab21269a6e3c9f922acd9e2da9"
 dependencies = [
  "getrandom 0.3.2",
-]
-
-[[package]]
-name = "venial"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a42528baceab6c7784446df2a10f4185078c39bf73dc614f154353f1a6b1229"
-dependencies = [
- "proc-macro2",
- "quote",
 ]
 
 [[package]]

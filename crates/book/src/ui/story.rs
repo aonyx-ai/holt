@@ -12,6 +12,7 @@ pub struct StoryVariant {
 pub struct Story {
     pub id: &'static str,
     pub name: &'static str,
+    pub description: Option<&'static str>,
     pub variants: &'static [&'static StoryVariant],
 }
 
@@ -24,6 +25,7 @@ impl StoryAsView for Story {
         view! {
             <div>
                 <h1>{self.name}</h1>
+                {self.description.map(|desc| view! { <p>{desc}</p> })}
                 <div>
                     <select on:change=move |ev| {
                         let value = event_target_value(&ev);
@@ -56,7 +58,7 @@ impl StoryAsView for Story {
     }
 }
 
-inventory::collect!(Story);
+inventory::collect!(&'static Story);
 
 unsafe extern "C" {
     fn __wasm_call_ctors();

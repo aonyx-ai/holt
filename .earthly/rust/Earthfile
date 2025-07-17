@@ -2,27 +2,6 @@ VERSION 0.8
 
 IMPORT github.com/earthly/lib/rust AS rust
 
-generate-stories-docs:
-    FROM rustlang/rust:nightly-slim
-    WORKDIR /holt
-
-    DO rust+INIT --keep_fingerprints=true
-
-    COPY --keep-ts --if-exists ../../+root-rust-sources/Cargo.toml .
-    COPY --keep-ts --if-exists ../../+root-rust-sources/Cargo.lock .
-    COPY --keep-ts --dir ../../+root-rust-sources/crates crates
-
-    WORKDIR /holt/crates/ui-book/
-
-    RUN cargo run -p holt-book run
-
-    SAVE ARTIFACT /holt/crates/ui-book/src/stories_docs.rs
-
-GENERATE_STORIES_DOCS:
-    FUNCTION
-
-    COPY +generate-stories-docs/stories_docs.rs /holt/crates/ui-book/src/
-
 CONTAINER:
     FUNCTION
 
@@ -46,7 +25,6 @@ DEPS_LATEST:
     FUNCTION
 
     DO +SOURCES
-    DO +GENERATE_STORIES_DOCS
 
     # Switch to beta toolchain
     RUN rustup default beta
@@ -62,7 +40,6 @@ DEPS_MINIMAL:
     FUNCTION
 
     DO +SOURCES
-    DO +GENERATE_STORIES_DOCS
 
     # Switch to nightly toolchain
     RUN rustup default nightly
@@ -77,7 +54,6 @@ DOCS:
     FUNCTION
 
     DO +SOURCES
-    DO +GENERATE_STORIES_DOCS
 
     # Generate the documentation
     DO rust+CARGO --args="doc --all-features --no-deps" --output="doc/.+"
@@ -89,7 +65,6 @@ FEATURES:
     FUNCTION
 
     DO +SOURCES
-    DO +GENERATE_STORIES_DOCS
 
     # Install cargo-hack
     DO rust+CARGO --args="install cargo-hack"
@@ -103,7 +78,6 @@ FORMAT:
     ARG FIX="false"
 
     DO +SOURCES
-    DO +GENERATE_STORIES_DOCS
 
     # Check or fix the formatting of the source code
     IF [ "$FIX" = "true" ]
@@ -116,7 +90,6 @@ LINT:
     FUNCTION
 
     DO +SOURCES
-    DO +GENERATE_STORIES_DOCS
 
     # Check the code for linting errors
     DO rust+CARGO --args="clippy --workspace --all-targets --all-features -- -D warnings"
@@ -134,7 +107,6 @@ MSRV:
 
     # Copy the source code in a cache-friendly way
     DO +COPY_RUST_SOURCES
-    DO +GENERATE_STORIES_DOCS
 
     # Check that the project compiles with the MSRV
     DO rust+CARGO --args="+$MSRV check --workspace --all-features --all-targets"
@@ -145,7 +117,6 @@ PUBLISH:
     ARG CRATE=""
 
     DO +SOURCES
-    DO +GENERATE_STORIES_DOCS
 
     # Copy additional files for the release into the container
     COPY README.md .
@@ -172,7 +143,6 @@ TEST:
 
     # Copy the source code in a cache-friendly way
     DO +SOURCES
-    DO +GENERATE_STORIES_DOCS
 
     # Run the tests and measure the code coverage
     DO rust+CARGO --args="test --workspace --all-features --all-targets --locked"

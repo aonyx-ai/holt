@@ -56,7 +56,7 @@ fn StorybookNavigation() -> impl IntoView {
         <nav class="space-y-1">
             <h2 class="mb-2 text-lg font-semibold">Stories</h2>
             <ul class="space-y-1">
-                {inventory::iter::<Story>
+                {inventory::iter::<&'static Story>
                     .into_iter()
                     .map(|story| {
                         view! {
@@ -90,7 +90,7 @@ fn StorybookStory() -> impl IntoView {
             .and_then(|params| params.story_id.clone());
 
         if let Some(id) = id {
-            inventory::iter::<Story>
+            inventory::iter::<&'static Story>
                 .into_iter()
                 .find(|story| story.id == id)
                 .map_or_else(
@@ -104,8 +104,6 @@ fn StorybookStory() -> impl IntoView {
                     },
                     |story| {
                         view! {
-                            <p>"wip"</p>
-
                             {story.as_view()}
                         }
                         .into_any()

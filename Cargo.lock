@@ -675,8 +675,6 @@ dependencies = [
  "phf",
  "phf_codegen",
  "prettyplease",
- "proc-macro2",
- "quote",
  "serde_json",
  "syn",
  "tailwind_fuse",

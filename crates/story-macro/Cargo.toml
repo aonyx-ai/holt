@@ -13,8 +13,8 @@ syn = { version = ">=2.0.95,<3", default-features = false, features = [
   "full",
   "proc-macro",
 ] }
-quote = "1.0"
-proc-macro2 = "1.0"
+quote = ">=1.0.35,<2"
+proc-macro2 = ">=1.0.91, <2"
 
 [dev-dependencies]
 holt-book = { path = "../book" }

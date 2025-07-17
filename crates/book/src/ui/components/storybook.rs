@@ -5,7 +5,6 @@ use leptos_router::components::{A, Route, Routes};
 use leptos_router::hooks::use_params;
 use leptos_router::params::Params;
 use leptos_router::path;
-use phf::Map;
 
 use crate::ui::story::Story;
 use crate::ui::story::StoryAsView;

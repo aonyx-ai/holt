@@ -1,7 +1,6 @@
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::components::Router;
-use phf::Map;
 
 use crate::ui::components::Storybook;
 

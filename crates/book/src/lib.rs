@@ -7,7 +7,6 @@ use leptos::view;
 
 pub use crate::ui::story::{Story, StoryAsView, StoryVariant};
 pub use inventory::submit;
-pub use phf::Map;
 
 pub fn run_book() {
     init_story_registry();

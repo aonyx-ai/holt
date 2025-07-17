@@ -688,6 +688,8 @@ dependencies = [
 name = "holt-story-macro"
 version = "0.0.0"
 dependencies = [
+ "holt-book",
+ "leptos",
  "proc-macro2",
  "quote",
  "syn",

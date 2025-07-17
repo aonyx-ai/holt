@@ -3,8 +3,8 @@ use holt_story_macro::story;
 use holt_ui::visual::{Button, ButtonVariant};
 use leptos::prelude::*;
 
-#[story(id = "button", name = "Button")]
 /// Buttons are for clicking and doing button things
+#[story(id = "button", name = "Button")]
 const BUTTON_STORY: &[&StoryVariant] = &[
     &StoryVariant {
         name: "Default",

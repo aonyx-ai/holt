@@ -19,5 +19,3 @@ node_modules/
 
 dist/
 .idea/
-
-crates/ui-book/src/stories_docs.rs

@@ -33,11 +33,7 @@ pub fn BreadcrumbList(#[prop(optional)] class: &'static str, children: Children)
         }
     };
 
-    view! {
-        <ol class=classes>
-            {children()}
-        </ol>
-    }
+    view! { <ol class=classes>{children()}</ol> }
 }
 
 /// A single breadcrumb item
@@ -51,11 +47,7 @@ pub fn BreadcrumbItem(#[prop(optional)] class: &'static str, children: Children)
         }
     };
 
-    view! {
-        <li class=classes>
-            {children()}
-        </li>
-    }
+    view! { <li class=classes>{children()}</li> }
 }
 
 /// A link-styled breadcrumb item
@@ -109,9 +101,5 @@ pub fn BreadcrumbSeparator(#[prop(optional)] class: &'static str) -> impl IntoVi
         }
     };
 
-    view! {
-        <li class=classes>
-            "/"
-        </li>
-    }
+    view! { <li class=classes>"/"</li> }
 }

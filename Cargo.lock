@@ -675,13 +675,22 @@ dependencies = [
  "phf",
  "phf_codegen",
  "prettyplease",
- "proc-macro2",
- "quote",
  "serde_json",
  "syn",
  "tailwind_fuse",
  "tempfile",
  "thiserror 2.0.12",
+]
+
+[[package]]
+name = "holt-story-macro"
+version = "0.0.0"
+dependencies = [
+ "holt-book",
+ "leptos",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -697,6 +706,7 @@ name = "holt-ui-book"
 version = "0.0.0"
 dependencies = [
  "holt-book",
+ "holt-story-macro",
  "holt-ui",
  "icondata",
  "leptos",

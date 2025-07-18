@@ -150,7 +150,7 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                 {move || {
                     let index = selected_variant.get();
                     if let Some(variant) = variants.get(index) {
-                        (variant.view)()
+                        (variant.render)()
                     } else {
                         view! { <div>"No variant selected"</div> }.into_any()
                     }

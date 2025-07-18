@@ -688,6 +688,7 @@ version = "0.0.0"
 dependencies = [
  "holt-book",
  "leptos",
+ "prettyplease",
  "proc-macro2",
  "quote",
  "syn",

@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
-use syn::{ItemFn, ReturnType};
+use syn::{Item, ItemFn};
 
 pub(crate) struct VariantGenerator {
     pub(crate) function: ItemFn,
@@ -57,28 +57,11 @@ impl VariantGenerator {
     }
 
     fn generate_source_code(&self) -> String {
-        // Generate the source code representation of the original function
-        let fn_token = &self.function.sig.fn_token;
-        let ident = &self.function.sig.ident;
-        let inputs = &self.function.sig.inputs;
-        let output = &self.function.sig.output;
-        let block = &self.function.block;
-
-        let output_str = match output {
-            ReturnType::Default => String::new(),
-            ReturnType::Type(_, ty) => {
-                format!(" -> {}", quote!(#ty))
-            }
-        };
-
-        format!(
-            "{} {}({}){}{}",
-            quote!(#fn_token),
-            ident,
-            quote!(#inputs),
-            output_str,
-            quote!(#block)
-        )
+        prettyplease::unparse(&syn::File {
+            shebang: None,
+            attrs: vec![],
+            items: vec![Item::Fn(self.function.clone())],
+        })
     }
 }
 

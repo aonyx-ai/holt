@@ -123,20 +123,27 @@ fn StorybookStory() -> impl IntoView {
 #[component]
 fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
     let (selected_variant, set_selected_variant) = signal(0);
+    let (active_tab, set_active_tab) = signal("preview");
 
     let variants = story.variants;
 
     view! {
-        <div>
-            <h1>{story.name}</h1>
-            {story.description.map(|desc| view! { <p>{desc}</p> })}
-            <div>
-                <select on:change=move |ev| {
-                    let value = event_target_value(&ev);
-                    if let Ok(index) = value.parse::<usize>() {
-                        set_selected_variant.set(index);
+        <div class="flex flex-col space-y-6">
+            <div class="space-y-2">
+                <h1 class="text-2xl font-bold">{story.name}</h1>
+                {story.description.map(|desc| view! { <p class="text-muted-foreground">{desc}</p> })}
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <select
+                    class="px-3 py-2 border rounded-md bg-background"
+                    on:change=move |ev| {
+                        let value = event_target_value(&ev);
+                        if let Ok(index) = value.parse::<usize>() {
+                            set_selected_variant.set(index);
+                        }
                     }
-                }>
+                >
                     {variants.iter().enumerate().map(|(i, variant)| {
                         view! {
                             <option value=i.to_string() selected=move || selected_variant.get() == i>
@@ -146,15 +153,59 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                     }).collect::<Vec<_>>()}
                 </select>
             </div>
-            <div>
-                {move || {
-                    let index = selected_variant.get();
-                    if let Some(variant) = variants.get(index) {
-                        (variant.view)()
-                    } else {
-                        view! { <div>"No variant selected"</div> }.into_any()
-                    }
-                }}
+
+            <div class="border rounded-lg">
+                <div class="flex border-b">
+                    <button
+                        class=move || format!("px-4 py-2 text-sm font-medium border-b-2 transition-colors {}",
+                            if active_tab.get() == "preview" {
+                                "border-primary text-primary bg-muted/50"
+                            } else {
+                                "border-transparent text-muted-foreground hover:text-foreground"
+                            }
+                        )
+                        on:click=move |_| set_active_tab.set("preview")
+                    >
+                        "Preview"
+                    </button>
+                    <button
+                        class=move || format!("px-4 py-2 text-sm font-medium border-b-2 transition-colors {}",
+                            if active_tab.get() == "code" {
+                                "border-primary text-primary bg-muted/50"
+                            } else {
+                                "border-transparent text-muted-foreground hover:text-foreground"
+                            }
+                        )
+                        on:click=move |_| set_active_tab.set("code")
+                    >
+                        "Code"
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    {move || {
+                        let index = selected_variant.get();
+                        if let Some(variant) = variants.get(index) {
+                            if active_tab.get() == "preview" {
+                                view! {
+                                    <div class="flex items-center justify-center min-h-[200px] bg-muted/20 rounded-lg">
+                                        {(variant.render)()}
+                                    </div>
+                                }.into_any()
+                            } else {
+                                view! {
+                                    <div class="bg-muted/30 rounded-lg p-4">
+                                        <pre class="text-sm overflow-x-auto">
+                                            <code>{variant.source}</code>
+                                        </pre>
+                                    </div>
+                                }.into_any()
+                            }
+                        } else {
+                            view! { <div>"No variant selected"</div> }.into_any()
+                        }
+                    }}
+                </div>
             </div>
         </div>
     }

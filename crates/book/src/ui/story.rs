@@ -2,7 +2,8 @@ use leptos::prelude::*;
 
 pub struct StoryVariant {
     pub name: &'static str,
-    pub view: fn() -> AnyView,
+    pub render: fn() -> AnyView,
+    pub source: &'static str,
 }
 
 pub struct Story {

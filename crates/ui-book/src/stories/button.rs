@@ -33,6 +33,8 @@ fn link() -> AnyView {
     view! { <Button class="w-32" variant=ButtonVariant::Link>"Click me!"</Button> }.into_any()
 }
 
+include!(concat!(env!("OUT_DIR"), "/stories/button_source.rs"));
+
 /// Buttons are for clicking and doing button things
-#[story(id = "button", name = "Button")]
+#[story(id = "button", name = "Button", extra_docs = BUTTON_SOURCE)]
 const BUTTON_STORY: () = &[default, outline, destructive, secondary, ghost, link];

@@ -2,19 +2,20 @@ use std::panic;
 
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
-use syn::{Expr, ExprArray, ItemConst, Lit, Meta, Token, punctuated::Punctuated};
+use syn::{Expr, ExprArray, ItemConst, Lit, Meta, Path, Token, punctuated::Punctuated};
 
 pub(crate) struct StoryGenerator {
     pub(crate) const_item: ItemConst,
     story_id: String,
     story_name: String,
     description: Option<String>,
+    extra_docs: Option<Path>,
     variant_names: Vec<Ident>,
 }
 
 impl StoryGenerator {
     pub fn new(args: Punctuated<Meta, Token![,]>, body: ItemConst) -> Self {
-        let (story_id, story_name) = Self::parse_attributes(args);
+        let (story_id, story_name, extra_docs) = Self::parse_attributes(args);
         let description = parse_doc_comments(&body);
         let variant_names = Self::parse_variant_names(&body);
 
@@ -24,12 +25,14 @@ impl StoryGenerator {
             story_name,
             description,
             variant_names,
+            extra_docs,
         }
     }
 
-    fn parse_attributes(args: Punctuated<Meta, Token![,]>) -> (String, String) {
+    fn parse_attributes(args: Punctuated<Meta, Token![,]>) -> (String, String, Option<Path>) {
         let mut story_id: Option<String> = None;
         let mut story_name: Option<String> = None;
+        let mut extra_docs: Option<Path> = None;
 
         for arg in args {
             if let Meta::NameValue(nv) = arg {
@@ -45,14 +48,19 @@ impl StoryGenerator {
                             story_name = Some(lit.value());
                         }
                     }
+                } else if nv.path.is_ident("extra_docs") {
+                    if let Expr::Path(path) = &nv.value {
+                        extra_docs = Some(path.path.clone());
+                    }
                 }
             }
         }
 
         let story_id = story_id.expect("story macro requires id attribute");
         let story_name = story_name.expect("story macro requires name attribute");
+        let extra_docs = extra_docs;
 
-        (story_id, story_name)
+        (story_id, story_name, extra_docs)
     }
 
     fn parse_variant_names(body: &ItemConst) -> Vec<Ident> {
@@ -99,11 +107,10 @@ impl StoryGenerator {
         let full_story_name = self.full_story_name();
         let story_id = &self.story_id;
         let story_name = &self.story_name;
-
-        let description = match &self.description {
-            Some(desc) => quote! { Some(#desc) },
-            _ => quote! { None },
-        };
+        let full_descr_name = Ident::new(
+            &format!("FULL_DESCR_{}_VARIANT", story_name.to_uppercase()),
+            full_story_name.span(),
+        );
 
         let variant_consts: Vec<Ident> = self
             .variant_names
@@ -111,11 +118,24 @@ impl StoryGenerator {
             .map(Self::function_name_to_const_name)
             .collect();
 
+        let full_descr = match (&self.description, &self.extra_docs) {
+            (Some(desc), Some(docs)) => quote! {
+                Some(const_format::concatcp!(#desc, "\n", #docs))
+            },
+            (Some(desc), None) => quote! { Some(#desc) },
+            (None, Some(docs)) => quote! {
+                Some(#docs)
+            },
+            (None, None) => quote! { None },
+        };
+
         quote! {
+            const #full_descr_name: Option<&'static str> = #full_descr;
+
             const #full_story_name: &'static holt_book::Story = &holt_book::Story {
                 id: #story_id,
                 name: #story_name,
-                description: #description,
+                description: #full_descr_name,
                 variants: &[
                     #(#variant_consts),*
                 ],
@@ -153,30 +173,6 @@ fn parse_doc_comments(body: &ItemConst) -> Option<String> {
     }
 }
 
-// Note: This function is no longer used since we're not extracting doc comments from array elements
-// fn extract_doc_comment_from_expr(expr: &Expr) -> Option<String> {
-//     // In the AST, doc comments on array elements are typically attached
-//     // to the expression itself. We need to look for attributes on the expression.
-//     match expr {
-//         Expr::Closure(closure) => {
-//             // Check if the closure has attributes (doc comments)
-//             for attr in &closure.attrs {
-//                 if let Meta::NameValue(meta) = &attr.meta {
-//                     if attr.meta.path().is_ident("doc") {
-//                         if let Expr::Lit(expr) = &meta.value {
-//                             if let Lit::Str(lit) = &expr.lit {
-//                                 return Some(lit.value().trim().to_string());
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-//             None
-//         }
-//         _ => None,
-//     }
-// }
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -185,10 +181,25 @@ mod tests {
     #[test]
     fn test_parse_attributes_with_valid_id_and_name() {
         let args = parse_quote! { id = "test_id", name = "Test Story" };
-        let (story_id, story_name) = StoryGenerator::parse_attributes(args);
+        let (story_id, story_name, full_descr_name) = StoryGenerator::parse_attributes(args);
 
         assert_eq!(story_id, "test_id");
         assert_eq!(story_name, "Test Story");
+        assert!(full_descr_name.is_none())
+    }
+
+    #[test]
+    fn test_parse_attributes_with_extra_docs() {
+        let args = parse_quote! { id = "test_id", name = "Test Story", extra_docs = FULL };
+        let (story_id, story_name, extra_docs) = StoryGenerator::parse_attributes(args);
+
+        assert_eq!(story_id, "test_id");
+        assert_eq!(story_name, "Test Story");
+        assert!(extra_docs.is_some_and(|p| {
+            p.segments
+                .get(0)
+                .is_some_and(|s| s.ident == "FULL")
+        }))
     }
 
     #[test]

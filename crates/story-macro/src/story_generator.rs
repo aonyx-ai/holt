@@ -195,11 +195,9 @@ mod tests {
 
         assert_eq!(story_id, "test_id");
         assert_eq!(story_name, "Test Story");
-        assert!(extra_docs.is_some_and(|p| {
-            p.segments
-                .get(0)
-                .is_some_and(|s| s.ident == "FULL")
-        }))
+        assert!(
+            extra_docs.is_some_and(|p| { p.segments.get(0).is_some_and(|s| s.ident == "FULL") })
+        )
     }
 
     #[test]

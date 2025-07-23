@@ -11,5 +11,5 @@ holt-ui = { path = "../ui" }
 icondata = { version = "0.6.0", default-features = false, features = [
   "lucide",
 ] }
-leptos_icons = "0.6.1"
+leptos_icons = "0.7.0"
 holt-story-macro = { path = "../story-macro" }

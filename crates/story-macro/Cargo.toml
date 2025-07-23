@@ -8,16 +8,16 @@ edition.workspace = true
 proc-macro = true
 
 [dependencies]
-syn = { version = ">=2.0.95,<3", default-features = false, features = [
+syn = { version = ">=2.0.104,<3", default-features = false, features = [
   "parsing",
   "full",
   "proc-macro",
   "printing",
 ] }
-quote = ">=1.0.35,<2"
-proc-macro2 = ">=1.0.91, <2"
-prettyplease = ">=0.2.25,<1"
+quote = ">=1.0.40,<2"
+proc-macro2 = ">=1.0.95, <2"
+prettyplease = ">=0.2.35,<1"
 
 [dev-dependencies]
 holt-book = { path = "../book" }
-leptos = "0.8.0"
+leptos = { workspace = true }

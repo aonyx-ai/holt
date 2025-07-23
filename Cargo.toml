@@ -14,7 +14,7 @@ license = "Apache-2.0 OR MIT"
 repository = "https://github.com/aonyx-rs/holt.git"
 
 # Edition 2024 requires Rust 1.85 or later
-rust-version = "1.85"
+rust-version = "1.88"
 
 [workspace.dependencies]
 leptos = "0.8.0"

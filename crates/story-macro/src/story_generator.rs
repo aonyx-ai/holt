@@ -8,24 +8,24 @@ pub(crate) struct StoryGenerator {
     pub(crate) const_item: ItemConst,
     story_id: String,
     story_name: String,
-    description: Option<String>,
-    extra_docs: Option<Path>,
+    documentation: Option<String>,
+    extra_docs_const: Option<Path>,
     variant_names: Vec<Ident>,
 }
 
 impl StoryGenerator {
     pub fn new(args: Punctuated<Meta, Token![,]>, body: ItemConst) -> Self {
-        let (story_id, story_name, extra_docs) = Self::parse_attributes(args);
-        let description = parse_doc_comments(&body);
+        let (story_id, story_name, extra_docs_const) = Self::parse_attributes(args);
+        let documentation = parse_doc_comments(&body);
         let variant_names = Self::parse_variant_names(&body);
 
         Self {
             const_item: body,
             story_id,
             story_name,
-            description,
+            documentation,
             variant_names,
-            extra_docs,
+            extra_docs_const,
         }
     }
 
@@ -36,22 +36,20 @@ impl StoryGenerator {
 
         for arg in args {
             if let Meta::NameValue(nv) = arg {
-                if nv.path.is_ident("id") {
-                    if let Expr::Lit(expr) = &nv.value {
-                        if let Lit::Str(lit) = &expr.lit {
-                            story_id = Some(lit.value());
-                        }
-                    }
-                } else if nv.path.is_ident("name") {
-                    if let Expr::Lit(expr) = &nv.value {
-                        if let Lit::Str(lit) = &expr.lit {
-                            story_name = Some(lit.value());
-                        }
-                    }
-                } else if nv.path.is_ident("extra_docs") {
-                    if let Expr::Path(path) = &nv.value {
-                        extra_docs = Some(path.path.clone());
-                    }
+                if let Expr::Lit(expr) = &nv.value
+                    && let Lit::Str(lit) = &expr.lit
+                    && nv.path.is_ident("id")
+                {
+                    story_id = Some(lit.value());
+                } else if let Expr::Lit(expr) = &nv.value
+                    && let Lit::Str(lit) = &expr.lit
+                    && nv.path.is_ident("name")
+                {
+                    story_name = Some(lit.value());
+                } else if let Expr::Path(path) = &nv.value
+                    && nv.path.is_ident("extra_docs")
+                {
+                    extra_docs = Some(path.path.clone());
                 }
             }
         }
@@ -118,7 +116,7 @@ impl StoryGenerator {
             .map(Self::function_name_to_const_name)
             .collect();
 
-        let full_descr = match (&self.description, &self.extra_docs) {
+        let full_descr = match (&self.documentation, &self.extra_docs_const) {
             (Some(desc), Some(docs)) => quote! {
                 Some(const_format::concatcp!(#desc, "\n", #docs))
             },
@@ -284,7 +282,10 @@ mod tests {
 
         assert_eq!(generator.story_id, "test_id");
         assert_eq!(generator.story_name, "Test Story");
-        assert_eq!(generator.description, Some("Test description".to_string()));
+        assert_eq!(
+            generator.documentation,
+            Some("Test description".to_string())
+        );
         assert_eq!(generator.const_item.ident, "TEST_VARIANTS");
         assert_eq!(generator.variant_names.len(), 1);
         assert_eq!(generator.variant_names[0].to_string(), "default");

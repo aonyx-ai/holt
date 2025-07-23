@@ -12,5 +12,3 @@ icondata = { version = "0.6.0", default-features = false, features = [
   "lucide",
 ] }
 leptos_icons = "0.6.1"
-holt-story-macro = { path = "../story-macro" }
-const_format = "0.2.34"

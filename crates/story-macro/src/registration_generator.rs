@@ -12,7 +12,7 @@ impl<'a> RegistrationGenerator<'a> {
     }
 
     pub fn submit_story(&self) -> TokenStream {
-        let full_story_name = self.story_generator.full_story_name();
+        let full_story_name = self.story_generator.story_const_name();
 
         quote! {
             holt_book::submit!(#full_story_name);

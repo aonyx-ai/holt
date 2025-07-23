@@ -1,4 +1,4 @@
-use holt_story_macro::{story, variant};
+use holt_book::{story, variant};
 use holt_ui::visual::{Button, ButtonVariant};
 use leptos::prelude::*;
 

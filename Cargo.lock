@@ -665,6 +665,8 @@ dependencies = [
  "clap",
  "console_error_panic_hook",
  "console_log",
+ "const_format",
+ "holt-story-macro",
  "holt-ui",
  "inventory",
  "leptos",
@@ -681,6 +683,7 @@ dependencies = [
 name = "holt-story-macro"
 version = "0.0.0"
 dependencies = [
+ "const_format",
  "holt-book",
  "leptos",
  "prettyplease",
@@ -701,9 +704,7 @@ dependencies = [
 name = "holt-ui-book"
 version = "0.0.0"
 dependencies = [
- "const_format",
  "holt-book",
- "holt-story-macro",
  "holt-ui",
  "icondata",
  "leptos",

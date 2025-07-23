@@ -9,7 +9,8 @@
         "cargo": {
           "buildScripts": {
             "enable": true
-          }
+          },
+          "features": "all"
         }
       }
     }

@@ -2,6 +2,8 @@ use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{Item, ItemFn};
 
+pub(crate) const VARIANT_PREFIX: &str = "VARIANT_";
+
 pub(crate) struct VariantGenerator {
     pub(crate) function: ItemFn,
     pub(crate) variant_name: String,
@@ -11,7 +13,7 @@ pub(crate) struct VariantGenerator {
 impl VariantGenerator {
     pub fn new(function: ItemFn) -> Self {
         let variant_name = Self::function_name_to_variant_name(&function.sig.ident);
-        let const_name = Self::function_name_to_const_name(&function.sig.ident);
+        let const_name = story_variant_fn_as_const_name(&function.sig.ident);
 
         Self {
             function,
@@ -33,12 +35,6 @@ impl VariantGenerator {
             })
             .collect::<Vec<String>>()
             .join(" ")
-    }
-
-    fn function_name_to_const_name(ident: &Ident) -> Ident {
-        // Convert snake_case to SCREAMING_SNAKE_CASE_VARIANT
-        let name = ident.to_string().to_uppercase();
-        Ident::new(&format!("{name}_VARIANT"), ident.span())
     }
 
     pub fn generate_variant_const(&self) -> TokenStream {
@@ -65,6 +61,14 @@ impl VariantGenerator {
     }
 }
 
+/// Converts function name to a constant name for a story variant.
+///
+/// e.g. `default` becomes `VARIANT_DEFAULT`
+pub(crate) fn story_variant_fn_as_const_name(ident: &Ident) -> Ident {
+    let name = ident.to_string().to_uppercase();
+    Ident::new(&format!("{VARIANT_PREFIX}{name}"), ident.span())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -88,12 +92,12 @@ mod tests {
     #[test]
     fn test_function_name_to_const_name() {
         let ident = Ident::new("default", proc_macro2::Span::call_site());
-        let result = VariantGenerator::function_name_to_const_name(&ident);
-        assert_eq!(result.to_string(), "DEFAULT_VARIANT");
+        let result = story_variant_fn_as_const_name(&ident);
+        assert_eq!(result.to_string(), "VARIANT_DEFAULT");
 
         let ident = Ident::new("destructive_count", proc_macro2::Span::call_site());
-        let result = VariantGenerator::function_name_to_const_name(&ident);
-        assert_eq!(result.to_string(), "DESTRUCTIVE_COUNT_VARIANT");
+        let result = story_variant_fn_as_const_name(&ident);
+        assert_eq!(result.to_string(), "VARIANT_DESTRUCTIVE_COUNT");
     }
 
     #[test]
@@ -107,18 +111,9 @@ mod tests {
         let generator = VariantGenerator::new(function);
         let result = generator.generate_variant_const().to_string();
 
-        // expected output:
-        // const DEFAULT_VARIANT: &holt_book::StoryVariant = &holt_book::StoryVariant {
-        //     name: "Default",
-        //     render: || {
-        //         view! { <Badge>Default</Badge> }.into_any()
-        //     },
-        //     source: "fn default ( ) -> AnyView { view ! { < Badge > Default < / Badge > } . into_any ( ) }",
-        // };
-
         // Note: We can't easily test exact token equality due to formatting differences,
         // but we can verify the structure is correct
-        assert!(result.contains("DEFAULT_VARIANT"));
+        assert!(result.contains("VARIANT_DEFAULT"));
         assert!(result.contains("\"Default\""));
         assert!(result.contains("render : ||"));
     }
@@ -136,7 +131,7 @@ mod tests {
         assert_eq!(generator.variant_name, "Destructive Count");
         assert_eq!(
             generator.const_name.to_string(),
-            "DESTRUCTIVE_COUNT_VARIANT"
+            "VARIANT_DESTRUCTIVE_COUNT"
         );
         assert_eq!(generator.function.sig.ident, "destructive_count");
     }

@@ -14,4 +14,4 @@ icondata = { version = "0.6.0", default-features = false, features = [
 leptos_icons = "0.7.0"
 
 [build-dependencies]
-thiserror = "1.0"
+thiserror = ">=1.0.37, <2"

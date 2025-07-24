@@ -82,16 +82,20 @@ impl StoryGenerator {
     }
 }
 
+/// Parse story variant names from a const expression
+///
+/// Takes a const expression representing a (reference to an) array of variant
+/// names, and returns a vector of Idents of the variant names.
 fn parse_variant_names(body: &ItemConst) -> Vec<Ident> {
     let mut variant_names = Vec::new();
 
     // Extract the array expression from the const
     if let Expr::Array(array) = &*body.expr {
         variant_names = extract_variant_names_from_array(array);
-    } else if let Expr::Reference(ref_expr) = &*body.expr {
-        if let Expr::Array(array) = &*ref_expr.expr {
-            variant_names = extract_variant_names_from_array(array);
-        }
+    } else if let Expr::Reference(ref_expr) = &*body.expr
+        && let Expr::Array(array) = &*ref_expr.expr
+    {
+        variant_names = extract_variant_names_from_array(array);
     }
 
     variant_names
@@ -102,12 +106,10 @@ fn extract_variant_names_from_array(array: &ExprArray) -> Vec<Ident> {
 
     for elem in &array.elems {
         // Each element should be a function name (identifier)
-        if let Expr::Path(path) = elem {
-            if let Some(ident) = path.path.get_ident() {
-                variant_names.push(ident.clone());
-            } else {
-                panic!("expected function name");
-            }
+        if let Expr::Path(path) = elem
+            && let Some(ident) = path.path.get_ident()
+        {
+            variant_names.push(ident.clone());
         } else {
             panic!("expected function name");
         }

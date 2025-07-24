@@ -1,120 +1,299 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use thiserror::Error;
 
-fn main() {
+use crate::config::BuildConfig;
+use crate::generator::CodeGenerator;
+use crate::parser::StoryParser;
+
+type BuildResult<T> = Result<T, BuildError>;
+
+/// Errors that can occur during the build process.
+#[derive(Error, Debug)]
+pub enum BuildError {
+    #[error("IO error: {0}")]
+    IoError(#[from] std::io::Error),
+    #[error("Environment variable error: {0}")]
+    EnvError(#[from] env::VarError),
+    #[error("Invalid story file: {0}")]
+    InvalidStory(String),
+    #[error("Component not found: {0}")]
+    ComponentNotFound(String),
+    #[error("No valid component found in story: {0}")]
+    NoValidComponent(String),
+}
+
+/// Main build script entry point.
+/// Parses story files and generates source code for each component.
+fn main() -> BuildResult<()> {
+    setup_cargo_rerun_conditions();
+
+    let config = BuildConfig::new()?;
+    let stories = StoryParser::new(&config).parse_stories()?;
+    let generator = CodeGenerator::new(&config);
+
+    generator.generate_story_files(&stories)?;
+
+    Ok(())
+}
+
+fn setup_cargo_rerun_conditions() {
     println!("cargo:rerun-if-changed=src/stories/");
     println!("cargo:rerun-if-changed=../ui/src/visual/");
+}
 
-    let out_dir = env::var("OUT_DIR").unwrap();
-    let stories_dir = Path::new(&out_dir).join("stories");
-    fs::create_dir_all(&stories_dir).expect("Failed to create stories output directory");
+mod config {
+    use super::*;
 
-    // Parse story files and map them to their components
-    let story_component_map = parse_story_files();
+    /// Configuration for the build process, including directory paths.
+    #[derive(Debug)]
+    pub struct BuildConfig {
+        pub stories_dir: PathBuf,
+        pub stories_output_dir: PathBuf,
+        pub ui_components_dir: PathBuf,
+    }
 
-    // Generate individual files for each story
-    for (story_name, component_info) in &story_component_map {
-        if let Ok(source_code) = read_component_source(&component_info.file_path) {
-            let file_name = format!("{story_name}_source.rs");
-            let file_path = stories_dir.join(file_name);
+    impl BuildConfig {
+        /// Creates a new build configuration from environment variables.
+        pub fn new() -> BuildResult<Self> {
+            let out_dir = PathBuf::from(env::var("OUT_DIR")?);
+            let stories_output_dir = out_dir.join("stories");
 
-            let mut generated_code = String::new();
-            generated_code.push_str(&format!(
-                "// Auto-generated source code for {story_name} component\n\n"
-            ));
-
-            let const_name = format!("{}_SOURCE", story_name.to_uppercase());
-            generated_code.push_str(&format!(
-                "const {const_name}: &str = r###\"\n```rust\n{source_code}\n```\n\"###;\n\n"
-            ));
-
-            fs::write(&file_path, generated_code)
-                .unwrap_or_else(|_| panic!("Failed to write source file for {story_name}"));
+            Ok(Self {
+                stories_dir: PathBuf::from("src/stories"),
+                stories_output_dir,
+                ui_components_dir: PathBuf::from("../ui/src/visual"),
+            })
         }
     }
 }
 
-#[derive(Debug)]
-struct ComponentInfo {
-    file_path: String,
+mod data {
+    /// Information about a UI component extracted from story files.
+    #[derive(Debug, Clone)]
+    pub struct ComponentInfo {
+        pub source: String,
+    }
+
+    impl ComponentInfo {
+        pub fn new(source: String) -> Self {
+            Self { source }
+        }
+    }
+
+    #[derive(Debug)]
+    pub struct ParsedStory {
+        pub name: String,
+        pub info: ComponentInfo,
+    }
 }
 
-fn parse_story_files() -> HashMap<String, ComponentInfo> {
-    let mut map = HashMap::new();
+mod imports {
+    use super::*;
 
-    let stories_dir = Path::new("src/stories");
-    if let Ok(entries) = fs::read_dir(stories_dir) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.extension().and_then(|s| s.to_str()) == Some("rs") {
-                let file_name = path.file_stem().unwrap().to_str().unwrap();
-                if file_name != "mod" {
-                    if let Ok(content) = fs::read_to_string(&path) {
-                        let components = extract_holt_ui_imports(&content);
-                        if !components.is_empty() {
-                            let component_path = format!("../ui/src/visual/{file_name}.rs");
-                            map.insert(
-                                file_name.to_string(),
-                                ComponentInfo {
-                                    file_path: component_path,
-                                },
-                            );
-                        }
-                    }
+    /// Extracts component names from holt_ui::visual imports in the given content.
+    /// Returns a sorted, deduplicated list of main component names (excluding variants).
+    pub fn extract_holt_ui_imports(content: &str) -> Vec<String> {
+        let mut components: Vec<String> = content
+            .lines()
+            .filter_map(|line| parse_import_line(line.trim()))
+            .flatten()
+            .filter(|import| is_main_component(import))
+            .collect::<HashSet<_>>() // Dedup
+            .into_iter()
+            .collect();
+
+        components.sort();
+        components
+    }
+
+    pub fn parse_import_line(line: &str) -> Option<Vec<String>> {
+        if !line.starts_with("use holt_ui::visual::") {
+            return None;
+        }
+
+        let imports_part = line.strip_prefix("use holt_ui::visual::")?;
+
+        if let Some(imports) = extract_braced_imports(imports_part) {
+            Some(imports)
+        } else {
+            extract_single_import(imports_part).map(|imp| vec![imp])
+        }
+    }
+
+    pub fn extract_braced_imports(imports_part: &str) -> Option<Vec<String>> {
+        if !imports_part.starts_with('{') || !imports_part.contains('}') {
+            return None;
+        }
+
+        let start = imports_part.find('{')?;
+        let end = imports_part.find('}')?;
+        let imports = &imports_part[start + 1..end];
+
+        Some(
+            imports
+                .split(',')
+                .map(|import| import.trim().to_string())
+                .filter(|import| !import.is_empty())
+                .collect(),
+        )
+    }
+
+    pub fn extract_single_import(imports_part: &str) -> Option<String> {
+        let import = imports_part.trim_end_matches(';').trim();
+        if import.is_empty() {
+            None
+        } else {
+            Some(import.to_string())
+        }
+    }
+
+    pub fn is_main_component(import: &str) -> bool {
+        !import.contains("Variant") && !import.contains("Size") && !import.is_empty()
+    }
+}
+
+mod parser {
+    use super::*;
+
+    /// Parses story files to extract component information.
+    pub struct StoryParser<'a> {
+        config: &'a config::BuildConfig,
+    }
+
+    impl<'a> StoryParser<'a> {
+        /// Creates a new story parser with the given configuration.
+        pub fn new(config: &'a config::BuildConfig) -> Self {
+            Self { config }
+        }
+
+        /// Parses all story files in the configured directory.
+        /// Returns a map of story names to their component information.
+        pub fn parse_stories(&self) -> BuildResult<HashMap<String, data::ComponentInfo>> {
+            let mut stories = HashMap::new();
+
+            let entries = fs::read_dir(&self.config.stories_dir)?;
+
+            for entry in entries {
+                let entry = entry?;
+                let path = entry.path();
+
+                if let Some(story) = self.try_parse_story_file(&path)? {
+                    stories.insert(story.name, story.info);
                 }
             }
+
+            Ok(stories)
         }
-    }
 
-    map
-}
-
-fn extract_holt_ui_imports(content: &str) -> Vec<String> {
-    let mut components = Vec::new();
-
-    for line in content.lines() {
-        let line = line.trim();
-
-        // Look for imports from holt_ui::visual
-        if line.starts_with("use holt_ui::visual::") {
-            // Parse: use holt_ui::visual::{Badge, BadgeVariant};
-            if let Some(imports_part) = line.strip_prefix("use holt_ui::visual::") {
-                if imports_part.starts_with('{') && imports_part.contains('}') {
-                    // Extract content between braces
-                    if let Some(start) = imports_part.find('{') {
-                        if let Some(end) = imports_part.find('}') {
-                            let imports = &imports_part[start + 1..end];
-                            for import in imports.split(',') {
-                                let import = import.trim();
-                                // Only take the main component name, not variants
-                                if !import.contains("Variant")
-                                    && !import.contains("Size")
-                                    && !import.is_empty()
-                                {
-                                    components.push(import.to_string());
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // Single import: use holt_ui::visual::Badge;
-                    let import = imports_part.trim_end_matches(';').trim();
-                    if !import.contains("Variant") && !import.contains("Size") && !import.is_empty()
-                    {
-                        components.push(import.to_string());
-                    }
-                }
+        fn try_parse_story_file(&self, path: &Path) -> BuildResult<Option<data::ParsedStory>> {
+            if !is_valid_story_file(path) {
+                return Ok(None);
             }
+
+            let story_name = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .ok_or_else(|| BuildError::InvalidStory(path.display().to_string()))?
+                .to_string();
+
+            let story_contents = fs::read_to_string(path)?;
+            let components = imports::extract_holt_ui_imports(&story_contents);
+
+            if components.len() != 1 {
+                return Ok(None);
+            }
+
+            let component_name = components.first().unwrap();
+            let component_path = self
+                .config
+                .ui_components_dir
+                .join(format!("{}.rs", component_name.to_lowercase()));
+
+            if !component_path.exists() {
+                return Err(BuildError::ComponentNotFound(component_name.clone()));
+            }
+
+            let component_source = fs::read_to_string(&component_path)?;
+
+            let info = data::ComponentInfo::new(component_source);
+
+            Ok(Some(data::ParsedStory {
+                name: story_name,
+                info,
+            }))
         }
     }
 
-    components.sort();
-    components.dedup();
-    components
+    pub fn is_valid_story_file(path: &Path) -> bool {
+        // Only process .rs files, excluding mod.rs
+        if path.extension().is_none_or(|ext| ext != "rs") {
+            return false;
+        }
+
+        let file_name = match path.file_stem().and_then(|s| s.to_str()) {
+            Some(name) => name,
+            None => return false,
+        };
+
+        file_name != "mod"
+    }
 }
 
-fn read_component_source(component_path: &str) -> Result<String, std::io::Error> {
-    fs::read_to_string(component_path)
+mod generator {
+    use super::*;
+
+    /// Generates source code files from parsed component information.
+    pub struct CodeGenerator<'a> {
+        config: &'a config::BuildConfig,
+    }
+
+    impl<'a> CodeGenerator<'a> {
+        /// Creates a new code generator with the given configuration.
+        pub fn new(config: &'a config::BuildConfig) -> Self {
+            Self { config }
+        }
+
+        /// Generates source code files for all stories.
+        /// Creates the output directory if it doesn't exist.
+        pub fn generate_story_files(
+            &self,
+            stories: &HashMap<String, data::ComponentInfo>,
+        ) -> BuildResult<()> {
+            fs::create_dir_all(&self.config.stories_output_dir)?;
+
+            for (story_name, component_info) in stories {
+                self.generate_story_file(story_name, component_info)?;
+            }
+
+            Ok(())
+        }
+
+        fn generate_story_file(
+            &self,
+            story_name: &str,
+            info: &data::ComponentInfo,
+        ) -> BuildResult<()> {
+            let file_path = self
+                .config
+                .stories_output_dir
+                .join(format!("{story_name}_source.rs"));
+            let content = build_file_content(story_name, info);
+
+            fs::write(&file_path, content)?;
+            Ok(())
+        }
+    }
+
+    pub fn build_file_content(story_name: &str, info: &data::ComponentInfo) -> String {
+        let const_name = format!("{}_SOURCE", story_name.to_uppercase());
+
+        format!(
+            "// Auto-generated source code for {} component\n\n\
+             const {}: &str = r###\"\n```rust\n{}\n```\n\"###;\n\n",
+            story_name, const_name, info.source
+        )
+    }
 }

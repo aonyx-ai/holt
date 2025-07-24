@@ -1,4 +1,4 @@
-use holt_story_macro::{story, variant};
+use holt_book::{story, variant};
 use holt_ui::visual::{Badge, BadgeVariant};
 use leptos::prelude::*;
 use leptos_icons::Icon;
@@ -65,7 +65,9 @@ fn number_20_plus() -> AnyView {
     .into_any()
 }
 
-#[story(id = "badge", name = "Badge")]
+include!(concat!(env!("OUT_DIR"), "/stories/badge_source.rs"));
+
+#[story(id = "badge", name = "Badge", extra_docs = BADGE_SOURCE)]
 /// Badges are small status indicators
 const BADGE_STORY: () = &[
     default,

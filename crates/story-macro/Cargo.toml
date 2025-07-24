@@ -17,6 +17,7 @@ syn = { version = ">=2.0.104,<3", default-features = false, features = [
 quote = ">=1.0.40,<2"
 proc-macro2 = ">=1.0.95, <2"
 prettyplease = ">=0.2.35,<1"
+const_format = "0.2.34"
 
 [dev-dependencies]
 holt-book = { path = "../book" }

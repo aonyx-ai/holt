@@ -237,7 +237,9 @@ mod parser {
             let components = extract_component_names(component_imports.clone());
 
             if components.len() != 1 {
-                println!("cargo:warning=Found more than one component used in story '{story_name}': {components:?}");
+                println!(
+                    "cargo:warning=Found more than one component used in story '{story_name}': {components:?}"
+                );
 
                 return Ok(None);
             }

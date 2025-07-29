@@ -1,30 +1,99 @@
-// "use client"
+use leptos::html;
+use leptos::prelude::*;
+use leptos::web_sys::Event;
+use leptos_icons::Icon;
+use tailwind_fuse::*;
 
-// import * as React from "react"
-// import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-// import { Check } from "lucide-react"
+#[derive(TwClass)]
+#[tw(
+    class = "peer h-4 w-4 shrink-0 rounded-sm border border-input ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:border-primary"
+)]
+struct CheckboxStyle {
+    size: CheckboxSize,
+}
 
-// import { cn } from "@/lib/utils"
+#[derive(TwVariant)]
+pub enum CheckboxSize {
+    #[tw(default, class = "h-4 w-4")]
+    Default,
+    #[tw(class = "h-3 w-3")]
+    Sm,
+    #[tw(class = "h-5 w-5")]
+    Lg,
+}
 
-// const Checkbox = React.forwardRef<
-//   React.ElementRef<typeof CheckboxPrimitive.Root>,
-//   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
-// >(({ className, ...props }, ref) => (
-//   <CheckboxPrimitive.Root
-//     ref={ref}
-//     className={cn(
-//       "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
-//       className
-//     )}
-//     {...props}
-//   >
-//     <CheckboxPrimitive.Indicator
-//       className={cn("flex items-center justify-center text-current")}
-//     >
-//       <Check className="h-4 w-4" />
-//     </CheckboxPrimitive.Indicator>
-//   </CheckboxPrimitive.Root>
-// ))
-// Checkbox.displayName = CheckboxPrimitive.Root.displayName
+#[component]
+pub fn Checkbox(
+    #[prop(optional)] class: &'static str,
+    #[prop(optional)] size: CheckboxSize,
+    #[prop(optional)] checked: RwSignal<bool>,
+    #[prop(optional)] disabled: bool,
+    #[prop(optional)] id: Option<&'static str>,
+    #[prop(optional)] name: Option<&'static str>,
+    #[prop(optional)] on_change: Option<Box<dyn Fn(bool) + 'static>>,
+) -> impl IntoView {
+    let final_class = CheckboxStyle { size }.with_class(class);
+    let element: NodeRef<html::Input> = NodeRef::new();
 
-// export { Checkbox }
+    let checked_signal = if !checked.get_untracked() && on_change.is_none() {
+        RwSignal::new(false)
+    } else {
+        checked
+    };
+
+    let handle_change = move |_: Event| {
+        if !disabled {
+            let new_value = !checked_signal.get();
+            checked_signal.set(new_value);
+            if let Some(ref callback) = on_change {
+                callback(new_value);
+            }
+        }
+    };
+
+    let checkbox_class = move || tw_merge!(
+        &final_class,
+        if checked_signal.get() {
+            "bg-primary text-primary-foreground border-primary"
+        } else {
+            ""
+        }
+    );
+
+    view! {
+        <div class="relative inline-flex items-center">
+            <input
+                type="checkbox"
+                node_ref=element
+                class="sr-only"
+                prop:checked=move || checked_signal.get()
+                disabled=disabled
+                id=id
+                name=name
+                on:change=handle_change
+            />
+            <div
+                class=checkbox_class
+                class:cursor-pointer=move || !disabled
+                on:click=move |_| {
+                    if !disabled {
+                        if let Some(el) = element.get() { el.click() }
+                    }
+                }
+            >
+                <Show when=move || checked_signal.get()>
+                    <div class="flex items-center justify-center text-current">
+                        <Icon
+                            icon=icondata::LuCheck
+                            attr:class=match size {
+                                CheckboxSize::Sm => "h-2.5 w-2.5",
+                                CheckboxSize::Default => "h-3 w-3",
+                                CheckboxSize::Lg => "h-4 w-4",
+                            }
+                        />
+                    </div>
+                </Show>
+            </div>
+        </div>
+    }
+}

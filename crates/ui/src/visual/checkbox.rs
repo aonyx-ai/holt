@@ -1,6 +1,5 @@
 use leptos::html;
 use leptos::prelude::*;
-use leptos::web_sys::Event;
 use leptos_icons::Icon;
 use tailwind_fuse::*;
 
@@ -30,35 +29,18 @@ pub fn Checkbox(
     #[prop(optional)] disabled: bool,
     #[prop(optional)] id: Option<&'static str>,
     #[prop(optional)] name: Option<&'static str>,
-    #[prop(optional)] on_change: Option<Box<dyn Fn(bool) + 'static>>,
 ) -> impl IntoView {
     let final_class = CheckboxStyle { size }.with_class(class);
     let element: NodeRef<html::Input> = NodeRef::new();
 
-    let checked_signal = if !checked.get_untracked() && on_change.is_none() {
-        RwSignal::new(false)
-    } else {
-        checked
+    let checkbox_class = move || {
+        tw_merge!(
+            final_class.clone(),
+            checked
+                .get()
+                .then_some("bg-primary text-primary-foreground border-primary"),
+        )
     };
-
-    let handle_change = move |_: Event| {
-        if !disabled {
-            let new_value = !checked_signal.get();
-            checked_signal.set(new_value);
-            if let Some(ref callback) = on_change {
-                callback(new_value);
-            }
-        }
-    };
-
-    let checkbox_class = move || tw_merge!(
-        &final_class,
-        if checked_signal.get() {
-            "bg-primary text-primary-foreground border-primary"
-        } else {
-            ""
-        }
-    );
 
     view! {
         <div class="relative inline-flex items-center">
@@ -66,11 +48,10 @@ pub fn Checkbox(
                 type="checkbox"
                 node_ref=element
                 class="sr-only"
-                prop:checked=move || checked_signal.get()
+                bind:checked=checked
                 disabled=disabled
                 id=id
                 name=name
-                on:change=handle_change
             />
             <div
                 class=checkbox_class
@@ -81,7 +62,7 @@ pub fn Checkbox(
                     }
                 }
             >
-                <Show when=move || checked_signal.get()>
+                <Show when=move || checked.get()>
                     <div class="flex items-center justify-center text-current">
                         <Icon
                             icon=icondata::LuCheck

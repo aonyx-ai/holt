@@ -56,8 +56,9 @@ fn interactive() -> AnyView {
     let checked = RwSignal::new(false);
     let count = RwSignal::new(0);
 
-    let on_change = Box::new(move |is_checked: bool| {
-        if is_checked {
+    // Create an effect to track when checkbox is checked
+    Effect::new(move |_| {
+        if checked.get() {
             count.update(|c| *c += 1);
         }
     });
@@ -65,7 +66,7 @@ fn interactive() -> AnyView {
     view! {
         <div class="flex flex-col space-y-2">
             <div class="flex items-center space-x-2">
-                <Checkbox checked=checked on_change=on_change />
+                <Checkbox checked=checked />
                 <label class="text-sm font-medium">
                     "Toggle me"
                 </label>

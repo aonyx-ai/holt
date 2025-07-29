@@ -15,3 +15,4 @@ leptos_icons = "0.7.0"
 
 [build-dependencies]
 thiserror = ">=1.0.37, <2"
+itertools = "0.14.0"

@@ -767,6 +767,7 @@ dependencies = [
  "holt-book",
  "holt-ui",
  "icondata",
+ "itertools",
  "leptos",
  "leptos_icons",
  "thiserror 1.0.69",

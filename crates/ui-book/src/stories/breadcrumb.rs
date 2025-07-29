@@ -1,5 +1,7 @@
-use holt_story_macro::{story, variant};
-use holt_ui::visual::{Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator};
+use holt_book::{story, variant};
+use holt_ui::visual::{
+    Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
+};
 use leptos::prelude::*;
 
 #[variant]
@@ -16,7 +18,8 @@ fn two_elements() -> AnyView {
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-    }.into_any()
+    }
+    .into_any()
 }
 
 #[variant]
@@ -45,7 +48,8 @@ fn multiple_elements() -> AnyView {
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-    }.into_any()
+    }
+    .into_any()
 }
 
 #[variant]
@@ -77,10 +81,8 @@ fn long_path() -> AnyView {
     }.into_any()
 }
 
-#[story(id = "breadcrumb", name = "Breadcrumb")]
+include!(concat!(env!("OUT_DIR"), "/stories/breadcrumb_source.rs"));
+
+#[story(id = "breadcrumb", name = "Breadcrumb", extra_docs = BREADCRUMB_SOURCE)]
 /// Breadcrumbs provide navigation context and show the user's current location within a hierarchy
-const BREADCRUMB_STORY: () = &[
-    two_elements,
-    multiple_elements,
-    long_path,
-];
+const BREADCRUMB_STORY: () = &[two_elements, multiple_elements, long_path];

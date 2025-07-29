@@ -1,30 +1,56 @@
-// "use client"
+use leptos::prelude::*;
+use leptos_icons::Icon;
+use tailwind_fuse::*;
 
-// import * as React from "react"
-// import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-// import { Check } from "lucide-react"
+use crate::behavior::{CheckboxIndicator, CheckboxRoot};
 
-// import { cn } from "@/lib/utils"
+#[derive(TwClass)]
+#[tw(
+    class = "peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
+)]
+struct CheckboxStyle {
+    size: CheckboxSize,
+}
 
-// const Checkbox = React.forwardRef<
-//   React.ElementRef<typeof CheckboxPrimitive.Root>,
-//   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
-// >(({ className, ...props }, ref) => (
-//   <CheckboxPrimitive.Root
-//     ref={ref}
-//     className={cn(
-//       "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
-//       className
-//     )}
-//     {...props}
-//   >
-//     <CheckboxPrimitive.Indicator
-//       className={cn("flex items-center justify-center text-current")}
-//     >
-//       <Check className="h-4 w-4" />
-//     </CheckboxPrimitive.Indicator>
-//   </CheckboxPrimitive.Root>
-// ))
-// Checkbox.displayName = CheckboxPrimitive.Root.displayName
+#[derive(TwVariant)]
+pub enum CheckboxSize {
+    #[tw(default, class = "size-4")]
+    Default,
+    #[tw(class = "size-3")]
+    Sm,
+    #[tw(class = "size-5")]
+    Lg,
+}
 
-// export { Checkbox }
+#[component]
+pub fn Checkbox(
+    #[prop(optional)] class: &'static str,
+    #[prop(optional)] size: CheckboxSize,
+    #[prop(optional)] checked: RwSignal<bool>,
+    #[prop(optional, into)] disabled: Signal<bool>,
+    #[prop(optional_no_strip, into)] id: Option<&'static str>,
+    #[prop(optional_no_strip, into)] name: Option<&'static str>,
+) -> impl IntoView {
+    let final_class = CheckboxStyle { size }.with_class(class);
+
+    view! {
+        <CheckboxRoot
+            checked=checked
+            disabled=disabled
+            id=id
+            name=name
+            class=final_class
+        >
+            <CheckboxIndicator class="flex items-center justify-center text-current transition-none">
+                <Icon
+                    icon=icondata::LuCheck
+                    attr:class=match size {
+                        CheckboxSize::Sm => "size-2.5",
+                        CheckboxSize::Default => "size-3.5",
+                        CheckboxSize::Lg => "size-4",
+                    }
+                />
+            </CheckboxIndicator>
+        </CheckboxRoot>
+    }
+}

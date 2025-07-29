@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -40,6 +40,7 @@ fn main() -> BuildResult<()> {
 }
 
 fn setup_cargo_rerun_conditions() {
+    println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/stories/");
     println!("cargo:rerun-if-changed=../ui/src/visual/");
 }
@@ -91,39 +92,69 @@ mod data {
 }
 
 mod imports {
-    use super::*;
+    use itertools::Itertools;
 
     /// Extracts component names from holt_ui::visual imports in the given content.
     /// Returns a sorted, deduplicated list of main component names (excluding variants).
     pub fn extract_holt_ui_imports(content: &str) -> Vec<String> {
-        let mut components: Vec<String> = content
-            .lines()
-            .filter_map(|line| parse_import_line(line.trim()))
-            .flatten()
-            .filter(|import| is_main_component(import))
-            .collect::<HashSet<_>>() // Dedup
+        let mut components: Vec<String> = extract_all_imports(content)
             .into_iter()
+            .filter(|import| is_main_component(import))
+            .unique()
             .collect();
 
         components.sort();
         components
     }
 
-    pub fn parse_import_line(line: &str) -> Option<Vec<String>> {
-        if !line.starts_with("use holt_ui::visual::") {
-            return None;
+    /// Extracts all imports from holt_ui::visual, handling both single-line and multi-line imports.
+    fn extract_all_imports(content: &str) -> Vec<String> {
+        let mut imports = Vec::new();
+        let mut current_pos = 0;
+
+        while current_pos < content.len() {
+            if let Some(import_start) = content[current_pos..].find("use holt_ui::visual::") {
+                let absolute_start = current_pos + import_start;
+                let import_content = &content[absolute_start..];
+
+                if let Some(import_end) = find_import_end(import_content) {
+                    let full_import = &import_content[..import_end];
+                    imports.extend(parse_full_import(full_import));
+                    current_pos = absolute_start + import_end;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
         }
 
-        let imports_part = line.strip_prefix("use holt_ui::visual::")?;
+        imports
+    }
+
+    /// Finds the end of an import statement (the semicolon).
+    fn find_import_end(import_content: &str) -> Option<usize> {
+        import_content.find(';').map(|pos| pos + 1)
+    }
+
+    /// Parses a complete import statement (which may span multiple lines).
+    fn parse_full_import(import_statement: &str) -> Vec<String> {
+        let imports_part = import_statement
+            .strip_prefix("use holt_ui::visual::")
+            .unwrap_or("")
+            .trim_end_matches(';')
+            .trim();
 
         if let Some(imports) = extract_braced_imports(imports_part) {
-            Some(imports)
+            imports
+        } else if let Some(import) = extract_single_import(imports_part) {
+            vec![import]
         } else {
-            extract_single_import(imports_part).map(|imp| vec![imp])
+            Vec::new()
         }
     }
 
-    pub fn extract_braced_imports(imports_part: &str) -> Option<Vec<String>> {
+    fn extract_braced_imports(imports_part: &str) -> Option<Vec<String>> {
         if !imports_part.starts_with('{') || !imports_part.contains('}') {
             return None;
         }
@@ -141,8 +172,8 @@ mod imports {
         )
     }
 
-    pub fn extract_single_import(imports_part: &str) -> Option<String> {
-        let import = imports_part.trim_end_matches(';').trim();
+    fn extract_single_import(imports_part: &str) -> Option<String> {
+        let import = imports_part.trim();
         if import.is_empty() {
             None
         } else {
@@ -156,6 +187,8 @@ mod imports {
 }
 
 mod parser {
+    use itertools::Itertools;
+
     use super::*;
 
     /// Parses story files to extract component information.
@@ -200,9 +233,14 @@ mod parser {
                 .to_string();
 
             let story_contents = fs::read_to_string(path)?;
-            let components = imports::extract_holt_ui_imports(&story_contents);
+            let component_imports = imports::extract_holt_ui_imports(&story_contents);
+            let components = extract_component_names(component_imports.clone());
 
             if components.len() != 1 {
+                println!(
+                    "cargo:warning=Found more than one component used in story '{story_name}': {components:?}"
+                );
+
                 return Ok(None);
             }
 
@@ -225,6 +263,29 @@ mod parser {
                 info,
             }))
         }
+    }
+
+    fn extract_component_names(component_imports: Vec<String>) -> Vec<String> {
+        component_imports
+            .into_iter()
+            .filter_map(extract_base_component_name)
+            .unique()
+            .collect()
+    }
+
+    fn extract_base_component_name(component_name: String) -> Option<String> {
+        if component_name.is_empty() {
+            return None;
+        }
+
+        Some(
+            component_name
+                .chars()
+                .enumerate()
+                .take_while(|&(i, ch)| i == 0 || ch.is_lowercase())
+                .map(|(_, ch)| ch)
+                .collect(),
+        )
     }
 
     pub fn is_valid_story_file(path: &Path) -> bool {

@@ -66,8 +66,8 @@ fn interactive() -> AnyView {
     view! {
         <div class="flex flex-col space-y-2">
             <div class="flex items-center space-x-2">
-                <Checkbox checked=checked id="toggle-me" />
-                <label for="toggle-me" class="text-sm font-medium">
+                <Checkbox checked=checked />
+                <label class="text-sm font-medium">
                     "Toggle me"
                 </label>
             </div>

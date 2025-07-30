@@ -2,7 +2,9 @@ name: Deploy holt_ui_book to GH Pages
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - marts/build
   workflow_dispatch:
 
 permissions:

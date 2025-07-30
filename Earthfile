@@ -71,15 +71,15 @@ checks:
 # run sequentially to avoid overwriting each other's changes.
 pre-commit:
     WAIT
-        BUILD +prettier
+        BUILD +prettier --FIX="true"
     END
     WAIT
-        BUILD +format-toml
+        BUILD +format-toml --FIX="true"
     END
-    BUILD +format-rust
-    BUILD +lint-markdown
-    BUILD +lint-rust
-    BUILD +lint-yaml
+    BUILD +format-rust --FIX="true"
+    BUILD +format-markdown --FIX="true"
+    BUILD +format-rust --FIX="true"
+    BUILD +format-yaml --FIX="true"
 
 check-docs:
     DO ./.earthly/rust+DOCS

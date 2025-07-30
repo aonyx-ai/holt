@@ -1,0 +1,27 @@
+VERSION 0.8
+
+FORMAT:
+    FUNCTION
+
+    ARG FIX="false"
+
+    FROM python
+    WORKDIR /holt
+
+    # Install Just
+    RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+
+    # Copy the source code into the container
+    COPY . .
+
+    # Run Just
+    IF [ "$FIX" = "true" ]
+        RUN just --fmt --unstable
+    ELSE
+        RUN just --fmt --check --unstable
+    END
+
+    # Save changes back to the local filesystem
+    IF [ "$FIX" = "true" ]
+        SAVE ARTIFACT ./* AS LOCAL .
+    END

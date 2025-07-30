@@ -24,5 +24,5 @@ dual licensed as above, without any additional terms or conditions.
 ### Development
 
 For developing and testing Holt, all you should need is Cargo and Trunk (which
-can be installed via `cargo install trunk`). Run `just serve` to start a
+can be installed via `cargo install trunk`). Run `just ui_book serve` to start a
 development server hosting our storybook.

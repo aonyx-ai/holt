@@ -1,0 +1,47 @@
+name: Deploy holt_ui_book to GH Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install earthly
+        uses: jdno/earthly-actions-setup@v2.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 0.8
+
+      - name: Run check with Earthly
+        env:
+          EARTHLY_TOKEN: ${{ secrets.EARTHLY_TOKEN }}
+        run: earthly --allow-privileged --ci --push --remote-cache=ghcr.io/aonyx-rs/holt-earthly-cache:build-holt-book +build-holt-book
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "crates/ui-book/dist/"
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -81,6 +81,9 @@ pre-commit:
     BUILD +lint-rust
     BUILD +lint-yaml
 
+build-holt-book:
+    DO ./.earthly/rust+BUILD_HOLT_BOOK
+
 check-docs:
     DO ./.earthly/rust+DOCS
 

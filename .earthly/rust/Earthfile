@@ -130,6 +130,19 @@ PUBLISH:
         DO rust+CARGO --secret CARGO_REGISTRY_TOKEN --args="publish -v --all-features --token $CARGO_REGISTRY_TOKEN -p $CRATE"
     END
 
+BUILD_HOLT_BOOK:
+    FUNCTION
+
+    DO +SOURCES
+
+    # Build the book
+    RUN rustup target add wasm32-unknown-unknown
+    DO rust+CARGO --args="install trunk"
+    WORKDIR /holt/crates/ui-book
+    RUN trunk build
+
+    SAVE ARTIFACT /holt/crates/ui-book/dist/ AS LOCAL crates/ui-book/dist/
+
 SOURCES:
     FUNCTION
 

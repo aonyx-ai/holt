@@ -20,3 +20,9 @@ for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
 
 [leptos]: https://leptos.dev/
+
+### Development
+
+For developing and testing Holt, all you should need is Cargo and Trunk (which
+can be installed via `cargo install trunk`). Run `just serve` to start a
+development server hosting our storybook.

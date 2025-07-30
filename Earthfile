@@ -57,6 +57,7 @@ checks:
     BUILD +check-latest-deps
     BUILD +check-minimal-deps
     BUILD +check-msrv
+    BUILD +format-just --FIX="false"
     BUILD +format-json --FIX="false"
     BUILD +format-markdown --FIX="false"
     BUILD +format-rust --FIX="false"
@@ -71,20 +72,16 @@ checks:
 # run sequentially to avoid overwriting each other's changes.
 pre-commit:
     WAIT
-        BUILD +prettier --FIX="true"
+        BUILD +prettier
     END
     WAIT
-        BUILD +format-toml --FIX="true"
+        BUILD +format-toml
     END
-    WAIT
-      BUILD +format-rust --FIX="true"
-    END
-    WAIT
-      BUILD +lint-rust --FIX="true"
-    END
-    BUILD +format-markdown --FIX="true"
-    BUILD +format-rust --FIX="true"
-    BUILD +format-yaml --FIX="true"
+    BUILD +format-just
+    BUILD +format-rust
+    BUILD +lint-markdown
+    BUILD +lint-rust
+    BUILD +lint-yaml
 
 check-docs:
     DO ./.earthly/rust+DOCS
@@ -101,6 +98,10 @@ check-minimal-deps:
 check-msrv:
     ARG MSRV="1.88.0"
     DO ./.earthly/rust+MSRV --MSRV="$MSRV"
+
+format-just:
+    ARG FIX="false"
+    DO ./.earthly/just+FORMAT --FIX="$FIX"
 
 format-json:
     ARG FIX="false"

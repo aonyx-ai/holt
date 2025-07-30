@@ -76,7 +76,12 @@ pre-commit:
     WAIT
         BUILD +format-toml --FIX="true"
     END
-    BUILD +format-rust --FIX="true"
+    WAIT
+      BUILD +format-rust --FIX="true"
+    END
+    WAIT
+      BUILD +lint-rust --FIX="true"
+    END
     BUILD +format-markdown --FIX="true"
     BUILD +format-rust --FIX="true"
     BUILD +format-yaml --FIX="true"

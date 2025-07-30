@@ -82,8 +82,12 @@ FORMAT:
     # Check or fix the formatting of the source code
     IF [ "$FIX" = "true" ]
         DO rust+CARGO --args="fmt --all"
+        DO rust+CARGO --args="install leptosfmt"
+        RUN leptosfmt ./crates/**/*.rs
     ELSE
         DO rust+CARGO --args="fmt --all --check"
+        DO rust+CARGO --args="install leptosfmt"
+        RUN leptosfmt --check ./crates/**/*.rs
     END
 
 LINT:

@@ -236,7 +236,15 @@ mod parser {
             let component_imports = imports::extract_holt_ui_imports(&story_contents);
             let components = extract_component_names(component_imports.clone());
 
-            if components.len() != 1 {
+            let chosen_component = if components.len() != 1 {
+                components
+                    .iter()
+                    .find(|c| c.to_lowercase() == story_name.to_lowercase())
+            } else {
+                components.first()
+            };
+
+            if chosen_component.is_none() {
                 println!(
                     "cargo:warning=Found more than one component used in story '{story_name}': {components:?}"
                 );
@@ -244,7 +252,7 @@ mod parser {
                 return Ok(None);
             }
 
-            let component_name = components.first().unwrap();
+            let component_name = chosen_component.unwrap();
             let component_path = self
                 .config
                 .ui_components_dir

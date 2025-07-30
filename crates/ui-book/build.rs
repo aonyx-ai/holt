@@ -237,7 +237,9 @@ mod parser {
             let components = extract_component_names(component_imports.clone());
 
             let chosen_component = if components.len() != 1 {
-                components.iter().find(|c| c.to_lowercase() == story_name.to_lowercase())
+                components
+                    .iter()
+                    .find(|c| c.to_lowercase() == story_name.to_lowercase())
             } else {
                 components.first()
             };

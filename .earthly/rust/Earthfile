@@ -86,13 +86,29 @@ FORMAT:
         DO rust+CARGO --args="fmt --all --check"
     END
 
+    # Save changes back to the local filesystem
+    IF [ "$FIX" = "true" ]
+        SAVE ARTIFACT ./* AS LOCAL .
+    END
+
 LINT:
     FUNCTION
+
+    ARG FIX="false"
 
     DO +SOURCES
 
     # Check the code for linting errors
-    DO rust+CARGO --args="clippy --workspace --all-targets --all-features -- -D warnings"
+    IF [ "$FIX" = "true" ]
+        DO rust+CARGO --args="clippy --workspace --all-targets --all-features --fix -- -D warnings"
+    ELSE
+        DO rust+CARGO --args="clippy --workspace --all-targets --all-features -- -D warnings"
+    END
+
+    # Save changes back to the local filesystem
+    IF [ "$FIX" = "true" ]
+        SAVE ARTIFACT ./* AS LOCAL .
+    END
 
 MSRV:
     FUNCTION

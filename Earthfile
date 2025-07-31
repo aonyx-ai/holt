@@ -84,7 +84,8 @@ pre-commit:
     BUILD +lint-yaml
 
 build-holt-book:
-    DO ./.earthly/rust+BUILD_HOLT_BOOK
+    ARG PUBLIC_URL=""
+    DO ./.earthly/rust+BUILD_HOLT_BOOK --PUBLIC_URL="$PUBLIC_URL"
 
 check-docs:
     DO ./.earthly/rust+DOCS

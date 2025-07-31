@@ -40,4 +40,4 @@ jobs:
       - name: Run tests with latest dependency versions
         env:
           EARTHLY_TOKEN: ${{ secrets.EARTHLY_TOKEN }}
-        run: earthly --ci --push --remote-cache=ghcr.io/aonyx-rs/holt-earthly-cache:check-latest-deps +check-latest-deps
+        run: earthly --ci --push --remote-cache=ghcr.io/aonyx-rs/holt-earthly-cache:check-latest-deps +check-latest-deps --PUBLIC_URL="https://aonyx-rs.github.io/holt/"

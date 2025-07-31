@@ -149,13 +149,20 @@ PUBLISH:
 BUILD_HOLT_BOOK:
     FUNCTION
 
+    ARG PUBLIC_URL=""
+
     DO +SOURCES
 
     # Build the book
     RUN rustup target add wasm32-unknown-unknown
     DO rust+CARGO --args="install trunk"
     WORKDIR /holt/crates/ui-book
-    RUN trunk build
+
+    IF [ "$PUBLIC_URL" = "" ]
+        RUN trunk build
+    ELSE
+        RUN trunk build --public-url "$PUBLIC_URL"
+    END
 
     SAVE ARTIFACT /holt/crates/ui-book/dist/ AS LOCAL crates/ui-book/
 

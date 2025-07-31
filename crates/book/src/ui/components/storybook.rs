@@ -64,7 +64,7 @@ fn StorybookNavigation() -> impl IntoView {
                         view! {
                             <li>
                                 <A
-                                    href=move || format!("/story/{}", story.id)
+                                    href=move || format!("story/{}", story.id)
                                     {..}
                                     class="block px-2 py-1 rounded hover:bg-muted"
                                 >

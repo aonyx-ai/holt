@@ -157,7 +157,7 @@ BUILD_HOLT_BOOK:
     WORKDIR /holt/crates/ui-book
     RUN trunk build
 
-    SAVE ARTIFACT /holt/crates/ui-book/dist/ AS LOCAL crates/ui-book/dist/
+    SAVE ARTIFACT /holt/crates/ui-book/dist/ AS LOCAL crates/ui-book/
 
 SOURCES:
     FUNCTION

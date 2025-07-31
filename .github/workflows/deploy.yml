@@ -1,17 +1,12 @@
+---
 name: Deploy holt_ui_book to GH Pages
 
-on:
+"on":
   push:
     branches:
       - main
       - marts/build
   workflow_dispatch:
-
-permissions:
-  packages: write
-  contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -23,6 +18,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+      contents: read
+      pages: write
+      id-token: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,12 +48,12 @@ jobs:
       - name: Run check with Earthly
         env:
           EARTHLY_TOKEN: ${{ secrets.EARTHLY_TOKEN }}
-        run: earthly --allow-privileged --ci --push --remote-cache=ghcr.io/aonyx-rs/holt-earthly-cache:build-holt-book +build-holt-book
+        run: earthly --allow-privileged --ci --push --remote-cache=ghcr.io/aonyx-rs/holt-earthly-cache:build-holt-book --output +build-holt-book
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "crates/ui-book/dist/"
+          path: "crates/ui-book/dist"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

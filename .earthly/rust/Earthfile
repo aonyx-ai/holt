@@ -150,6 +150,7 @@ BUILD_HOLT_BOOK:
     FUNCTION
 
     ARG PUBLIC_URL=""
+    ARG RELEASE="false"
 
     DO +CONTAINER
 
@@ -161,11 +162,17 @@ BUILD_HOLT_BOOK:
 
     WORKDIR /holt/crates/ui-book
 
+    LET publicUrlFlag = ""
     IF [ "$PUBLIC_URL" = "" ]
-        RUN trunk build
-    ELSE
-        RUN trunk build --public-url "$PUBLIC_URL"
+        SET publicUrlFlag = "--public-url $PUBLIC_URL"
     END
+
+    LET releaseFlag = ""
+    IF [ "$RELEASE" = "true" ]
+        SET releaseFlag = "--release"
+    END
+
+    RUN trunk build $publicUrlFlag $releaseFlag
 
     SAVE ARTIFACT /holt/crates/ui-book/dist/ AS LOCAL crates/ui-book/
 

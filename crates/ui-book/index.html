@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+    <!-- Provide Trunk's public URL param to Leptos for routing -->
     <base data-trunk-public-url />
 
     <!-- See https://trunkrs.dev/assets/#tailwind -->
@@ -11,6 +12,9 @@
 
     <!-- include support for `wasm-bindgen --weak-refs` - see: https://rustwasm.github.io/docs/wasm-bindgen/reference/weak-references.html -->
     <link data-trunk rel="rust" data-wasm-opt="z" data-weak-refs />
+
+    <!-- Include 404 file for Github Pages redirect -->
+    <link data-trunk rel="copy-file" href="404.html" />
   </head>
 
   <body></body>

@@ -8,6 +8,7 @@ use crate::ui::components::Storybook;
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
+    let base = document().base_uri().ok().flatten().unwrap_or_default();
 
     view! {
         <Html attr:lang="en" attr:dir="ltr" attr:data-theme="light" />
@@ -19,7 +20,7 @@ pub fn App() -> impl IntoView {
         <Meta charset="UTF-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <Router>
+        <Router base=base>
             <Storybook />
         </Router>
     }

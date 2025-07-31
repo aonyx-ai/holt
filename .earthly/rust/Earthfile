@@ -163,7 +163,7 @@ BUILD_HOLT_BOOK:
     WORKDIR /holt/crates/ui-book
 
     LET publicUrlFlag = ""
-    IF [ "$PUBLIC_URL" = "" ]
+    IF [ "$PUBLIC_URL" != "" ]
         SET publicUrlFlag = "--public-url $PUBLIC_URL"
     END
 

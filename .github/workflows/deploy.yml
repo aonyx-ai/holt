@@ -48,7 +48,7 @@ jobs:
       - name: Run check with Earthly
         env:
           EARTHLY_TOKEN: ${{ secrets.EARTHLY_TOKEN }}
-        run: earthly --allow-privileged --ci --push --remote-cache=ghcr.io/aonyx-rs/holt-earthly-cache:build-holt-book --output +build-holt-book
+        run: earthly --allow-privileged --ci --push --remote-cache=ghcr.io/aonyx-rs/holt-earthly-cache:build-holt-book --output +build-holt-book --PUBLIC_URL="https://aonyx-rs.github.io/holt/"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

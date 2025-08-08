@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT github.com/earthly/lib/rust AS rust
 
-FROM rust:1.88.0-slim
+FROM rust:1.89.0-slim
 WORKDIR /holt
 
 root-rust-sources:

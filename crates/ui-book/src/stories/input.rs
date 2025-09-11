@@ -7,7 +7,7 @@ fn default() -> AnyView {
     let value = RwSignal::new(String::new());
     view! {
         <div class="w-80 space-y-2">
-            <Input value=value placeholder=Some("Email") />
+            <Input value=value placeholder="Email" />
             <p class="text-sm text-gray-600">"Value: " {move || value.get()}</p>
         </div>
     }
@@ -21,9 +21,9 @@ fn sizes() -> AnyView {
     let v3 = RwSignal::new(String::new());
     view! {
         <div class="w-80 space-y-3">
-            <Input size=InputSize::Sm value=v1 placeholder=Some("Small") />
-            <Input value=v2 placeholder=Some("Default") />
-            <Input size=InputSize::Lg value=v3 placeholder=Some("Large") />
+            <Input size=InputSize::Sm value=v1 placeholder="Small" />
+            <Input value=v2 placeholder="Default" />
+            <Input size=InputSize::Lg value=v3 placeholder="Large" />
         </div>
     }
     .into_any()
@@ -41,9 +41,8 @@ fn with_label_and_help() -> AnyView {
     view! {
         <div class="w-80 space-y-2">
             <label for="email" class="text-sm font-medium leading-none">"Email"</label>
-            <Input id=Some("email") name=Some("email") value=value placeholder=Some("you@example.com") />
-            <p class="text-xs text-muted-foreground">"We’ll never share your email."
-            </p>
+            <Input id="email" name="email" value=value placeholder="you@example.com" />
+            <p class="text-xs text-muted-foreground">"We’ll never share your email."</p>
         </div>
     }
     .into_any()

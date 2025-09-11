@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT github.com/earthly/lib/rust AS rust
 
-FROM rust:1.88.0-slim
+FROM rust:1.89.0-slim
 WORKDIR /holt
 
 root-rust-sources:
@@ -57,6 +57,7 @@ checks:
     BUILD +check-latest-deps
     BUILD +check-minimal-deps
     BUILD +check-msrv
+    BUILD +format-just --FIX="false"
     BUILD +format-json --FIX="false"
     BUILD +format-markdown --FIX="false"
     BUILD +format-rust --FIX="false"
@@ -76,6 +77,7 @@ pre-commit:
     WAIT
         BUILD +format-toml
     END
+    BUILD +format-just
     BUILD +format-rust
     BUILD +lint-markdown
     BUILD +lint-rust
@@ -96,6 +98,10 @@ check-minimal-deps:
 check-msrv:
     ARG MSRV="1.88.0"
     DO ./.earthly/rust+MSRV --MSRV="$MSRV"
+
+format-just:
+    ARG FIX="false"
+    DO ./.earthly/just+FORMAT --FIX="$FIX"
 
 format-json:
     ARG FIX="false"

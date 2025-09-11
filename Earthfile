@@ -61,6 +61,7 @@ checks:
     BUILD +format-json --FIX="false"
     BUILD +format-markdown --FIX="false"
     BUILD +format-rust --FIX="false"
+    BUILD +format-leptos --FIX="false"
     BUILD +format-toml --FIX="false"
     BUILD +format-yaml --FIX="false"
     BUILD +lint-markdown
@@ -79,6 +80,7 @@ pre-commit:
     END
     BUILD +format-just
     BUILD +format-rust
+    BUILD +format-leptos
     BUILD +lint-markdown
     BUILD +lint-rust
     BUILD +lint-yaml
@@ -114,6 +116,10 @@ format-markdown:
 format-rust:
     ARG FIX="false"
     DO ./.earthly/rust+FORMAT --FIX="$FIX"
+
+format-leptos:
+    ARG FIX="false"
+    DO ./.earthly/leptos+FORMAT --FIX="$FIX"
 
 format-toml:
     ARG FIX="false"

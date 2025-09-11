@@ -104,12 +104,7 @@ fn StorybookStory() -> impl IntoView {
                         }
                         .into_any()
                     },
-                    |story| {
-                        view! {
-                            <StoryVariantDisplay story=story />
-                        }
-                        .into_any()
-                    },
+                    |story| view! { <StoryVariantDisplay story=story /> }.into_any(),
                 )
         } else {
             view! {
@@ -146,38 +141,51 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                         }
                     }
                 >
-                    {variants.iter().enumerate().map(|(i, variant)| {
-                        view! {
-                            <option value=i.to_string() selected=move || selected_variant.get() == i>
-                                {variant.name}
-                            </option>
-                        }
-                    }).collect::<Vec<_>>()}
+                    {variants
+                        .iter()
+                        .enumerate()
+                        .map(|(i, variant)| {
+                            view! {
+                                <option
+                                    value=i.to_string()
+                                    selected=move || selected_variant.get() == i
+                                >
+                                    {variant.name}
+                                </option>
+                            }
+                        })
+                        .collect::<Vec<_>>()}
                 </select>
             </div>
 
             <div class="border rounded-lg">
                 <div class="flex border-b">
                     <button
-                        class=move || format!("px-4 py-2 text-sm font-medium border-b-2 transition-colors {}",
-                            if active_tab.get() == "preview" {
-                                "border-primary text-primary bg-muted/50"
-                            } else {
-                                "border-transparent text-muted-foreground hover:text-foreground"
-                            }
-                        )
+                        class=move || {
+                            format!(
+                                "px-4 py-2 text-sm font-medium border-b-2 transition-colors {}",
+                                if active_tab.get() == "preview" {
+                                    "border-primary text-primary bg-muted/50"
+                                } else {
+                                    "border-transparent text-muted-foreground hover:text-foreground"
+                                },
+                            )
+                        }
                         on:click=move |_| set_active_tab.set("preview")
                     >
                         "Preview"
                     </button>
                     <button
-                        class=move || format!("px-4 py-2 text-sm font-medium border-b-2 transition-colors {}",
-                            if active_tab.get() == "code" {
-                                "border-primary text-primary bg-muted/50"
-                            } else {
-                                "border-transparent text-muted-foreground hover:text-foreground"
-                            }
-                        )
+                        class=move || {
+                            format!(
+                                "px-4 py-2 text-sm font-medium border-b-2 transition-colors {}",
+                                if active_tab.get() == "code" {
+                                    "border-primary text-primary bg-muted/50"
+                                } else {
+                                    "border-transparent text-muted-foreground hover:text-foreground"
+                                },
+                            )
+                        }
                         on:click=move |_| set_active_tab.set("code")
                     >
                         "Code"
@@ -193,7 +201,8 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                                     <div class="flex items-center justify-center min-h-[200px] bg-muted/20 rounded-lg">
                                         {(variant.render)()}
                                     </div>
-                                }.into_any()
+                                }
+                                    .into_any()
                             } else {
                                 view! {
                                     <div class="bg-muted/30 rounded-lg p-4">
@@ -201,7 +210,8 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                                             <code>{variant.source}</code>
                                         </pre>
                                     </div>
-                                }.into_any()
+                                }
+                                    .into_any()
                             }
                         } else {
                             view! { <div>"No variant selected"</div> }.into_any()
@@ -210,16 +220,18 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                 </div>
             </div>
 
-            {story.description.map(|desc| {
-               view! {
-                   <div class="max-w-full">
-                       <H2>Documentation</H2>
-                       <div class="max-w-full overflow-hidden">
-                           <Markdown content={desc.to_string()} />
-                       </div>
-                   </div>
-                }
-            })}
+            {story
+                .description
+                .map(|desc| {
+                    view! {
+                        <div class="max-w-full">
+                            <H2>Documentation</H2>
+                            <div class="max-w-full overflow-hidden">
+                                <Markdown content=desc.to_string() />
+                            </div>
+                        </div>
+                    }
+                })}
         </div>
     }
 }

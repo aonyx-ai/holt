@@ -48,7 +48,9 @@ pub fn Input(
             disabled=disabled
             readonly=readonly
             required=required
-            data-invalid=move || if required.get() && value.get().is_empty() { Some("true") } else { None }
+            data-invalid=move || {
+                if required.get() && value.get().is_empty() { Some("true") } else { None }
+            }
         />
     }
 }

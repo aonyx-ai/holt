@@ -35,7 +35,9 @@ fn with_footer() -> AnyView {
                 </p>
             </CardContent>
             <CardFooter>
-                <Button variant=ButtonVariant::Outline class="mr-2">Cancel</Button>
+                <Button variant=ButtonVariant::Outline class="mr-2">
+                    Cancel
+                </Button>
                 <Button>Get Started</Button>
             </CardFooter>
         </Card>
@@ -63,7 +65,9 @@ fn notification_card() -> AnyView {
                 </p>
             </CardContent>
             <CardFooter class="pt-3">
-                <Button variant=ButtonVariant::Ghost class="text-xs">Mark as read</Button>
+                <Button variant=ButtonVariant::Ghost class="text-xs">
+                    Mark as read
+                </Button>
             </CardFooter>
         </Card>
     }
@@ -81,9 +85,7 @@ fn stats_card() -> AnyView {
                 </CardHeader>
                 <CardContent>
                     <div class="text-2xl font-bold">$45,231.89</div>
-                    <p class="text-xs text-muted-foreground">
-                        +20.1% from last month
-                    </p>
+                    <p class="text-xs text-muted-foreground">+20.1% from last month</p>
                 </CardContent>
             </Card>
             <Card>
@@ -93,9 +95,7 @@ fn stats_card() -> AnyView {
                 </CardHeader>
                 <CardContent>
                     <div class="text-2xl font-bold">+2,350</div>
-                    <p class="text-xs text-muted-foreground">
-                        +180.1% from last month
-                    </p>
+                    <p class="text-xs text-muted-foreground">+180.1% from last month</p>
                 </CardContent>
             </Card>
             <Card>
@@ -105,9 +105,7 @@ fn stats_card() -> AnyView {
                 </CardHeader>
                 <CardContent>
                     <div class="text-2xl font-bold">+573</div>
-                    <p class="text-xs text-muted-foreground">
-                        +201 since last hour
-                    </p>
+                    <p class="text-xs text-muted-foreground">+201 since last hour</p>
                 </CardContent>
             </Card>
         </div>
@@ -195,11 +193,12 @@ fn minimal() -> AnyView {
         <Card class="w-64">
             <CardContent class="pt-6">
                 <div class="text-center">
-                    <Icon icon=icondata::LuPackage attr:class="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                    <Icon
+                        icon=icondata::LuPackage
+                        attr:class="mx-auto h-12 w-12 text-muted-foreground mb-4"
+                    />
                     <h3 class="font-semibold mb-2">Empty State</h3>
-                    <p class="text-sm text-muted-foreground">
-                        No items to display yet.
-                    </p>
+                    <p class="text-sm text-muted-foreground">No items to display yet.</p>
                 </div>
             </CardContent>
         </Card>
@@ -230,9 +229,7 @@ fn interactive() -> AnyView {
                 </div>
             </CardContent>
             <CardFooter>
-                <Button class="w-full">
-                    Click me!
-                </Button>
+                <Button class="w-full">Click me!</Button>
             </CardFooter>
         </Card>
     }

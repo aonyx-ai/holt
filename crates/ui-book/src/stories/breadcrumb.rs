@@ -74,11 +74,14 @@ fn long_path() -> AnyView {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Current Page with a Rather Long Name That Might Overflow</BreadcrumbPage>
+                    <BreadcrumbPage>
+                        Current Page with a Rather Long Name That Might Overflow
+                    </BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-    }.into_any()
+    }
+    .into_any()
 }
 
 include!(concat!(env!("OUT_DIR"), "/stories/breadcrumb_source.rs"));

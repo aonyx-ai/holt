@@ -50,10 +50,16 @@ fn controlled() -> AnyView {
         <div class="space-y-3">
             <div class="flex gap-2">
                 <Button on:click=move |_| open.set(true)>"Open"</Button>
-                <Button variant=holt_ui::visual::ButtonVariant::Outline on:click=move |_| open.set(false)>
+                <Button
+                    variant=holt_ui::visual::ButtonVariant::Outline
+                    on:click=move |_| open.set(false)
+                >
                     "Close"
                 </Button>
-                <Button variant=holt_ui::visual::ButtonVariant::Secondary on:click=move |_| open.update(|o| *o = !*o)>
+                <Button
+                    variant=holt_ui::visual::ButtonVariant::Secondary
+                    on:click=move |_| open.update(|o| *o = !*o)
+                >
                     "Toggle"
                 </Button>
             </div>

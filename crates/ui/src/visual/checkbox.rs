@@ -34,13 +34,7 @@ pub fn Checkbox(
     let final_class = CheckboxStyle { size }.with_class(class);
 
     view! {
-        <CheckboxRoot
-            checked=checked
-            disabled=disabled
-            id=id
-            name=name
-            class=final_class
-        >
+        <CheckboxRoot checked=checked disabled=disabled id=id name=name class=final_class>
             <CheckboxIndicator class="flex items-center justify-center text-current transition-none">
                 <Icon
                     icon=icondata::LuCheck

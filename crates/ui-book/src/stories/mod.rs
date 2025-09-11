@@ -6,3 +6,4 @@ mod checkbox;
 mod collapsible;
 mod input;
 mod label;
+mod select;

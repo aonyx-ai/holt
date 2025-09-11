@@ -2,8 +2,10 @@
 
 mod checkbox;
 mod collapsible;
+mod select;
 mod sidebar;
 
 pub use checkbox::*;
 pub use collapsible::*;
+pub use select::*;
 pub use sidebar::*;

@@ -36,7 +36,8 @@ fn disabled() -> AnyView {
         <div class="w-80">
             <Input value=value disabled=true />
         </div>
-    }.into_any()
+    }
+    .into_any()
 }
 
 #[variant]

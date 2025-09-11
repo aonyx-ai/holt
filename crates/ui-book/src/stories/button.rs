@@ -13,7 +13,8 @@ fn outline() -> AnyView {
         <Button class="w-32" variant=ButtonVariant::Outline>
             "Click me!"
         </Button>
-    }.into_any()
+    }
+    .into_any()
 }
 
 #[variant]
@@ -23,7 +24,7 @@ fn destructive() -> AnyView {
             "Click me!"
         </Button>
     }
-        .into_any()
+    .into_any()
 }
 
 #[variant]
@@ -32,7 +33,8 @@ fn secondary() -> AnyView {
         <Button class="w-32" variant=ButtonVariant::Secondary>
             "Click me!"
         </Button>
-    }.into_any()
+    }
+    .into_any()
 }
 
 #[variant]
@@ -41,7 +43,8 @@ fn ghost() -> AnyView {
         <Button class="w-32" variant=ButtonVariant::Ghost>
             "Click me!"
         </Button>
-    }.into_any()
+    }
+    .into_any()
 }
 
 #[variant]
@@ -50,7 +53,8 @@ fn link() -> AnyView {
         <Button class="w-32" variant=ButtonVariant::Link>
             "Click me!"
         </Button>
-    }.into_any()
+    }
+    .into_any()
 }
 
 include!(concat!(env!("OUT_DIR"), "/stories/button_source.rs"));

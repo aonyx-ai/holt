@@ -37,7 +37,7 @@ fn verified() -> AnyView {
 #[variant]
 fn number_8() -> AnyView {
     view! { <Badge class="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">8</Badge> }
-    .into_any()
+        .into_any()
 }
 
 #[variant]

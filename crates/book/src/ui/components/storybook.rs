@@ -104,10 +104,7 @@ fn StorybookStory() -> impl IntoView {
                         }
                         .into_any()
                     },
-                    |story| {
-                        view! { <StoryVariantDisplay story=story /> }
-                        .into_any()
-                    },
+                    |story| view! { <StoryVariantDisplay story=story /> }.into_any(),
                 )
         } else {
             view! {

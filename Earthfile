@@ -79,8 +79,8 @@ pre-commit:
         BUILD +format-toml
     END
     BUILD +format-just
-    BUILD +format-rust
     BUILD +format-leptos
+    BUILD +format-rust
     BUILD +lint-markdown
     BUILD +lint-rust
     BUILD +lint-yaml

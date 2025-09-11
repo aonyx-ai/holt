@@ -80,7 +80,8 @@ fn long_path() -> AnyView {
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-    }.into_any()
+    }
+    .into_any()
 }
 
 include!(concat!(env!("OUT_DIR"), "/stories/breadcrumb_source.rs"));

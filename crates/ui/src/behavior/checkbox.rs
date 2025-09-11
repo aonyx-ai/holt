@@ -27,7 +27,7 @@ impl CheckboxContext {
     }
 }
 
-/// Root checkbox primitive that provides context and handles the underlying input
+/// Root checkbox primitive that provides context and handles the underlying button
 #[component]
 pub fn CheckboxRoot(
     #[prop(optional, into)] class: Option<String>,
@@ -38,19 +38,27 @@ pub fn CheckboxRoot(
     children: Children,
 ) -> impl IntoView {
     let context = CheckboxContext::new(checked, disabled);
+    let context_on_click = context.clone();
     provide_context(context);
 
     view! {
-        <input
-            type="checkbox"
+        <button
+            type="button"
+            role="checkbox"
+            aria-checked=move || checked.get()
             class=class
-            bind:checked=checked
+            on:click=move |_| {
+                if !context_on_click.is_disabled() {
+                    context_on_click.toggle();
+                }
+            }
             disabled=disabled
-            data-state=if checked.get() { "checked" } else { "unchecked" }
+            data-state=move || if checked.get() { "checked" } else { "unchecked" }
             id=id
             name=name
-        />
-        {children()}
+        >
+            {children()}
+        </button>
     }
 }
 

@@ -5,7 +5,13 @@ use leptos::prelude::*;
 #[variant]
 fn default() -> AnyView {
     let value = RwSignal::new(String::new());
-    view! { <div class="w-80"><Input value=value placeholder=Some("Email") /></div> }.into_any()
+    view! {
+        <div class="w-80 space-y-2">
+            <Input value=value placeholder=Some("Email") />
+            <p class="text-sm text-gray-600">"Value: " {move || value.get()}</p>
+        </div>
+    }
+    .into_any()
 }
 
 #[variant]

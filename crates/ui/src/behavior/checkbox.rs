@@ -68,9 +68,7 @@ pub fn CheckboxIndicator(
 
     view! {
         <Show when=move || context.checked.get()>
-            <div class=class>
-                {children()}
-            </div>
+            <div class=class>{children()}</div>
         </Show>
     }
 }

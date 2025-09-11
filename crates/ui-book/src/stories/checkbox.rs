@@ -44,7 +44,10 @@ fn with_label() -> AnyView {
     view! {
         <div class="flex items-center space-x-2">
             <Checkbox checked=checked id="terms" />
-            <label for="terms" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            <label
+                for="terms"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
                 "Accept terms and conditions"
             </label>
         </div>
@@ -67,13 +70,9 @@ fn interactive() -> AnyView {
         <div class="flex flex-col space-y-2">
             <div class="flex items-center space-x-2">
                 <Checkbox checked=checked />
-                <label class="text-sm font-medium">
-                    "Toggle me"
-                </label>
+                <label class="text-sm font-medium">"Toggle me"</label>
             </div>
-            <p class="text-sm text-muted-foreground">
-                "Checked " {move || count.get()} " times"
-            </p>
+            <p class="text-sm text-muted-foreground">"Checked " {move || count.get()} " times"</p>
         </div>
     }
     .into_any()

@@ -9,28 +9,48 @@ fn default() -> AnyView {
 
 #[variant]
 fn outline() -> AnyView {
-    view! { <Button class="w-32" variant=ButtonVariant::Outline>"Click me!"</Button> }.into_any()
+    view! {
+        <Button class="w-32" variant=ButtonVariant::Outline>
+            "Click me!"
+        </Button>
+    }.into_any()
 }
 
 #[variant]
 fn destructive() -> AnyView {
-    view! { <Button class="w-32" variant=ButtonVariant::Destructive>"Click me!"</Button> }
+    view! {
+        <Button class="w-32" variant=ButtonVariant::Destructive>
+            "Click me!"
+        </Button>
+    }
         .into_any()
 }
 
 #[variant]
 fn secondary() -> AnyView {
-    view! { <Button class="w-32" variant=ButtonVariant::Secondary>"Click me!"</Button> }.into_any()
+    view! {
+        <Button class="w-32" variant=ButtonVariant::Secondary>
+            "Click me!"
+        </Button>
+    }.into_any()
 }
 
 #[variant]
 fn ghost() -> AnyView {
-    view! { <Button class="w-32" variant=ButtonVariant::Ghost>"Click me!"</Button> }.into_any()
+    view! {
+        <Button class="w-32" variant=ButtonVariant::Ghost>
+            "Click me!"
+        </Button>
+    }.into_any()
 }
 
 #[variant]
 fn link() -> AnyView {
-    view! { <Button class="w-32" variant=ButtonVariant::Link>"Click me!"</Button> }.into_any()
+    view! {
+        <Button class="w-32" variant=ButtonVariant::Link>
+            "Click me!"
+        </Button>
+    }.into_any()
 }
 
 include!(concat!(env!("OUT_DIR"), "/stories/button_source.rs"));

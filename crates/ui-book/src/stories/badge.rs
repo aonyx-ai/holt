@@ -25,43 +25,44 @@ fn outline() -> AnyView {
 
 #[variant]
 fn verified() -> AnyView {
-    view! { <Badge
-        variant=BadgeVariant::Secondary
-        class="bg-blue-500 text-white dark:bg-blue-600"
-    >
-        <Icon icon=icondata::LuBadgeCheck />
-        Verified
-    </Badge> }
+    view! {
+        <Badge variant=BadgeVariant::Secondary class="bg-blue-500 text-white dark:bg-blue-600">
+            <Icon icon=icondata::LuBadgeCheck />
+            Verified
+        </Badge>
+    }
     .into_any()
 }
 
 #[variant]
 fn number_8() -> AnyView {
-    view! { <Badge class="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">
-        8
-    </Badge> }
+    view! { <Badge class="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">8</Badge> }
     .into_any()
 }
 
 #[variant]
 fn number_99() -> AnyView {
-    view! { <Badge
-        variant=BadgeVariant::Destructive
-        class="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
-    >
-        99
-    </Badge> }
+    view! {
+        <Badge
+            variant=BadgeVariant::Destructive
+            class="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
+        >
+            99
+        </Badge>
+    }
     .into_any()
 }
 
 #[variant]
 fn number_20_plus() -> AnyView {
-    view! { <Badge
-        variant=BadgeVariant::Outline
-        class="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
-    >
-        20+
-    </Badge> }
+    view! {
+        <Badge
+            variant=BadgeVariant::Outline
+            class="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
+        >
+            20+
+        </Badge>
+    }
     .into_any()
 }
 

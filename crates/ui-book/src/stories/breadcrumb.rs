@@ -74,7 +74,9 @@ fn long_path() -> AnyView {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Current Page with a Rather Long Name That Might Overflow</BreadcrumbPage>
+                    <BreadcrumbPage>
+                        Current Page with a Rather Long Name That Might Overflow
+                    </BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

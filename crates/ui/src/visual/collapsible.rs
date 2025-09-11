@@ -29,7 +29,11 @@ pub fn Collapsible(
     children: Children,
 ) -> impl IntoView {
     let class = CollapsibleStyle {}.with_class(class);
-    view! { <CollapsibleRootPrimitive class=class open=open>{children()}</CollapsibleRootPrimitive> }
+    view! {
+        <CollapsibleRootPrimitive class=class open=open>
+            {children()}
+        </CollapsibleRootPrimitive>
+    }
 }
 
 #[component]
@@ -39,7 +43,11 @@ pub fn CollapsibleTrigger(
     children: Children,
 ) -> impl IntoView {
     let class = CollapsibleTriggerStyle {}.with_class(class);
-    view! { <CollapsibleTriggerPrimitive class=class disabled=disabled>{children()}</CollapsibleTriggerPrimitive> }
+    view! {
+        <CollapsibleTriggerPrimitive class=class disabled=disabled>
+            {children()}
+        </CollapsibleTriggerPrimitive>
+    }
 }
 
 #[component]

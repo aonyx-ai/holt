@@ -32,7 +32,11 @@ fn sizes() -> AnyView {
 #[variant]
 fn disabled() -> AnyView {
     let value = RwSignal::new("Disabled".to_string());
-    view! { <div class="w-80"><Input value=value disabled=true /></div> }.into_any()
+    view! {
+        <div class="w-80">
+            <Input value=value disabled=true />
+        </div>
+    }.into_any()
 }
 
 #[variant]
@@ -40,7 +44,9 @@ fn with_label_and_help() -> AnyView {
     let value = RwSignal::new(String::new());
     view! {
         <div class="w-80 space-y-2">
-            <label for="email" class="text-sm font-medium leading-none">"Email"</label>
+            <label for="email" class="text-sm font-medium leading-none">
+                "Email"
+            </label>
             <Input id="email" name="email" value=value placeholder="you@example.com" />
             <p class="text-xs text-muted-foreground">"We’ll never share your email."</p>
         </div>

@@ -32,7 +32,7 @@ check-features:
 
 # Check latest dependencies with cargo-update
 check-deps-latest:
-    #!/usr/bin/env bash .flox/in-tmp-flox-env.sh check-deps-latest
+    #!/usr/bin/env bash -S .flox/in-tmp-flox-env.sh check-deps-latest
     # TODO(marts): Figure out how to install beta through the CLI
 
     # cargo update
@@ -42,7 +42,7 @@ check-deps-latest:
 
 # Check minimal dependencies with cargo-update
 check-deps-minimal:
-    #!/usr/bin/env bash .flox/in-tmp-flox-env.sh check-deps-minimal
+    #!/usr/bin/env bash -S .flox/in-tmp-flox-env.sh check-deps-minimal
     flox uninstall cargo
     # TODO(marts): Figure out how to install beta through the CLI
     # flox install
@@ -52,7 +52,7 @@ check-deps-minimal:
 
 # Check MSRV
 check-msrv:
-    #!/usr/bin/env bash .flox/in-tmp-flox-env.sh check-msrv
+    #!/usr/bin/env bash -S .flox/in-tmp-flox-env.sh check-msrv
     flox uninstall cargo
     flox install cargo@{{ msrv }}
     cargo check --workspace --all-features --all-targets

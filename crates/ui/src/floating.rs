@@ -497,7 +497,6 @@ mod tests {
         assert_eq!(position.y, 200.0); // reference_y
     }
 
-
     #[test]
     fn floating_position_all_combinations() {
         // Test all side/align combinations to ensure comprehensive coverage

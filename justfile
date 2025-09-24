@@ -29,16 +29,6 @@ check-docs:
 check-features:
     cargo hack --workspace --feature-powerset check --tests
 
-[private]
-inner-check-deps-latest:
-  rustup default beta
-
-  # Update the dependencies to the latest versions
-  cargo update
-
-  # Run tests to ensure the latest versions are compatible
-  RUSTFLAGS="-D deprecated" cargo test --all-features --all-targets --locked
-
 # Check latest dependencies with cargo-update
 check-deps-latest:
     #!/usr/bin/env sh
@@ -49,19 +39,19 @@ check-deps-latest:
         cd /tmp/deps-latest
     fi
 
-    just inner-check-deps-latest
+    flox activate -- sh -u <<EOF
+        rustup default beta
+
+        # Update the dependencies to the latest versions
+        cargo update
+
+        # Run tests to ensure the latest versions are compatible
+        RUSTFLAGS="-D deprecated" cargo test --all-features --all-targets --locked
+    EOF
 
     if [[ -z "$CI" ]]; then
         rm -rf /tmp/deps-latest
     fi
-
-[private]
-inner-check-deps-minimal:
-  rustup default nightly
-  cargo update -Z direct-minimal-versions
-
-  # Run tests to ensure the minimal versions are compatible
-  cargo test --all-features --all-targets --locked
 
 # Check minimal dependencies with cargo-update
 check-deps-minimal:
@@ -73,7 +63,13 @@ check-deps-minimal:
         cd /tmp/deps-minimal
     fi
 
-    just inner-check-deps-minimal
+    flox activate -- sh -u <<EOF
+        rustup default nightly
+        cargo update -Z direct-minimal-versions
+
+        # Run tests to ensure the minimal versions are compatible
+        cargo test --all-features --all-targets --locked
+    EOF
 
     if [[ -z "$CI" ]]; then
         rm -rf /tmp/deps-latest

@@ -1,10 +1,10 @@
 use holt_ui::floating::*;
-use leptos::prelude::*;
 use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);
 
-#[wasm_bindgen_test]
+#[wasm_bindgen_test(unsupported = test)]
+#[cfg_attr(not(target_family = "wasm"), ignore)]
 fn test_use_floating_with_real_dom_elements() {
     use leptos::wasm_bindgen::JsCast;
     use leptos::web_sys::*;
@@ -46,10 +46,6 @@ fn test_use_floating_with_real_dom_elements() {
     body.append_child(&button).unwrap();
     body.append_child(&div).unwrap();
 
-    // Create NodeRefs (this is tricky - we need to simulate Leptos NodeRef behavior)
-    let button_ref = NodeRef::<leptos::html::Button>::new();
-    let div_ref = NodeRef::<leptos::html::Div>::new();
-
     // Test positioning calculation
     let options = FloatingOptions {
         side: Side::Bottom,
@@ -75,7 +71,8 @@ fn test_use_floating_with_real_dom_elements() {
     body.remove_child(&div).unwrap();
 }
 
-#[wasm_bindgen_test]
+#[wasm_bindgen_test(unsupported = test)]
+#[cfg_attr(not(target_family = "wasm"), ignore)]
 fn test_calculate_position_from_rect_in_browser() {
     // Test our positioning function with known values
     let options = FloatingOptions {

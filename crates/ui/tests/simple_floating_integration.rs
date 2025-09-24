@@ -3,7 +3,8 @@ use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);
 
-#[wasm_bindgen_test]
+#[wasm_bindgen_test(unsupported = test)]
+#[cfg_attr(not(target_family = "wasm"), ignore)]
 fn basic_floating_creation() {
     // Test basic floating data structures work in WASM
     let position = FloatingPosition {
@@ -22,7 +23,8 @@ fn basic_floating_creation() {
     assert_eq!(cloned.x, position.x);
 }
 
-#[wasm_bindgen_test]
+#[wasm_bindgen_test(unsupported = test)]
+#[cfg_attr(not(target_family = "wasm"), ignore)]
 fn floating_options_creation() {
     // Test FloatingOptions can be created with different values
     let options = FloatingOptions {
@@ -45,7 +47,8 @@ fn floating_options_creation() {
     assert_eq!(default_options.align_offset, 0.0);
 }
 
-#[wasm_bindgen_test]
+#[wasm_bindgen_test(unsupported = test)]
+#[cfg_attr(not(target_family = "wasm"), ignore)]
 fn side_align_enums_work() {
     // Test that all enum variants work in WASM
     let sides = [Side::Top, Side::Right, Side::Bottom, Side::Left];

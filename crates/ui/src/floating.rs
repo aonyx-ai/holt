@@ -225,8 +225,6 @@ mod tests {
 
     #[test]
     fn side_enum_all_variants() {
-        let _sides = [Side::Top, Side::Right, Side::Bottom, Side::Left];
-
         // Test Debug formatting
         assert_eq!(format!("{:?}", Side::Top), "Top");
         assert_eq!(format!("{:?}", Side::Right), "Right");
@@ -236,16 +234,10 @@ mod tests {
         // Test equality
         assert_eq!(Side::Top, Side::Top);
         assert_ne!(Side::Top, Side::Bottom);
-
-        // Test Clone
-        let cloned = Side::Top.clone();
-        assert_eq!(cloned, Side::Top);
     }
 
     #[test]
     fn align_enum_all_variants() {
-        let _aligns = [Align::Start, Align::Center, Align::End];
-
         // Test Debug formatting
         assert_eq!(format!("{:?}", Align::Start), "Start");
         assert_eq!(format!("{:?}", Align::Center), "Center");
@@ -254,10 +246,6 @@ mod tests {
         // Test equality
         assert_eq!(Align::Start, Align::Start);
         assert_ne!(Align::Start, Align::Center);
-
-        // Test Clone
-        let cloned = Align::Center.clone();
-        assert_eq!(cloned, Align::Center);
     }
 
     #[test]
@@ -303,11 +291,7 @@ mod tests {
 
     #[test]
     fn floating_options_builder_pattern() {
-        // Test that we can build options incrementally
-        let mut options = FloatingOptions::default();
-        options.side = Side::Top;
-        options.align = Align::End;
-        options.side_offset = 16.0;
+        let options = FloatingOptions { side: Side::Top, align: Align::End, side_offset: 16.0, ..Default::default() };
 
         assert_eq!(options.side, Side::Top);
         assert_eq!(options.align, Align::End);

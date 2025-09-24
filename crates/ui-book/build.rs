@@ -92,103 +92,24 @@ mod data {
 }
 
 mod imports {
-    use itertools::Itertools;
 
-    /// Extracts component names from holt_ui::visual imports in the given content.
-    /// Returns a sorted, deduplicated list of main component names (excluding variants).
-    pub fn extract_holt_ui_imports(content: &str) -> Vec<String> {
-        let mut components: Vec<String> = extract_all_imports(content)
-            .into_iter()
-            .filter(|import| is_main_component(import))
-            .unique()
-            .collect();
-
-        components.sort();
-        components
-    }
-
-    /// Extracts all imports from holt_ui::visual, handling both single-line and multi-line imports.
-    fn extract_all_imports(content: &str) -> Vec<String> {
-        let mut imports = Vec::new();
-        let mut current_pos = 0;
-
-        while current_pos < content.len() {
-            if let Some(import_start) = content[current_pos..].find("use holt_ui::visual::") {
-                let absolute_start = current_pos + import_start;
-                let import_content = &content[absolute_start..];
-
-                if let Some(import_end) = find_import_end(import_content) {
-                    let full_import = &import_content[..import_end];
-                    imports.extend(parse_full_import(full_import));
-                    current_pos = absolute_start + import_end;
-                } else {
-                    break;
+    /// Extracts the component name from a helper comment in the format `// @component ComponentName`.
+    /// If found, returns Some(ComponentName). Otherwise returns None.
+    pub fn extract_component_from_comment(content: &str) -> Option<String> {
+        for line in content.lines() {
+            let line = line.trim();
+            if line.starts_with("// @component ") {
+                let component_name = line.strip_prefix("// @component ")?.trim();
+                if !component_name.is_empty() {
+                    return Some(component_name.to_string());
                 }
-            } else {
-                break;
             }
         }
-
-        imports
-    }
-
-    /// Finds the end of an import statement (the semicolon).
-    fn find_import_end(import_content: &str) -> Option<usize> {
-        import_content.find(';').map(|pos| pos + 1)
-    }
-
-    /// Parses a complete import statement (which may span multiple lines).
-    fn parse_full_import(import_statement: &str) -> Vec<String> {
-        let imports_part = import_statement
-            .strip_prefix("use holt_ui::visual::")
-            .unwrap_or("")
-            .trim_end_matches(';')
-            .trim();
-
-        if let Some(imports) = extract_braced_imports(imports_part) {
-            imports
-        } else if let Some(import) = extract_single_import(imports_part) {
-            vec![import]
-        } else {
-            Vec::new()
-        }
-    }
-
-    fn extract_braced_imports(imports_part: &str) -> Option<Vec<String>> {
-        if !imports_part.starts_with('{') || !imports_part.contains('}') {
-            return None;
-        }
-
-        let start = imports_part.find('{')?;
-        let end = imports_part.find('}')?;
-        let imports = &imports_part[start + 1..end];
-
-        Some(
-            imports
-                .split(',')
-                .map(|import| import.trim().to_string())
-                .filter(|import| !import.is_empty())
-                .collect(),
-        )
-    }
-
-    fn extract_single_import(imports_part: &str) -> Option<String> {
-        let import = imports_part.trim();
-        if import.is_empty() {
-            None
-        } else {
-            Some(import.to_string())
-        }
-    }
-
-    pub fn is_main_component(import: &str) -> bool {
-        !import.contains("Variant") && !import.contains("Size") && !import.is_empty()
+        None
     }
 }
 
 mod parser {
-    use itertools::Itertools;
-
     use super::*;
 
     /// Parses story files to extract component information.
@@ -233,26 +154,19 @@ mod parser {
                 .to_string();
 
             let story_contents = fs::read_to_string(path)?;
-            let component_imports = imports::extract_holt_ui_imports(&story_contents);
-            let components = extract_component_names(component_imports.clone());
 
-            let chosen_component = if components.len() != 1 {
-                components
-                    .iter()
-                    .find(|c| c.to_lowercase() == story_name.to_lowercase())
+            // Check for helper comment specifying the component
+            let component_name = if let Some(comment_component) =
+                imports::extract_component_from_comment(&story_contents)
+            {
+                comment_component
             } else {
-                components.first()
+                println!(
+                    "cargo:warning=No @component comment found in story '{story_name}'. Skipping file."
+                );
+                return Ok(None);
             };
 
-            if chosen_component.is_none() {
-                println!(
-                    "cargo:warning=Found more than one component used in story '{story_name}': {components:?}"
-                );
-
-                return Ok(None);
-            }
-
-            let component_name = chosen_component.unwrap();
             let component_path = self
                 .config
                 .ui_components_dir
@@ -271,29 +185,6 @@ mod parser {
                 info,
             }))
         }
-    }
-
-    fn extract_component_names(component_imports: Vec<String>) -> Vec<String> {
-        component_imports
-            .into_iter()
-            .filter_map(extract_base_component_name)
-            .unique()
-            .collect()
-    }
-
-    fn extract_base_component_name(component_name: String) -> Option<String> {
-        if component_name.is_empty() {
-            return None;
-        }
-
-        Some(
-            component_name
-                .chars()
-                .enumerate()
-                .take_while(|&(i, ch)| i == 0 || ch.is_lowercase())
-                .map(|(_, ch)| ch)
-                .collect(),
-        )
     }
 
     pub fn is_valid_story_file(path: &Path) -> bool {

@@ -291,7 +291,12 @@ mod tests {
 
     #[test]
     fn floating_options_builder_pattern() {
-        let options = FloatingOptions { side: Side::Top, align: Align::End, side_offset: 16.0, ..Default::default() };
+        let options = FloatingOptions {
+            side: Side::Top,
+            align: Align::End,
+            side_offset: 16.0,
+            ..Default::default()
+        };
 
         assert_eq!(options.side, Side::Top);
         assert_eq!(options.align, Align::End);

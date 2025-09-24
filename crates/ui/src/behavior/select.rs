@@ -1,3 +1,6 @@
+use crate::floating::{Align, FloatingOptions, Side, use_floating};
+use leptos::html::Div;
+use leptos::portal::Portal;
 use leptos::prelude::*;
 
 /// Select behavior context that manages state and interactions
@@ -6,6 +9,7 @@ pub struct SelectContext {
     pub value: RwSignal<Option<String>>,
     pub open: RwSignal<bool>,
     pub disabled: Signal<bool>,
+    pub trigger_ref: NodeRef<leptos::html::Button>,
 }
 
 impl SelectContext {
@@ -14,6 +18,7 @@ impl SelectContext {
             value,
             open: RwSignal::new(false),
             disabled,
+            trigger_ref: NodeRef::new(),
         }
     }
 
@@ -93,6 +98,7 @@ pub fn SelectTrigger(
             aria-haspopup="listbox"
             class=class
             id=id
+            node_ref=context.trigger_ref
             on:click=move |_| context.toggle()
             disabled=move || context_disabled.disabled
             data-state=move || if context_state.open.get() { "open" } else { "closed" }
@@ -106,16 +112,42 @@ pub fn SelectTrigger(
 #[component]
 pub fn SelectContent(
     #[prop(optional, into)] class: Option<String>,
+    #[prop(into, default = Side::Bottom)] side: Side,
+    #[prop(into, default = Align::Start)] align: Align,
+    #[prop(into, default = 4.0)] side_offset: f64,
     children: ChildrenFn,
 ) -> impl IntoView {
     let context = use_select();
     let children = StoredValue::new(children);
+    let content_ref = NodeRef::<Div>::new();
+
+    // Set up floating positioning
+    let floating_options = FloatingOptions {
+        side,
+        align,
+        side_offset,
+        align_offset: 0.0,
+    };
+
+    let floating = use_floating(context.trigger_ref, content_ref, floating_options);
 
     view! {
         <Show when=move || context.open.get() clone:class>
-            <div role="listbox" class=class.clone() data-state="open">
-                {children.read_value()()}
-            </div>
+            <Portal clone:class>
+                <div
+                    role="listbox"
+                    class=class.clone()
+                    data-state="open"
+                    node_ref=content_ref
+                    style:position="fixed"
+                    style:left=move || format!("{}px", floating.x.get())
+                    style:top=move || format!("{}px", floating.y.get())
+                    style:z-index="50"
+                    data-side=move || format!("{:?}", floating.side.get()).to_lowercase()
+                >
+                    {children.read_value()()}
+                </div>
+            </Portal>
         </Show>
     }
 }

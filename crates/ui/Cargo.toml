@@ -11,3 +11,14 @@ leptos_icons = "0.7.0"
 icondata = { version = "0.6.0", default-features = false, features = [
   "lucide",
 ] }
+web-sys = { version = "0.3", features = ["DomRect", "Element"] }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+console_log = "1.0"
+console_error_panic_hook = "0.1"
+log = "0.4"
+web-sys = "0.3"
+
+[lib]
+crate-type = ["cdylib", "rlib"]

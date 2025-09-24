@@ -100,7 +100,7 @@ pub fn SelectTrigger(
             id=id
             node_ref=context.trigger_ref
             on:click=move |_| context.toggle()
-            disabled=move || context_disabled.disabled
+            disabled=move || context_disabled.disabled.get()
             data-state=move || if context_state.open.get() { "open" } else { "closed" }
         >
             {children()}

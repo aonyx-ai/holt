@@ -1,5 +1,5 @@
 use holt_book::{story, variant};
-use holt_ui::visual::{Checkbox, CheckboxSize};
+use holt_ui::visual::{Checkbox, CheckboxSize, Label};
 use leptos::prelude::*;
 
 #[variant]
@@ -44,14 +44,10 @@ fn with_label() -> AnyView {
     view! {
         <div class="flex items-center space-x-2">
             <Checkbox checked=checked id="terms" />
-            <label
-                for="terms"
-                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-                "Accept terms and conditions"
-            </label>
+            <Label r#for="terms">"Accept terms and conditions"</Label>
         </div>
-    }.into_any()
+    }
+    .into_any()
 }
 
 #[variant]
@@ -69,8 +65,8 @@ fn interactive() -> AnyView {
     view! {
         <div class="flex flex-col space-y-2">
             <div class="flex items-center space-x-2">
-                <Checkbox checked=checked />
-                <label class="text-sm font-medium">"Toggle me"</label>
+                <Checkbox checked=checked id="terms" />
+                <Label r#for="terms">"Toggle me"</Label>
             </div>
             <p class="text-sm text-muted-foreground">"Checked " {move || count.get()} " times"</p>
         </div>
@@ -88,21 +84,15 @@ fn multiple_options() -> AnyView {
         <div class="flex flex-col space-y-3">
             <div class="flex items-center space-x-2">
                 <Checkbox checked=option1 id="option1" />
-                <label for="option1" class="text-sm font-medium">
-                    "Email notifications"
-                </label>
+                <Label r#for="option1">"Email notifications"</Label>
             </div>
             <div class="flex items-center space-x-2">
                 <Checkbox checked=option2 id="option2" />
-                <label for="option2" class="text-sm font-medium">
-                    "SMS notifications"
-                </label>
+                <Label r#for="option2">"SMS notifications"</Label>
             </div>
             <div class="flex items-center space-x-2">
                 <Checkbox checked=option3 id="option3" />
-                <label for="option3" class="text-sm font-medium">
-                    "Push notifications"
-                </label>
+                <Label r#for="option3">"Push notifications"</Label>
             </div>
         </div>
     }

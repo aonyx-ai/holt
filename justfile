@@ -1,6 +1,7 @@
 mod ui_book "crates/ui-book"
 
 set shell := ["flox", "activate", "--", "sh", "-cu"]
+msrv := `grep 'rust-version' Cargo.toml | sed 's/.*rust-version = "\([^"]*\)".*/\1/'`
 
 [private]
 default:
@@ -31,49 +32,30 @@ check-features:
 
 # Check latest dependencies with cargo-update
 check-deps-latest:
-    #!/usr/bin/env sh
-    if [[ -z "$CI" ]]; then
-        rm -rf /tmp/deps-latest && mkdir -p /tmp/deps-latest
-        git checkout-index -a --prefix=/tmp/deps-latest/
+    #!/usr/bin/env bash .flox/in-tmp-flox-env.sh check-deps-latest
+    # TODO(marts): Figure out how to install beta through the CLI
 
-        cd /tmp/deps-latest
-    fi
+    # cargo update
+    # RUSTFLAGS="-D deprecated" cargo test --all-features --all-targets --locked
 
-    flox activate -- sh -u <<EOF
-        rustup default beta
-
-        # Update the dependencies to the latest versions
-        cargo update
-
-        # Run tests to ensure the latest versions are compatible
-        RUSTFLAGS="-D deprecated" cargo test --all-features --all-targets --locked
-    EOF
-
-    if [[ -z "$CI" ]]; then
-        rm -rf /tmp/deps-latest
-    fi
+    echo "This is broken, for now..."
 
 # Check minimal dependencies with cargo-update
 check-deps-minimal:
-    #!/usr/bin/env sh
-    if [[ -z "$CI" ]]; then
-        rm -rf /tmp/deps-latest && mkdir -p /tmp/deps-latest
-        git checkout-index -a --prefix=/tmp/deps-latest/
+    #!/usr/bin/env bash .flox/in-tmp-flox-env.sh check-deps-minimal
+    flox uninstall cargo
+    # TODO(marts): Figure out how to install beta through the CLI
+    # flox install
+    # cargo test --all-features --all-targets --locked
 
-        cd /tmp/deps-minimal
-    fi
+    echo "This is broken, for now..."
 
-    flox activate -- sh -u <<EOF
-        rustup default nightly
-        cargo update -Z direct-minimal-versions
-
-        # Run tests to ensure the minimal versions are compatible
-        cargo test --all-features --all-targets --locked
-    EOF
-
-    if [[ -z "$CI" ]]; then
-        rm -rf /tmp/deps-latest
-    fi
+# Check MSRV
+check-msrv:
+    #!/usr/bin/env bash .flox/in-tmp-flox-env.sh check-msrv
+    flox uninstall cargo
+    flox install cargo@{{ msrv }}
+    cargo check --workspace --all-features --all-targets
 
 # Format JSON files
 format-json fix="false": (prettier fix "{json,json5}")

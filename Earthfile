@@ -64,7 +64,7 @@ checks:
     BUILD +format-leptos --FIX="false"
     BUILD +format-toml --FIX="false"
     BUILD +format-yaml --FIX="false"
-    BUILD +lint-markdown
+    BUILD +lint-markdown --FIX="false"
     BUILD +lint-rust
     BUILD +lint-yaml
     BUILD +test-rust
@@ -130,7 +130,8 @@ format-yaml:
     DO ./.earthly/prettier+PRETTIER --EXTENSION="{yaml,yml}" --FIX="$FIX"
 
 lint-markdown:
-    DO ./.earthly/markdown+LINT
+    ARG FIX="false"
+    DO ./.earthly/markdown+LINT --FIX="$FIX"
 
 lint-rust:
     DO ./.earthly/rust+LINT

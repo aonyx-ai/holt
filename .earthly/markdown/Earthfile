@@ -3,6 +3,8 @@ VERSION 0.8
 LINT:
     FUNCTION
 
+    ARG FIX="false"
+
     FROM node:alpine
     WORKDIR /holt
 
@@ -13,4 +15,13 @@ LINT:
     COPY . .
 
     # Check the Markdown for linting errors
-    RUN markdownlint **/*.md
+    IF [ "$FIX" == "true" ]
+      RUN markdownlint --fix **/*.md || true
+    ELSE
+      RUN markdownlint **/*.md
+    END
+
+    # Save changes back to the local filesystem
+    IF [ "$FIX" = "true" ]
+        SAVE ARTIFACT ./* AS LOCAL .
+    END

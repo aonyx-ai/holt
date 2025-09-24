@@ -1,3 +1,5 @@
+trunk := require("trunk")
+
 # Serve the Holt Book for our UI components
 serve:
-    trunk serve
+    {{trunk}} serve

@@ -5,27 +5,33 @@ name: Continuous Integration
   pull_request:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   targets:
-    name: Enumerate Earthly targets
+    name: Enumerate Just recipes
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
 
     outputs:
       matrix: ${{ steps.export-targets.outputs.targets }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Install earthly
-        uses: jdno/earthly-actions-setup@v2.0.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # 5.0.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 0.8
+          persist-credentials: false
+
+      - name: Install Just
+        uses: taiki-e/install-action@4575ae687efd0e2c78240087f26013fb2484987f # 2.62.6
+        with:
+          tool: just
 
       - name: Export targets
         id: export-targets
-        run: echo "targets=$(earthly ls | jq -cnR '[inputs | sub("\\+"; "") | select(startswith("check-") or startswith("format-") or startswith("lint-") or startswith("test-"))]')" >> "$GITHUB_OUTPUT"
+        run: echo "targets=$(just --list | awk '/build-|check-|format-|lint-|test-/{print $1}' | jq -cnR '[inputs]')" >> "$GITHUB_OUTPUT"
 
   checks:
     name: ${{ matrix.target }}
@@ -42,35 +48,57 @@ jobs:
       matrix:
         target: ${{ fromJson(needs.targets.outputs.matrix) }}
 
+    services:
+      postgres:
+        image: postgres@sha256:0f4f20021a065d114083d1b95d9fb89ad847cbc4c3cc9238417815c7df42350f
+        ports:
+          - 5433:5432
+        env:
+          POSTGRES_USER: otterdone
+          POSTGRES_PASSWORD: otterdone
+          POSTGRES_DB: otterdone
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # 5.0.0
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
-      - name: Install earthly
-        uses: jdno/earthly-actions-setup@v2.0.0
+      - name: Install Flox
+        uses: flox/install-flox-action@ba0eb4eb776f1d3b47279d7980f6643caffd8c41 # 2.0.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 0.8
+          version: 1.6.1
 
-      - name: Run check with Earthly
-        env:
-          EARTHLY_TOKEN: ${{ secrets.EARTHLY_TOKEN }}
-        run: earthly --allow-privileged --ci --push --remote-cache=ghcr.io/aonyx-rs/holt-earthly-cache:${{ matrix.target }} +${{ matrix.target }}
+      - name: Remove Flox installer (if it exists)
+        run: rm -f flox.x86_64-linux.deb
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # 2.8.1
+        with:
+          prefix-key: "v0-${{ matrix.target }}"
+
+      - name: Run check with Just
+        uses: flox/activate-action@bdcbcf8d84af6f503e588ae4125e48133787df95 # 1.0.0
+        with:
+          command: just ${{ matrix.target }}
 
   success:
     name: All checks succeeded
     runs-on: ubuntu-latest
+
+    permissions: {}
 
     needs: checks
     if: always()
 
     steps:
       - name: Check if all checks succeeded
+        # `needs` is a list of job names, which themselves are generated from
+        # the output of `just --list`, so we ignore the template injection here.
+        # zizmor: ignore[template-injection]
         run: jq --exit-status 'all(.result == "success")' <<< '${{ toJson(needs) }}'

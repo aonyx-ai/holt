@@ -21,3 +21,4 @@ leptos = ">=0.8.3"
 leptos_router = "0.8.0"
 leptos_meta = "0.8.0"
 tailwind_fuse = { version = ">=0.3.0", features = ["variant"] }
+wasm-bindgen-test = "0.3.0"

@@ -1,8 +1,8 @@
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
-use syn::{Item, ItemFn};
 use std::io::Write;
 use std::process::Command;
+use syn::{Item, ItemFn};
 
 pub(crate) const VARIANT_PREFIX: &str = "VARIANT_";
 
@@ -60,11 +60,11 @@ impl VariantGenerator {
             attrs: vec![],
             items: vec![Item::Fn(self.function.clone())],
         });
-        
+
         // Try to format with leptosfmt --rustfmt, fall back to original if it fails
         self.format_with_leptosfmt(&source).unwrap_or(source)
     }
-    
+
     fn format_with_leptosfmt(&self, source: &str) -> Result<String, Box<dyn std::error::Error>> {
         let mut cmd = Command::new("leptosfmt");
         cmd.arg("--rustfmt").arg("--stdin");
@@ -183,12 +183,12 @@ mod tests {
 
         let generator = VariantGenerator::new(function);
         let source_code = generator.generate_source_code();
-        
+
         // The source code should be formatted (no excessive whitespace)
         // This test verifies that leptosfmt is being called, even if it falls back to prettyplease
         assert!(!source_code.contains("let x    =    5"));
         assert!(!source_code.contains("class=\"w-32\"     on:click"));
-        
+
         // Should contain the basic structure
         assert!(source_code.contains("fn badly_formatted"));
         assert!(source_code.contains("let x = 5"));
@@ -204,10 +204,10 @@ mod tests {
         };
 
         let generator = VariantGenerator::new(function);
-        
+
         // Test the format_with_leptosfmt method directly
         let test_source = "fn test() { let x    =    5; }";
-        
+
         // This should either succeed with leptosfmt or fall back gracefully
         match generator.format_with_leptosfmt(test_source) {
             Ok(formatted) => {

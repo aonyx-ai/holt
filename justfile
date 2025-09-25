@@ -1,4 +1,5 @@
 mod ui_book "crates/ui-book"
+mod ui "crates/ui"
 
 set shell := ["flox", "activate", "--", "sh", "-cu"]
 
@@ -110,3 +111,6 @@ prettier fix="false" extension="*":
 # Run the tests
 test-rust:
     cargo test --all-features --all-targets
+
+test-e2e:
+    wasm-pack test

@@ -1,6 +1,7 @@
 mod ui_book "crates/ui-book"
 
 set shell := ["flox", "activate", "--", "sh", "-cu"]
+
 msrv := `grep 'rust-version' Cargo.toml | sed 's/.*rust-version = "\([^"]*\)".*/\1/'`
 
 [private]

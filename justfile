@@ -1,4 +1,5 @@
 mod ui_book "crates/ui-book"
+mod ui "crates/ui"
 
 set shell := ["flox", "activate", "--", "sh", "-cu"]
 

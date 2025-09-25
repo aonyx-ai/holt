@@ -75,6 +75,9 @@
       "taplo": {
         "pkg-path": "taplo"
       },
+      "wasm-pack": {
+        "pkg-path": "wasm-pack"
+      },
       "yamllint": {
         "pkg-path": "yamllint"
       },
@@ -2039,6 +2042,122 @@
       ],
       "outputs": {
         "out": "/nix/store/0ylhpa0vki4d9c7n68nn1nwgfvq1hb6l-taplo-0.10.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "wasm-pack",
+      "broken": false,
+      "derivation": "/nix/store/mlfc1yga8178bv7sqj9w95a1yspk6pfk-wasm-pack-0.13.1.drv",
+      "description": "Utility that builds rust-generated WebAssembly package",
+      "install_id": "wasm-pack",
+      "license": "[ Apache-2.0, MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "wasm-pack-0.13.1",
+      "pname": "wasm-pack",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:03:10.768516Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/42f5x8h50xgyr0m6k7kczlhfwnsg6cp9-wasm-pack-0.13.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "wasm-pack",
+      "broken": false,
+      "derivation": "/nix/store/wzdax9a3ijn8fihz2sbhjb6cv55vs2jq-wasm-pack-0.13.1.drv",
+      "description": "Utility that builds rust-generated WebAssembly package",
+      "install_id": "wasm-pack",
+      "license": "[ Apache-2.0, MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "wasm-pack-0.13.1",
+      "pname": "wasm-pack",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:32:55.342720Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/aal7jad1bqdpwfwvxm17ld8ww6kk1kfq-wasm-pack-0.13.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "wasm-pack",
+      "broken": false,
+      "derivation": "/nix/store/jljfsw6sbh9ch6r5g74adj2415vs154d-wasm-pack-0.13.1.drv",
+      "description": "Utility that builds rust-generated WebAssembly package",
+      "install_id": "wasm-pack",
+      "license": "[ Apache-2.0, MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "wasm-pack-0.13.1",
+      "pname": "wasm-pack",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:59:02.534355Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/w7hniks8wkxb0pmmdjl7d00g1qkf2ps9-wasm-pack-0.13.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "wasm-pack",
+      "broken": false,
+      "derivation": "/nix/store/ffv7wndfb201k13zi6ghy2zhj23wnapn-wasm-pack-0.13.1.drv",
+      "description": "Utility that builds rust-generated WebAssembly package",
+      "install_id": "wasm-pack",
+      "license": "[ Apache-2.0, MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "wasm-pack-0.13.1",
+      "pname": "wasm-pack",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T03:30:21.642984Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nglgzdm77ird9jj3nnfyy4sdii5sh9w2-wasm-pack-0.13.1"
       },
       "system": "x86_64-linux",
       "group": "toplevel",

@@ -4,6 +4,5 @@ set shell := ["flox", "activate", "--", "sh", "-cu"]
 default:
     @just --list --list-submodules
 
-# Serve the Holt Book for our UI components
-serve:
-    trunk serve
+test-e2e:
+    MACOSX_DEPLOYMENT_TARGET=10.7 wasm-pack test --firefox

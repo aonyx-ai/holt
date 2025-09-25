@@ -1,3 +1,4 @@
+// @component Checkbox
 use holt_book::{story, variant};
 use holt_ui::visual::{Checkbox, CheckboxSize, Label};
 use leptos::prelude::*;

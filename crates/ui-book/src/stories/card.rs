@@ -1,3 +1,4 @@
+// @component Card
 use holt_book::{story, variant};
 use holt_ui::visual::{
     Button, ButtonVariant, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,

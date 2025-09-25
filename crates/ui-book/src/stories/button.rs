@@ -1,3 +1,4 @@
+// @component Button
 use holt_book::{story, variant};
 use holt_ui::visual::{Button, ButtonVariant};
 use leptos::prelude::*;

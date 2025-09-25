@@ -1,3 +1,4 @@
+// @component Breadcrumb
 use holt_book::{story, variant};
 use holt_ui::visual::{
     Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,

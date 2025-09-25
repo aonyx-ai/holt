@@ -1,3 +1,4 @@
+// @component Select
 use holt_book::{story, variant};
 use holt_ui::visual::{
     Select, SelectContent, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue,

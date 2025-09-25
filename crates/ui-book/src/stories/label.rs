@@ -1,3 +1,4 @@
+// @component Label
 use holt_book::{story, variant};
 use holt_ui::visual::{Checkbox, Input, Label};
 use leptos::prelude::*;

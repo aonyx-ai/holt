@@ -1,3 +1,4 @@
+// @component Collapsible
 use holt_book::{story, variant};
 use holt_ui::visual::{Button, Collapsible, CollapsibleContent, CollapsibleTrigger};
 use leptos::prelude::*;

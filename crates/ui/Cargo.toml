@@ -14,11 +14,8 @@ icondata = { version = "0.6.0", default-features = false, features = [
 web-sys = { version = "0.3.80", features = ["DomRect", "Element"] }
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.53"
+wasm-bindgen-test = { workspace = true }
 console_log = "1.0"
 console_error_panic_hook = "0.1.7"
 log = "0.4.22"
 web-sys = "0.3.80"
-
-[lib]
-crate-type = ["cdylib", "rlib"]

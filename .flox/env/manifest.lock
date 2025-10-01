@@ -47,6 +47,9 @@
           "x86_64-darwin"
         ]
       },
+      "lld": {
+        "pkg-path": "lld"
+      },
       "markdownlint-cli": {
         "pkg-path": "markdownlint-cli"
       },
@@ -1568,6 +1571,130 @@
         "out": "/nix/store/4idh8sgmy2wafmvmbab8dw0053jgwr8c-libiconv-109"
       },
       "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "lld",
+      "broken": false,
+      "derivation": "/nix/store/g88dh4lb7mkd841bgnfai716pmxv5s03-lld-19.1.7.drv",
+      "description": "LLVM linker (unwrapped)",
+      "install_id": "lld",
+      "license": "[ NCSA, Apache-2.0, LLVM-exception ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "lld-19.1.7",
+      "pname": "lld",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:01:00.238728Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "19.1.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/ya6cjjrxpf54j88v7187xbz087zjhcg6-lld-19.1.7-dev",
+        "lib": "/nix/store/za4x3c5r6yw61lk1nqpc5nrw5mdlzilv-lld-19.1.7-lib",
+        "out": "/nix/store/6srv6jv1wfjp1wkh33445cvyvzpffg9g-lld-19.1.7"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "lld",
+      "broken": false,
+      "derivation": "/nix/store/xzzzh7jvqzz0wrzi34hj2gp0x88iy8n0-lld-19.1.7.drv",
+      "description": "LLVM linker (unwrapped)",
+      "install_id": "lld",
+      "license": "[ NCSA, Apache-2.0, LLVM-exception ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "lld-19.1.7",
+      "pname": "lld",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:30:10.308112Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "19.1.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/fgnxjqv0hknjsk1j64a7602qa547lci8-lld-19.1.7-dev",
+        "lib": "/nix/store/rmsmslkbx5fy4rma3jza6wa0cb4jbkm2-lld-19.1.7-lib",
+        "out": "/nix/store/7j49zwxa3f6knw619kxf62hacdvcswnc-lld-19.1.7"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "lld",
+      "broken": false,
+      "derivation": "/nix/store/21dcmyp421w65ipp8amgwljp2wkyr3y1-lld-19.1.7.drv",
+      "description": "LLVM linker (unwrapped)",
+      "install_id": "lld",
+      "license": "[ NCSA, Apache-2.0, LLVM-exception ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "lld-19.1.7",
+      "pname": "lld",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:56:53.198289Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "19.1.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/1qikfk9xj52xha7y208f10srcw66lwr1-lld-19.1.7-dev",
+        "lib": "/nix/store/i6n1i7nx0da5nr4whivxpnrmla1wsv2i-lld-19.1.7-lib",
+        "out": "/nix/store/v1xv2l3m5rb8n9120nqkwr9dxcbhm06g-lld-19.1.7"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "lld",
+      "broken": false,
+      "derivation": "/nix/store/al1fxiaxqjwmxmp524d2x8b6af0dymw5-lld-19.1.7.drv",
+      "description": "LLVM linker (unwrapped)",
+      "install_id": "lld",
+      "license": "[ NCSA, Apache-2.0, LLVM-exception ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "lld-19.1.7",
+      "pname": "lld",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T03:27:28.715657Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "19.1.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/6bca5i74dy8qb44vp4dlq0z2fma2cdxr-lld-19.1.7-dev",
+        "lib": "/nix/store/8vrq2qcw8ic6hvlspc6rqccy35yklqcs-lld-19.1.7-lib",
+        "out": "/nix/store/34xsb4b01nlaifsp2fpjwvcnxjy9aljw-lld-19.1.7"
+      },
+      "system": "x86_64-linux",
       "group": "toplevel",
       "priority": 5
     },

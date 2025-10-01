@@ -5,4 +5,4 @@ default:
     @just --list --list-submodules
 
 test-e2e:
-    MACOSX_DEPLOYMENT_TARGET=10.7 wasm-pack test --firefox
+    wasm-pack test --firefox --headless

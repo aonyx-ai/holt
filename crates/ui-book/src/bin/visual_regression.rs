@@ -569,8 +569,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut passed = 0;
     let mut failed = 0;
 
-    for variant in variants {
-        match process_variant(&driver, &variant).await {
+    for variant in &variants {
+        match process_variant(&driver, variant).await {
             Ok(true) => passed += 1,
             Ok(false) => failed += 1,
             Err(e) => {
@@ -589,8 +589,63 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n================================");
     println!("Results: {} passed, {} failed", passed, failed);
 
+    // Clean up orphaned baseline images
+    cleanup_orphaned_baselines(&variants)?;
+
     if failed > 0 {
         std::process::exit(1);
+    }
+
+    Ok(())
+}
+
+/// Removes baseline images that no longer have corresponding stories/variants
+fn cleanup_orphaned_baselines(variants: &[StoryVariant]) -> io::Result<()> {
+    let baseline_dir = Path::new(BASELINE_DIR);
+    if !baseline_dir.exists() {
+        return Ok(());
+    }
+
+    // Build a set of expected baseline paths
+    let mut expected_paths = std::collections::HashSet::new();
+    for variant in variants {
+        let path = get_baseline_path(variant);
+        expected_paths.insert(path);
+    }
+
+    // Walk through all baseline files
+    let mut orphaned = Vec::new();
+    for entry in fs::read_dir(baseline_dir)? {
+        let entry = entry?;
+        if entry.file_type()?.is_dir() {
+            // Check files within story directories
+            for file_entry in fs::read_dir(entry.path())? {
+                let file_entry = file_entry?;
+                if file_entry.file_type()?.is_file() {
+                    let file_path = file_entry.path();
+                    if !expected_paths.contains(&file_path) {
+                        orphaned.push(file_path);
+                    }
+                }
+            }
+        }
+    }
+
+    // Delete orphaned files
+    if !orphaned.is_empty() {
+        println!("\nCleaning up {} orphaned baseline(s):", orphaned.len());
+        for path in orphaned {
+            println!("  Removing: {}", path.display());
+            fs::remove_file(&path)?;
+
+            // Remove parent directory if empty
+            if let Some(parent) = path.parent()
+                && let Ok(mut entries) = fs::read_dir(parent)
+                && entries.next().is_none()
+            {
+                let _ = fs::remove_dir(parent);
+            }
+        }
     }
 
     Ok(())

@@ -1,6 +1,7 @@
 # CLAUDE.md
 
-Holt is a UI toolkit for Leptos implementing Shadcn/Radix-style components with behavior/presentation separation.
+Holt is a UI toolkit for Leptos implementing Shadcn/Radix-style components with
+behavior/presentation separation.
 
 ## Workspace Structure
 

@@ -1,6 +1,7 @@
 # UI Component Architecture
 
-Components use behavior/visual separation: behavior components handle logic, visual components add styling.
+Components use behavior/visual separation: behavior components handle logic,
+visual components add styling.
 
 ## Structure
 

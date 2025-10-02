@@ -31,7 +31,10 @@ jobs:
 
       - name: Export targets
         id: export-targets
-        run: echo "targets=$(just --list | awk '/build-|check-|format-|lint-|test-/{print $1}' | jq -cnR '[inputs]')" >> "$GITHUB_OUTPUT"
+        run:
+          echo "targets=$(just --list | awk
+          '/build-|check-|format-|lint-|test-/{print $1}' | jq -cnR '[inputs]')"
+          >> "$GITHUB_OUTPUT"
 
   checks:
     name: ${{ matrix.target }}
@@ -58,9 +61,7 @@ jobs:
           POSTGRES_PASSWORD: otterdone
           POSTGRES_DB: otterdone
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
           --health-retries 5
 
     steps:
@@ -101,4 +102,6 @@ jobs:
         # `needs` is a list of job names, which themselves are generated from
         # the output of `just --list`, so we ignore the template injection here.
         # zizmor: ignore[template-injection]
-        run: jq --exit-status 'all(.result == "success")' <<< '${{ toJson(needs) }}'
+        run:
+          jq --exit-status 'all(.result == "success")' <<< '${{ toJson(needs)
+          }}'

@@ -504,6 +504,7 @@ async fn process_variant(
 ) -> Result<bool, Box<dyn std::error::Error>> {
     let screenshot = capture_screenshot(driver, variant).await?;
     let baseline_path = get_baseline_path(variant);
+    let is_ci = std::env::var("CI").is_ok();
 
     // Check if baseline exists
     if baseline_path.exists() {
@@ -518,13 +519,23 @@ async fn process_variant(
                 variant.story_id, variant.name
             );
 
-            if prompt_user_approval(variant, &baseline, &screenshot, &baseline_path)? {
+            if is_ci {
+                // In CI mode, always save the new screenshot for comparison
+                let parent = baseline_path.parent().unwrap();
+                fs::create_dir_all(parent)?;
                 fs::write(&baseline_path, screenshot)?;
-                println!("  → Baseline updated");
+                println!("  → New screenshot saved for comparison");
                 Ok(true)
             } else {
-                println!("  → Baseline not updated");
-                Ok(false)
+                // Interactive mode
+                if prompt_user_approval(variant, &baseline, &screenshot, &baseline_path)? {
+                    fs::write(&baseline_path, screenshot)?;
+                    println!("  → Baseline updated");
+                    Ok(true)
+                } else {
+                    println!("  → Baseline not updated");
+                    Ok(false)
+                }
             }
         }
     } else {
@@ -537,6 +548,7 @@ async fn process_variant(
 
         fs::write(&baseline_path, screenshot)?;
         println!("  → Baseline created");
+
         Ok(true)
     }
 }

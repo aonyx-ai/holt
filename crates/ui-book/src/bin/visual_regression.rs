@@ -116,51 +116,58 @@ impl Drop for TrunkServer {
     }
 }
 
-/// Discovers all stories and variants by scraping the storybook
-async fn discover_stories() -> WebDriverResult<Vec<StoryVariant>> {
+/// Discovers all stories and variants by scraping the storybook navigation
+async fn discover_stories(driver: &WebDriver) -> WebDriverResult<Vec<StoryVariant>> {
     println!("Discovering stories...");
 
-    // For MVP, we'll hardcode the stories we know exist
-    // In the future, we could scrape the storybook or use a build script
-    let stories = vec![
-        (
-            "badge",
-            vec!["default", "secondary", "destructive", "outline"],
-        ),
-        (
-            "button",
-            vec![
-                "default",
-                "destructive",
-                "outline",
-                "secondary",
-                "ghost",
-                "link",
-                "icon",
-                "loading",
-            ],
-        ),
-        ("breadcrumb", vec!["default"]),
-        ("card", vec!["default"]),
-        ("input", vec!["default", "disabled", "with_label"]),
-        ("checkbox", vec!["default", "checked", "disabled"]),
-        ("collapsible", vec!["default"]),
-        ("label", vec!["default"]),
-        ("select", vec!["default"]),
-    ];
+    // Navigate to the storybook home page
+    driver.goto(&format!("{}/", SERVER_URL)).await?;
 
-    let mut variants = Vec::new();
-    for (story_id, variant_names) in stories {
-        for (idx, name) in variant_names.iter().enumerate() {
-            variants.push(StoryVariant {
-                story_id: story_id.to_string(),
-                variant_index: idx,
-                name: name.to_string(),
-            });
+    // Wait for stories to load
+    thread::sleep(Duration::from_millis(1000));
+
+    // Get all story links from the navigation
+    let story_links = driver.find_all(By::Css("nav a[href^='/story/']")).await?;
+
+    let mut story_ids = Vec::new();
+    for link in story_links {
+        if let Ok(href) = link.attr("href").await
+            && let Some(href_str) = href
+        {
+            // Extract story ID from href like "/story/button"
+            if let Some(id) = href_str.strip_prefix("/story/") {
+                story_ids.push(id.to_string());
+            }
         }
     }
 
-    println!("Found {} story variants", variants.len());
+    println!("Found {} stories", story_ids.len());
+
+    // For each story, navigate to it and count variants
+    let mut variants = Vec::new();
+    for story_id in story_ids {
+        driver
+            .goto(&format!("{}/story/{}", SERVER_URL, story_id))
+            .await?;
+        thread::sleep(Duration::from_millis(500));
+
+        // Find the select element for variants
+        if let Ok(select) = driver.find(By::Css("select")).await
+            && let Ok(options) = select.find_all(By::Tag("option")).await
+        {
+            for (idx, option) in options.iter().enumerate() {
+                if let Ok(name) = option.text().await {
+                    variants.push(StoryVariant {
+                        story_id: story_id.clone(),
+                        variant_index: idx,
+                        name: name.to_lowercase().replace(' ', "_"),
+                    });
+                }
+            }
+        }
+    }
+
+    println!("Found {} total story variants", variants.len());
     Ok(variants)
 }
 
@@ -554,7 +561,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     driver.set_window_rect(0, 0, 1280, 720).await?;
 
     // Discover stories
-    let variants = discover_stories().await?;
+    let variants = discover_stories(&driver).await?;
 
     println!("\nProcessing {} story variants...\n", variants.len());
 

@@ -14,6 +14,12 @@ struct StoryParams {
     story_id: Option<String>,
 }
 
+#[derive(Params, PartialEq)]
+struct VisualTestParams {
+    story_id: Option<String>,
+    variant_index: Option<String>,
+}
+
 /// Main storybook layout component
 #[component]
 pub fn Storybook() -> impl IntoView {
@@ -233,5 +239,49 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                     }
                 })}
         </div>
+    }
+}
+
+/// Minimal component for visual regression testing - renders just the story variant
+#[component]
+pub fn VisualTestStory() -> impl IntoView {
+    let params = use_params::<VisualTestParams>();
+
+    move || {
+        let story_id = params
+            .read()
+            .as_ref()
+            .ok()
+            .and_then(|params| params.story_id.clone());
+
+        let variant_index = params
+            .read()
+            .as_ref()
+            .ok()
+            .and_then(|params| params.variant_index.clone())
+            .and_then(|idx| idx.parse::<usize>().ok());
+
+        match (story_id, variant_index) {
+            (Some(id), Some(index)) => inventory::iter::<&'static Story>
+                .into_iter()
+                .find(|story| story.id == id)
+                .and_then(|story| story.variants.get(index))
+                .map_or_else(
+                    || view! { <div>"Story variant not found"</div> }.into_any(),
+                    |variant| {
+                        view! {
+                            <div
+                                class="flex items-center justify-center min-h-screen bg-white p-8"
+                                data-story-id=id.clone()
+                                data-variant-index=index.to_string()
+                            >
+                                {(variant.render)()}
+                            </div>
+                        }
+                        .into_any()
+                    },
+                ),
+            _ => view! { <div>"Invalid parameters"</div> }.into_any(),
+        }
     }
 }

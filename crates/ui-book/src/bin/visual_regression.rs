@@ -124,7 +124,7 @@ async fn discover_stories(driver: &WebDriver) -> WebDriverResult<Vec<StoryVarian
     driver.goto(&format!("{}/", SERVER_URL)).await?;
 
     // Wait for stories to load
-    thread::sleep(Duration::from_millis(1000));
+    tokio::time::sleep(Duration::from_millis(1000)).await;
 
     // Get all story links from the navigation
     let story_links = driver.find_all(By::Css("nav a[href^='/story/']")).await?;
@@ -149,7 +149,7 @@ async fn discover_stories(driver: &WebDriver) -> WebDriverResult<Vec<StoryVarian
         driver
             .goto(&format!("{}/story/{}", SERVER_URL, story_id))
             .await?;
-        thread::sleep(Duration::from_millis(500));
+        tokio::time::sleep(Duration::from_millis(500)).await;
 
         // Find the select element for variants
         if let Ok(select) = driver.find(By::Css("select")).await
@@ -185,7 +185,7 @@ async fn capture_screenshot(
     driver.goto(&url).await?;
 
     // Wait a bit for rendering to complete
-    thread::sleep(Duration::from_millis(500));
+    tokio::time::sleep(Duration::from_millis(500)).await;
 
     driver.screenshot_as_png().await
 }

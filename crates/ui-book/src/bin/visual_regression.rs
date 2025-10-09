@@ -520,12 +520,15 @@ async fn process_variant(
             );
 
             if is_ci {
-                // In CI mode, always save the new screenshot for comparison
-                let parent = baseline_path.parent().unwrap();
-                fs::create_dir_all(parent)?;
-                fs::write(&baseline_path, screenshot)?;
-                println!("  → New screenshot saved for comparison");
-                Ok(true)
+                // In CI mode, fail the test and save diff for review
+                let diff_dir = Path::new("tests/visual-diffs");
+                fs::create_dir_all(diff_dir.join(&variant.story_id))?;
+                let diff_path = diff_dir
+                    .join(&variant.story_id)
+                    .join(format!("{}.png", variant.name));
+                fs::write(&diff_path, screenshot)?;
+                println!("  → Diff saved to {}", diff_path.display());
+                Ok(false)
             } else {
                 // Interactive mode
                 if prompt_user_approval(variant, &baseline, &screenshot, &baseline_path)? {

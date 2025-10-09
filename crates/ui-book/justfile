@@ -7,3 +7,7 @@ default:
 # Serve the Holt Book for our UI components
 serve:
     trunk serve
+
+# Run visual regression tests
+test-visual:
+    cargo run --bin visual-regression --features visual-regression

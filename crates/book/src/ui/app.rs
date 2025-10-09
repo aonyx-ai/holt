@@ -1,8 +1,9 @@
 use leptos::prelude::*;
 use leptos_meta::*;
-use leptos_router::components::Router;
+use leptos_router::components::{Route, Router, Routes};
+use leptos_router::path;
 
-use crate::ui::components::Storybook;
+use crate::ui::components::{Storybook, VisualTestStory};
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -20,7 +21,13 @@ pub fn App() -> impl IntoView {
         <Meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <Router>
-            <Storybook />
+            <Routes fallback=|| "not found">
+                <Route
+                    path=path!("/visual-test/:story_id/:variant_index")
+                    view=move || view! { <VisualTestStory /> }
+                />
+                <Route path=path!("/*any") view=move || view! { <Storybook /> } />
+            </Routes>
         </Router>
     }
 }

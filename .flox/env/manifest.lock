@@ -28,6 +28,9 @@
           "x86_64-linux"
         ]
       },
+      "geckodriver": {
+        "pkg-path": "geckodriver"
+      },
       "git": {
         "pkg-path": "git"
       },
@@ -1027,6 +1030,122 @@
         "info": "/nix/store/12sy2qyk3qir1rg4jdrdnj91jaw50my2-gcc-wrapper-14.3.0-info",
         "man": "/nix/store/ds5j2vvwhdvfgkjp7jnfx82bqswks46x-gcc-wrapper-14.3.0-man",
         "out": "/nix/store/95k9rsn1zsw1yvir8mj824ldhf90i4qw-gcc-wrapper-14.3.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "geckodriver",
+      "broken": false,
+      "derivation": "/nix/store/j7faxmgfdi7bjcg1dfr4b8x51cxhb1cx-geckodriver-0.36.0.drv",
+      "description": "Proxy for using W3C WebDriver-compatible clients to interact with Gecko-based browsers",
+      "install_id": "geckodriver",
+      "license": "MPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "geckodriver-0.36.0",
+      "pname": "geckodriver",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:00:43.192754Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.36.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fln7sa7y95k4gsmpdxbp5jc8z1zd616v-geckodriver-0.36.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "geckodriver",
+      "broken": false,
+      "derivation": "/nix/store/xsmi8px5vlzp1fn7y6mrfwvsj0qkwa2s-geckodriver-0.36.0.drv",
+      "description": "Proxy for using W3C WebDriver-compatible clients to interact with Gecko-based browsers",
+      "install_id": "geckodriver",
+      "license": "MPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "geckodriver-0.36.0",
+      "pname": "geckodriver",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:29:41.487494Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.36.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/xa61glap9q273blm0biw1p215sdmxi5s-geckodriver-0.36.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "geckodriver",
+      "broken": false,
+      "derivation": "/nix/store/mv0d1xn0gl8v79swq3b7l4a3pbzw3h87-geckodriver-0.36.0.drv",
+      "description": "Proxy for using W3C WebDriver-compatible clients to interact with Gecko-based browsers",
+      "install_id": "geckodriver",
+      "license": "MPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "geckodriver-0.36.0",
+      "pname": "geckodriver",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:56:36.581755Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.36.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8xmp33w11sxfxigvhdsard9jk3y11xym-geckodriver-0.36.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "geckodriver",
+      "broken": false,
+      "derivation": "/nix/store/w66dmxwwrcx25vy3khz2fbg6aj2jqcbl-geckodriver-0.36.0.drv",
+      "description": "Proxy for using W3C WebDriver-compatible clients to interact with Gecko-based browsers",
+      "install_id": "geckodriver",
+      "license": "MPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "geckodriver-0.36.0",
+      "pname": "geckodriver",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T03:26:57.689208Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.36.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2yv179fz74wwwwqv79xif9z4gjcllkfx-geckodriver-0.36.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",

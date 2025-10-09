@@ -12,7 +12,7 @@ icondata = { version = "0.6.0", default-features = false, features = [
   "lucide",
 ] }
 leptos_icons = "0.7.0"
-thirtyfour = { version = "0.32.0", optional = true }
+thirtyfour = { version = "0.36.0", optional = true }
 tokio = { version = "1.41", features = ["full"], optional = true }
 ureq = { version = "2.10", optional = true }
 eframe = { version = "0.32", optional = true }

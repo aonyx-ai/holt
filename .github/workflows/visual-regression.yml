@@ -32,6 +32,11 @@ jobs:
       - name: Remove Flox installer (if it exists)
         run: rm -f flox.x86_64-linux.deb
 
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # 2.8.1
+        with:
+          prefix-key: "v0-visual-regression"
+
       - name: Install Firefox
         run: |
           sudo apt-get update

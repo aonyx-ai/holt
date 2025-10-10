@@ -29,3 +29,8 @@ itertools = "0.14.0"
 name = "visual-regression"
 path = "src/bin/visual_regression.rs"
 required-features = ["visual-regression"]
+
+[[bin]]
+name = "render-variant"
+path = "src/bin/render_variant.rs"
+required-features = ["visual-regression"]

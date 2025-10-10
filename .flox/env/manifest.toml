@@ -45,6 +45,8 @@ taplo.pkg-path = "taplo"
 wasm-pack.pkg-path = "wasm-pack"
 yamllint.pkg-path = "yamllint"
 zizmor.pkg-path = "zizmor"
+lld.pkg-path = "lld"
+geckodriver.pkg-path = "geckodriver"
 
 [profile]
 

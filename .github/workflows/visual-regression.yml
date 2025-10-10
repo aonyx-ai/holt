@@ -1,0 +1,173 @@
+---
+name: Visual Regression
+
+permissions: {}
+
+"on":
+  pull_request:
+    paths:
+      - "crates/ui/**"
+      - "crates/ui-book/**"
+      - "crates/book/**"
+
+jobs:
+  visual-regression:
+    name: Visual Regression
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+
+      - name: Install Flox
+        uses: flox/install-flox-action@ba0eb4eb776f1d3b47279d7980f6643caffd8c41 # 2.0.0
+        with:
+          version: 1.6.1
+
+      - name: Remove Flox installer (if it exists)
+        run: rm -f flox.x86_64-linux.deb
+
+      - name: Install Firefox
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
+
+      - name: Get baseline screenshots from main
+        run: |
+          git fetch origin main
+          git checkout origin/main -- crates/ui-book/tests/visual-baselines || true
+
+      - name: Build visual regression binary
+        run: |
+          flox activate -- cargo build --bin visual-regression --features visual-regression -p holt-ui-book --release
+
+      - name: Run visual regression tests
+        id: visual-regression
+        continue-on-error: true
+        env:
+          CI: true
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Create output directory for screenshots
+          mkdir -p visual-regression-output/baseline
+          mkdir -p visual-regression-output/new
+
+          # Copy main branch baselines
+          if [ -d "crates/ui-book/tests/visual-baselines" ]; then
+            cp -r crates/ui-book/tests/visual-baselines/* visual-regression-output/baseline/ || true
+          fi
+
+          # Checkout PR branch to get updated code
+          git checkout "$SHA"
+
+          # Run the visual regression tool
+          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-ui-book --release 2>&1 | tee visual-regression.log || true
+
+          # Copy new screenshots
+          if [ -d "crates/ui-book/tests/visual-baselines" ]; then
+            cp -r crates/ui-book/tests/visual-baselines/* visual-regression-output/new/ || true
+          fi
+
+          # Check if there were any differences
+          if grep -q "differs from baseline" visual-regression.log || grep -q "new baseline" visual-regression.log; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload visual regression artifacts
+        if: steps.visual-regression.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-screenshots
+          path: visual-regression-output/
+
+      - name: Generate comparison report
+        if: steps.visual-regression.outputs.has_changes == 'true'
+        env:
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          cat > comment.md << 'EOF'
+          ## 📸 Visual Changes Detected
+
+          This PR includes visual changes to the following components:
+
+          EOF
+
+          # Parse the log file for changes
+          grep -E "(differs from baseline|new baseline)" visual-regression.log | while read -r line; do
+            if echo "$line" | grep -q "differs from baseline"; then
+              story=$(echo "$line" | sed -n 's/.*✗ \([^/]*\)\/\([^ ]*\) differs.*/\1\/\2/p')
+              echo "- 🔄 **Modified**: \`$story\`" >> comment.md
+            elif echo "$line" | grep -q "new baseline"; then
+              story=$(echo "$line" | sed -n 's/.*+ \([^/]*\)\/\([^ ]*\) (new.*/\1\/\2/p')
+              echo "- ✨ **New Component**: \`$story\`" >> comment.md
+            fi
+          done
+
+          cat >> comment.md << 'EOF'
+
+          ### 📥 View Screenshots
+
+          Download the [visual regression artifacts](https://github.com/$REPOSITORY/actions/runs/$RUN_ID) to compare:
+          - `baseline/` - Screenshots from main branch
+          - `new/` - Screenshots from this PR
+
+          > 💡 To update the baseline images, run `just ui_book test-visual` locally, review and accept the changes, then commit the updated baselines.
+
+          EOF
+
+      - name: Post PR comment
+        if: steps.visual-regression.outputs.has_changes == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const comment = fs.readFileSync('comment.md', 'utf8');
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Visual Regression Test Results')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: Summary
+        run: |
+          if [ "${STEPS_VISUAL_REGRESSION_OUTPUTS_HAS_CHANGES}" == "true" ]; then
+            echo "📸 Visual changes detected - see PR comment for details"
+          else
+            echo "✅ No visual changes detected"
+          fi
+
+        env:
+          STEPS_VISUAL_REGRESSION_OUTPUTS_HAS_CHANGES: ${{ steps.visual-regression.outputs.has_changes }}

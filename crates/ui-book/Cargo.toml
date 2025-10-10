@@ -12,7 +12,25 @@ icondata = { version = "0.6.0", default-features = false, features = [
   "lucide",
 ] }
 leptos_icons = "0.7.0"
+thirtyfour = { version = "0.36.0", optional = true }
+tokio = { version = "1.41", features = ["full"], optional = true }
+ureq = { version = "3.0", optional = true }
+eframe = { version = "0.33", optional = true }
+image = { version = "0.25", optional = true, features = ["png"] }
+
+[features]
+visual-regression = ["thirtyfour", "tokio", "ureq", "eframe", "image"]
 
 [build-dependencies]
 thiserror = ">=1.0.37, <2"
 itertools = "0.14.0"
+
+[[bin]]
+name = "visual-regression"
+path = "src/bin/visual_regression.rs"
+required-features = ["visual-regression"]
+
+[[bin]]
+name = "render-variant"
+path = "src/bin/render_variant.rs"
+required-features = ["visual-regression"]

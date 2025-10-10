@@ -7,3 +7,17 @@ default:
 # Serve the Holt Book for our UI components
 serve:
     trunk serve
+
+# Run visual regression tests
+test-visual:
+    cargo run --bin visual-regression --features visual-regression
+
+# Render a single story variant to PNG (for LLM agent use)
+# The <variant> can be either an index (0, 1, 2...) or a name ('default', 'destructive'...)
+# Examples:
+#   just ui_book render-variant button 0
+#   just ui_book render-variant button destructive
+
+# just ui_book render-variant select 2 ./output.png
+render-variant story_id variant output_path="./variant.png":
+    cargo run --bin render-variant --features visual-regression -- {{ story_id }} {{ variant }} {{ absolute_path(invocation_directory() / output_path) }}

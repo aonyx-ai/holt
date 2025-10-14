@@ -47,6 +47,7 @@ yamllint.pkg-path = "yamllint"
 zizmor.pkg-path = "zizmor"
 lld.pkg-path = "lld"
 geckodriver.pkg-path = "geckodriver"
+trunk.pkg-path = "trunk"
 
 [profile]
 

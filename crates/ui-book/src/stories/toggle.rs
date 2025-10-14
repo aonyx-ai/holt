@@ -99,9 +99,7 @@ fn interactive() -> AnyView {
             <Toggle pressed=pressed aria_label="Toggle bold">
                 <Icon icon=icondata::LuBold attr:class="h-4 w-4" />
             </Toggle>
-            <p class="text-sm text-muted-foreground">
-                "Pressed " {move || count.get()} " times"
-            </p>
+            <p class="text-sm text-muted-foreground">"Pressed " {move || count.get()} " times"</p>
         </div>
     }
     .into_any()

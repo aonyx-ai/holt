@@ -1,5 +1,5 @@
 [package]
-name = "holt-ui-book"
+name = "holt-kit-docs"
 
 version.workspace = true
 edition.workspace = true
@@ -7,7 +7,7 @@ edition.workspace = true
 [dependencies]
 leptos = { workspace = true }
 holt-book = { path = "../book" }
-holt-ui = { path = "../ui" }
+holt-kit = { path = "../kit" }
 icondata = { version = "0.6.0", default-features = false, features = [
   "lucide",
 ] }

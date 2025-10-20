@@ -49,7 +49,7 @@ jobs:
 
       - name: Build visual regression binary
         run: |
-          flox activate -- cargo build --bin visual-regression --features visual-regression -p holt-ui-book --release
+          flox activate -- cargo build --bin visual-regression --features visual-regression -p holt-kit-docs --release
 
       - name: Run visual regression tests
         id: visual-regression
@@ -71,7 +71,7 @@ jobs:
           git checkout "$SHA"
 
           # Run the visual regression tool
-          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-ui-book --release 2>&1 | tee visual-regression.log || true
+          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee visual-regression.log || true
 
           # Copy new screenshots
           if [ -d "crates/ui-book/tests/visual-baselines" ]; then
@@ -124,7 +124,7 @@ jobs:
           - `baseline/` - Screenshots from main branch
           - `new/` - Screenshots from this PR
 
-          > 💡 To update the baseline images, run `just ui_book test-visual` locally, review and accept the changes, then commit the updated baselines.
+          > 💡 To update the baseline images, run `just kit-docs test-visual` locally, review and accept the changes, then commit the updated baselines.
 
           EOF
 

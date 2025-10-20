@@ -1,6 +1,6 @@
 // @component Card
 use holt_book::{story, variant};
-use holt_ui::visual::{
+use holt_kit::visual::{
     Button, ButtonVariant, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
 };
 use leptos::prelude::*;

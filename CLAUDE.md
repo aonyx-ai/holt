@@ -5,8 +5,8 @@ behavior/presentation separation.
 
 ## Workspace Structure
 
-- **`holt-ui`** (`crates/ui/`) - Core UI library
-- **`holt-ui-book`** (`crates/ui-book/`) - Storybook app
+- **`holt-kit`** (`crates/ui/`) - Core UI library
+- **`holt-kit-docs`** (`crates/ui-book/`) - Storybook app
 - **`holt-book`** (`crates/book/`) - Storybook framework
 - **`holt-story-macro`** (`crates/story-macro/`) - Story macros
 
@@ -14,11 +14,11 @@ behavior/presentation separation.
 
 ```bash
 # Main workflow
-just ui_book serve
+just kit-docs serve
 
 # Testing
 just test-rust          # Unit tests
-just ui test-e2e        # Browser integration tests
+just kit test-e2e        # Browser integration tests
 
 # Code quality
 just format-rust true   # Format code

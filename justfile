@@ -1,5 +1,5 @@
-mod ui_book "crates/ui-book"
-mod ui "crates/ui"
+mod kit-docs "crates/kit-docs"
+mod kit "crates/kit"
 
 set shell := ["flox", "activate", "--", "sh", "-cu"]
 

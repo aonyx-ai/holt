@@ -19,4 +19,4 @@ visual components add styling.
 ## Testing
 
 - Unit tests for logic
-- `just ui test-e2e` to run browser tests
+- `just kit test-e2e` to run browser tests

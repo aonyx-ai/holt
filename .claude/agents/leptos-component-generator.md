@@ -46,7 +46,7 @@ When generating new Leptos components, you will:
 6. **Visual Iteration and Refinement**: Use the render-variant command to
    iterate on component visuals:
    - After creating stories, use
-     `just ui_book render-variant <story_id> <variant> <output_path>` to render
+     `just kit-docs render-variant <story_id> <variant> <output_path>` to render
      specific variants
    - The variant can be specified by index (0, 1, 2...) or by name ('default',
      'destructive', etc.)
@@ -54,9 +54,9 @@ When generating new Leptos components, you will:
    - Iterate on the component styling and structure based on the rendered output
    - Compare against the original Shadcn/Radix design to ensure visual fidelity
    - Examples:
-     - `just ui_book render-variant button 0 ./button-default.png`
-     - `just ui_book render-variant button destructive ./button-destructive.png`
-     - `just ui_book render-variant select 2 ./select-variant.png`
+     - `just kit-docs render-variant button 0 ./button-default.png`
+     - `just kit-docs render-variant button destructive ./button-destructive.png`
+     - `just kit-docs render-variant select 2 ./select-variant.png`
 
 7. **Quality Assurance**: Ensure the generated code:
    - Compiles without errors or warnings

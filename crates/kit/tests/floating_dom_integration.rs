@@ -1,4 +1,4 @@
-use holt_ui::floating::*;
+use holt_kit::floating::*;
 use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);

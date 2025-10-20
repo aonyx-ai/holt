@@ -1,6 +1,6 @@
 // @component Breadcrumb
 use holt_book::{story, variant};
-use holt_ui::visual::{
+use holt_kit::visual::{
     Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
 };
 use leptos::prelude::*;

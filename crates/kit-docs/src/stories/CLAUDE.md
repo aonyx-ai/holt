@@ -7,7 +7,7 @@ Stories showcase component variants for visual testing and documentation.
 ```rust
 // @component Button
 use holt_book::{story, variant};
-use holt_ui::visual::Button;
+use holt_kit::visual::Button;
 use leptos::prelude::*;
 
 #[variant]
@@ -37,5 +37,5 @@ const BUTTON_STORY: () = &[default, outline];
 ## Development
 
 ```bash
-just ui_book serve  # View at http://localhost:8080
+just kit-docs serve  # View at http://localhost:8080
 ```

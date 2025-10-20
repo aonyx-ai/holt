@@ -3,7 +3,7 @@
 //! ## Usage
 //!
 //! ```bash
-//! just ui_book render-variant <story_id> <variant> [output_path]
+//! just kit-docs render-variant <story_id> <variant> [output_path]
 //! ```
 //!
 //! The `<variant>` parameter can be either:
@@ -13,13 +13,13 @@
 //! Examples:
 //! ```bash
 //! # Render button story, first variant to default location (./variant.png)
-//! just ui_book render-variant button 0
+//! just kit-docs render-variant button 0
 //!
 //! # Render button story, "destructive" variant by name
-//! just ui_book render-variant button destructive
+//! just kit-docs render-variant button destructive
 //!
 //! # Render select story, variant 2 to specific file
-//! just ui_book render-variant select 2 ./select-variant-2.png
+//! just kit-docs render-variant select 2 ./select-variant-2.png
 //! ```
 //!
 //! The tool automatically manages geckodriver and the storybook server.

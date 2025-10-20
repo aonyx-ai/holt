@@ -8,7 +8,7 @@ edition.workspace = true
 clap = { version = "4.5.38", features = ["derive"] }
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
-holt-ui = { path = "../ui" }
+holt-kit = { path = "../kit" }
 inventory = "0.3.20"
 leptos = { workspace = true, features = ["csr"] }
 leptos_router = { workspace = true }

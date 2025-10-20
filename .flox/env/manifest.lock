@@ -81,6 +81,9 @@
       "taplo": {
         "pkg-path": "taplo"
       },
+      "trunk": {
+        "pkg-path": "trunk"
+      },
       "wasm-pack": {
         "pkg-path": "wasm-pack"
       },
@@ -2288,6 +2291,122 @@
       ],
       "outputs": {
         "out": "/nix/store/0ylhpa0vki4d9c7n68nn1nwgfvq1hb6l-taplo-0.10.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "trunk",
+      "broken": false,
+      "derivation": "/nix/store/5kvr0h0cqlbzgj7mprvijv3c5gwcd22b-trunk-0.21.14.drv",
+      "description": "Build, bundle & ship your Rust WASM application to the web",
+      "install_id": "trunk",
+      "license": "[ Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "trunk-0.21.14",
+      "pname": "trunk",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:02:49.578217Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.21.14",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/pmb9v1935g53g0cidxjlg3bribp77vvi-trunk-0.21.14"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "trunk",
+      "broken": false,
+      "derivation": "/nix/store/l1ni27k209252np1vjd8jf4xmjlyzn8i-trunk-0.21.14.drv",
+      "description": "Build, bundle & ship your Rust WASM application to the web",
+      "install_id": "trunk",
+      "license": "[ Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "trunk-0.21.14",
+      "pname": "trunk",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:32:30.193526Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.21.14",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/sldzwzq1bxzfb9xqhghc4y0r7xfvm8y0-trunk-0.21.14"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "trunk",
+      "broken": false,
+      "derivation": "/nix/store/7vgh6988zl4zcgd76babikkaxkqwvyal-trunk-0.21.14.drv",
+      "description": "Build, bundle & ship your Rust WASM application to the web",
+      "install_id": "trunk",
+      "license": "[ Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "trunk-0.21.14",
+      "pname": "trunk",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T02:58:41.671890Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.21.14",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/xflvkahhxd0l8k9jix0aicidac00nfx7-trunk-0.21.14"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "trunk",
+      "broken": false,
+      "derivation": "/nix/store/r69jvdprgbmayf995vhy4syial9hy48d-trunk-0.21.14.drv",
+      "description": "Build, bundle & ship your Rust WASM application to the web",
+      "install_id": "trunk",
+      "license": "[ Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "name": "trunk-0.21.14",
+      "pname": "trunk",
+      "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+      "rev_count": 861038,
+      "rev_date": "2025-09-13T06:43:22Z",
+      "scrape_date": "2025-09-15T03:29:54.933892Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.21.14",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/a1ch6bc1nf0rshglnv1vxzcbb61lni0n-trunk-0.21.14"
       },
       "system": "x86_64-linux",
       "group": "toplevel",

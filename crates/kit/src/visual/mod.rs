@@ -11,6 +11,7 @@ pub use self::label::*;
 pub use self::select::*;
 pub use self::separator::*;
 pub use self::sidebar::*;
+pub use self::textarea::*;
 pub use self::toggle::*;
 pub use self::typography::*;
 
@@ -25,5 +26,6 @@ mod label;
 mod select;
 mod separator;
 mod sidebar;
+mod textarea;
 mod toggle;
 mod typography;

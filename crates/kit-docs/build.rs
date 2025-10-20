@@ -8,6 +8,8 @@ use crate::config::BuildConfig;
 use crate::generator::CodeGenerator;
 use crate::parser::StoryParser;
 
+static KIT_DIR: &str = "../kit/";
+
 type BuildResult<T> = Result<T, BuildError>;
 
 /// Errors that can occur during the build process.
@@ -42,7 +44,10 @@ fn main() -> BuildResult<()> {
 fn setup_cargo_rerun_conditions() {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/stories/");
-    println!("cargo:rerun-if-changed=../ui/src/visual/");
+    println!(
+        "cargo:rerun-if-changed={}",
+        PathBuf::from(KIT_DIR).join("src/visual/").display()
+    );
 }
 
 mod config {
@@ -65,7 +70,7 @@ mod config {
             Ok(Self {
                 stories_dir: PathBuf::from("src/stories"),
                 stories_output_dir,
-                ui_components_dir: PathBuf::from("../ui/src/visual"),
+                ui_components_dir: PathBuf::from(KIT_DIR).join("src/visual"),
             })
         }
     }

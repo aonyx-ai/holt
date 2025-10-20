@@ -5,7 +5,7 @@
 //! ## Usage
 //!
 //! ```bash
-//! just ui_book test-visual
+//! just kit-docs test-visual
 //! ```
 //!
 //! The tool automatically manages geckodriver and the storybook server.

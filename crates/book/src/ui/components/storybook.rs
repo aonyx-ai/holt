@@ -1,5 +1,5 @@
-use holt_ui::behavior::*;
-use holt_ui::visual::*;
+use holt_kit::behavior::*;
+use holt_kit::visual::*;
 use leptos::prelude::*;
 use leptos_router::components::{A, Route, Routes};
 use leptos_router::hooks::use_params;

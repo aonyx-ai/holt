@@ -1,6 +1,6 @@
 // @component Badge
 use holt_book::{story, variant};
-use holt_ui::visual::{Badge, BadgeVariant};
+use holt_kit::visual::{Badge, BadgeVariant};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 

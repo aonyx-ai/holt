@@ -1,6 +1,6 @@
 // @component Collapsible
 use holt_book::{story, variant};
-use holt_ui::visual::{Button, Collapsible, CollapsibleContent, CollapsibleTrigger};
+use holt_kit::visual::{Button, Collapsible, CollapsibleContent, CollapsibleTrigger};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
@@ -52,13 +52,13 @@ fn controlled() -> AnyView {
             <div class="flex gap-2">
                 <Button on:click=move |_| open.set(true)>"Open"</Button>
                 <Button
-                    variant=holt_ui::visual::ButtonVariant::Outline
+                    variant=holt_kit::visual::ButtonVariant::Outline
                     on:click=move |_| open.set(false)
                 >
                     "Close"
                 </Button>
                 <Button
-                    variant=holt_ui::visual::ButtonVariant::Secondary
+                    variant=holt_kit::visual::ButtonVariant::Secondary
                     on:click=move |_| open.update(|o| *o = !*o)
                 >
                     "Toggle"

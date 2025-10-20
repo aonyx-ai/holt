@@ -2058,8 +2058,8 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "const_format",
+ "holt-kit",
  "holt-story-macro",
- "holt-ui",
  "inventory",
  "leptos",
  "leptos_meta",
@@ -2072,20 +2072,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "holt-story-macro"
-version = "0.0.0"
-dependencies = [
- "const_format",
- "holt-book",
- "leptos",
- "prettyplease",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "holt-ui"
+name = "holt-kit"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
@@ -2100,12 +2087,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "holt-ui-book"
+name = "holt-kit-docs"
 version = "0.0.0"
 dependencies = [
  "eframe",
  "holt-book",
- "holt-ui",
+ "holt-kit",
  "icondata",
  "image",
  "itertools 0.14.0",
@@ -2115,6 +2102,19 @@ dependencies = [
  "thiserror 1.0.69",
  "tokio",
  "ureq",
+]
+
+[[package]]
+name = "holt-story-macro"
+version = "0.0.0"
+dependencies = [
+ "const_format",
+ "holt-book",
+ "leptos",
+ "prettyplease",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

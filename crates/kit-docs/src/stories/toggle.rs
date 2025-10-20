@@ -1,6 +1,6 @@
 // @component Toggle
 use holt_book::{story, variant};
-use holt_ui::visual::{Toggle, ToggleSize, ToggleVariant};
+use holt_kit::visual::{Toggle, ToggleSize, ToggleVariant};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 

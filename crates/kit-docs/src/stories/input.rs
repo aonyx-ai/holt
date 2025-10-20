@@ -1,6 +1,6 @@
 // @component Input
 use holt_book::{story, variant};
-use holt_ui::visual::{Input, InputSize};
+use holt_kit::visual::{Input, InputSize};
 use leptos::prelude::*;
 
 #[variant]

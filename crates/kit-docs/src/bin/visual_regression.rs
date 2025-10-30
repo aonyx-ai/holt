@@ -102,7 +102,8 @@ impl TrunkServer {
         // In CI, show trunk output for debugging
         let is_ci = std::env::var("CI").is_ok();
         let mut cmd = Command::new("trunk");
-        cmd.args(["serve", "--port", "8080"]);
+        // Disable auto-reload to prevent rebuilds when baselines change during test
+        cmd.args(["serve", "--port", "8080", "--no-autoreload"]);
 
         if !is_ci {
             cmd.stdout(Stdio::null()).stderr(Stdio::null());

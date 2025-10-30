@@ -93,7 +93,8 @@ fn required_with_validation() -> AnyView {
     view! {
         <div class="w-80 space-y-2">
             <label for="message" class="text-sm font-medium leading-none">
-                "Message " <span class="text-red-500">"*"</span>
+                "Message "
+                <span class="text-red-500">"*"</span>
             </label>
             <Textarea
                 id="message"
@@ -105,11 +106,7 @@ fn required_with_validation() -> AnyView {
             />
             <p class="text-xs text-muted-foreground">
                 {move || {
-                    if value.get().is_empty() {
-                        "This field is required."
-                    } else {
-                        "Valid input."
-                    }
+                    if value.get().is_empty() { "This field is required." } else { "Valid input." }
                 }}
             </p>
         </div>

@@ -51,7 +51,6 @@ jobs:
         id: visual-regression
         env:
           CI: true
-          SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           # Create output directory for screenshots
           mkdir -p visual-regression-output/baseline
@@ -61,9 +60,6 @@ jobs:
           if [ -d "crates/ui-book/tests/visual-baselines" ]; then
             cp -r crates/ui-book/tests/visual-baselines/* visual-regression-output/baseline/ || true
           fi
-
-          # Checkout PR branch to get updated code
-          git checkout "$SHA"
 
           # Run the visual regression tool (will exit with code 1 on failure)
           flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee visual-regression.log

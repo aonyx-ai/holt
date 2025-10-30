@@ -54,11 +54,16 @@ impl GeckoDriver {
     fn start() -> Result<Self, Box<dyn std::error::Error>> {
         println!("Starting geckodriver...");
 
-        let process = Command::new("geckodriver")
-            .args(["--port", "4444"])
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()?;
+        // In CI, show geckodriver output for debugging
+        let is_ci = std::env::var("CI").is_ok();
+        let mut cmd = Command::new("geckodriver");
+        cmd.args(["--port", "4444"]);
+
+        if !is_ci {
+            cmd.stdout(Stdio::null()).stderr(Stdio::null());
+        }
+
+        let process = cmd.spawn()?;
 
         // Wait for geckodriver to be ready
         thread::sleep(Duration::from_secs(2));

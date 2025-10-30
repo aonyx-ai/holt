@@ -84,11 +84,16 @@ impl TrunkServer {
     fn start() -> Result<Self, Box<dyn std::error::Error>> {
         println!("Starting trunk server...");
 
-        let process = Command::new("trunk")
-            .args(["serve", "--port", "8080"])
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()?;
+        // In CI, show trunk output for debugging
+        let is_ci = std::env::var("CI").is_ok();
+        let mut cmd = Command::new("trunk");
+        cmd.args(["serve", "--port", "8080"]);
+
+        if !is_ci {
+            cmd.stdout(Stdio::null()).stderr(Stdio::null());
+        }
+
+        let process = cmd.spawn()?;
 
         // Wait for server to be ready
         for i in 0..30 {

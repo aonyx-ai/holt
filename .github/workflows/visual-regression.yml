@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           persist-credentials: true
+          fetch-depth: 0 # Fetch full history to allow checking out PR commits
 
       - name: Install Flox
         uses: flox/install-flox-action@ba0eb4eb776f1d3b47279d7980f6643caffd8c41 # 2.0.0

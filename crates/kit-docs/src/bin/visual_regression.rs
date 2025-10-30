@@ -598,7 +598,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Set up WebDriver
     println!("Connecting to WebDriver...");
-    let caps = DesiredCapabilities::firefox();
+    let mut caps = DesiredCapabilities::firefox();
+
+    // Run headless in CI (no display server available)
+    let is_ci = std::env::var("CI").is_ok();
+    if is_ci {
+        caps.set_headless()?;
+        println!("Running Firefox in headless mode");
+    }
+
     let driver = WebDriver::new("http://localhost:4444", caps).await?;
 
     // Set viewport size for consistent screenshots

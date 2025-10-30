@@ -62,8 +62,9 @@ jobs:
           fi
 
           # Run the visual regression tool (will exit with code 1 on failure)
+          set -o pipefail
           flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee visual-regression.log
-          EXIT_CODE=$?
+          EXIT_CODE=${PIPESTATUS[0]}
 
           # Copy new screenshots
           if [ -d "crates/ui-book/tests/visual-baselines" ]; then

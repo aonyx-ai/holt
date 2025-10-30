@@ -82,6 +82,18 @@ struct TrunkServer {
 
 impl TrunkServer {
     fn start() -> Result<Self, Box<dyn std::error::Error>> {
+        println!("Pre-building WASM app...");
+
+        // Build the app first to avoid timeout issues with trunk serve
+        let build_status = Command::new("trunk")
+            .args(["build", "--release"])
+            .current_dir("crates/kit-docs")
+            .status()?;
+
+        if !build_status.success() {
+            return Err("Failed to build WASM app".into());
+        }
+
         println!("Starting trunk server...");
 
         // In CI, show trunk output for debugging

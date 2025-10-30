@@ -106,7 +106,7 @@ impl TrunkServer {
             cmd.stdout(Stdio::null()).stderr(Stdio::null());
         }
 
-        let process = cmd.spawn()?;
+        let mut process = cmd.spawn()?;
 
         // Wait for server to be ready
         for i in 0..30 {
@@ -121,6 +121,11 @@ impl TrunkServer {
                 println!("Waiting for server to start... ({}/30)", i);
             }
         }
+
+        // Kill the process before returning error
+        println!("Timeout reached, killing trunk server...");
+        let _ = process.kill();
+        let _ = process.wait();
 
         Err("Server failed to start within 30 seconds".into())
     }

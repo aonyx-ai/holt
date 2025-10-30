@@ -6,9 +6,9 @@ permissions: {}
 "on":
   pull_request:
     paths:
-      - "crates/ui/**"
-      - "crates/ui-book/**"
       - "crates/book/**"
+      - "crates/kit/**"
+      - "crates/kit-docs/**"
 
 jobs:
   visual-regression:

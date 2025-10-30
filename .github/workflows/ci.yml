@@ -10,7 +10,7 @@ permissions: {}
 jobs:
   targets:
     name: Enumerate Just recipes
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-2x
 
     permissions:
       contents: read
@@ -35,7 +35,7 @@ jobs:
 
   checks:
     name: ${{ matrix.target }}
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-2x
 
     permissions:
       packages: write
@@ -89,7 +89,7 @@ jobs:
 
   success:
     name: All checks succeeded
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-2x
 
     permissions: {}
 

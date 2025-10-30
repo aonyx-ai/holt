@@ -13,7 +13,7 @@ permissions: {}
 jobs:
   visual-regression:
     name: Visual Regression
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-2x
     permissions:
       pull-requests: write
       contents: read
@@ -49,7 +49,6 @@ jobs:
 
       - name: Run visual regression tests
         id: visual-regression
-        continue-on-error: true
         env:
           CI: true
           SHA: ${{ github.event.pull_request.head.sha }}
@@ -66,8 +65,9 @@ jobs:
           # Checkout PR branch to get updated code
           git checkout "$SHA"
 
-          # Run the visual regression tool
-          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee visual-regression.log || true
+          # Run the visual regression tool (will exit with code 1 on failure)
+          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee visual-regression.log
+          EXIT_CODE=$?
 
           # Copy new screenshots
           if [ -d "crates/ui-book/tests/visual-baselines" ]; then
@@ -80,6 +80,9 @@ jobs:
           else
             echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
+
+          # Exit with the original exit code
+          exit $EXIT_CODE
 
       - name: Upload visual regression artifacts
         if: steps.visual-regression.outputs.has_changes == 'true'

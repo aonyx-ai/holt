@@ -14,10 +14,9 @@ pre-commit-inner:
     #!/usr/bin/env -S parallel --shebang --ungroup --jobs {{ num_cpus() }}
     just prettier true
     just format-toml true
-    just format-rust true
+    just format-leptos true
     just lint-github-actions
     just lint-markdown
-    just lint-rust
     just lint-yaml
     just test-rust
 
@@ -66,7 +65,7 @@ format-json fix="false": (prettier fix "{json,json5}")
 format-markdown fix="false": (prettier fix "md")
 
 # Format Leptos files
-format-leptos fix="false":
+format-leptos fix="false": (format-rust fix)
     leptosfmt {{ if fix != "true" { "--check" } else { "" } }} "crates/**/*.rs"
 
 # Format Rust files

@@ -85,8 +85,9 @@ impl TrunkServer {
         println!("Pre-building WASM app...");
 
         // Build the app first to avoid timeout issues with trunk serve
+        // Use debug build for faster compilation
         let build_status = Command::new("trunk")
-            .args(["build", "--release"])
+            .args(["build"])
             .current_dir("crates/kit-docs")
             .status()?;
 

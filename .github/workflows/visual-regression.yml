@@ -56,9 +56,9 @@ jobs:
           mkdir -p visual-regression-output/baseline
           mkdir -p visual-regression-output/new
 
-          # Copy main branch baselines
-          if [ -d "crates/ui-book/tests/visual-baselines" ]; then
-            cp -r crates/ui-book/tests/visual-baselines/* visual-regression-output/baseline/ || true
+          # Copy main branch baselines (fetched earlier)
+          if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
+            cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/baseline/ 2>/dev/null || echo "No baselines from main"
           fi
 
           # Run the visual regression tool (will exit with code 1 on failure)
@@ -66,9 +66,9 @@ jobs:
           flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee visual-regression.log
           EXIT_CODE=${PIPESTATUS[0]}
 
-          # Copy new screenshots
-          if [ -d "crates/ui-book/tests/visual-baselines" ]; then
-            cp -r crates/ui-book/tests/visual-baselines/* visual-regression-output/new/ || true
+          # Copy new screenshots from this PR
+          if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
+            cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/new/ 2>/dev/null || echo "No new screenshots generated"
           fi
 
           # Check if there were any differences

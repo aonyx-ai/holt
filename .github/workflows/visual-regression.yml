@@ -37,11 +37,6 @@ jobs:
         with:
           prefix-key: "v0-visual-regression"
 
-      - name: Install Firefox
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y firefox
-
       - name: Get baseline screenshots from main
         run: |
           git fetch origin main

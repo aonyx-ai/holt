@@ -101,26 +101,58 @@ jobs:
 
           EOF
 
-          # Parse the log file for changes
+          # Parse the log file for changes and embed images
           grep -E "(differs from baseline|new baseline)" visual-regression.log | while read -r line; do
             if echo "$line" | grep -q "differs from baseline"; then
               story=$(echo "$line" | sed -n 's/.*✗ \([^/]*\)\/\([^ ]*\) differs.*/\1\/\2/p')
-              echo "- 🔄 **Modified**: \`$story\`" >> comment.md
+              story_dir=$(echo "$story" | cut -d'/' -f1)
+              variant_name=$(echo "$story" | cut -d'/' -f2)
+
+              echo "" >> comment.md
+              echo "### 🔄 Modified: \`$story\`" >> comment.md
+              echo "" >> comment.md
+              echo "<details><summary>View comparison</summary>" >> comment.md
+              echo "" >> comment.md
+              echo "#### Baseline (main)" >> comment.md
+              if [ -f "visual-regression-output/baseline/$story_dir/${variant_name}.png" ]; then
+                base64 -i "visual-regression-output/baseline/$story_dir/${variant_name}.png" > /tmp/baseline.b64
+                echo "![Baseline](data:image/png;base64,$(cat /tmp/baseline.b64))" >> comment.md
+              fi
+              echo "" >> comment.md
+              echo "#### New (PR)" >> comment.md
+              if [ -f "visual-regression-output/new/$story_dir/${variant_name}.png" ]; then
+                base64 -i "visual-regression-output/new/$story_dir/${variant_name}.png" > /tmp/new.b64
+                echo "![New](data:image/png;base64,$(cat /tmp/new.b64))" >> comment.md
+              fi
+              echo "" >> comment.md
+              echo "</details>" >> comment.md
+              echo "" >> comment.md
+
             elif echo "$line" | grep -q "new baseline"; then
               story=$(echo "$line" | sed -n 's/.*+ \([^/]*\)\/\([^ ]*\) (new.*/\1\/\2/p')
-              echo "- ✨ **New Component**: \`$story\`" >> comment.md
+              story_dir=$(echo "$story" | cut -d'/' -f1)
+              variant_name=$(echo "$story" | cut -d'/' -f2)
+
+              echo "" >> comment.md
+              echo "### ✨ New Component: \`$story\`" >> comment.md
+              echo "" >> comment.md
+              if [ -f "crates/kit-docs/tests/visual-baselines/$story_dir/${variant_name}.png" ]; then
+                base64 -i "crates/kit-docs/tests/visual-baselines/$story_dir/${variant_name}.png" > /tmp/new.b64
+                echo "![New Component](data:image/png;base64,$(cat /tmp/new.b64))" >> comment.md
+              fi
+              echo "" >> comment.md
             fi
           done
 
           cat >> comment.md << EOF
 
-          ### 📥 View Screenshots
+          ---
 
-          Download the [visual regression artifacts](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}) to compare:
-          - `baseline/` - Screenshots from main branch
-          - `new/` - Screenshots from this PR
+          ### 📥 Download Full Results
 
-          > 💡 To update the baseline images, run `just kit-docs test-visual` locally, review and accept the changes, then commit the updated baselines.
+          Download the [visual regression artifacts](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}) for detailed comparison.
+
+          > 💡 To update the baseline images, run \`just kit-docs test-visual\` locally, review and accept the changes, then commit the updated baselines.
 
           EOF
 

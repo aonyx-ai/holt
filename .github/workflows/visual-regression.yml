@@ -41,7 +41,7 @@ jobs:
       - name: Get baseline screenshots from main
         run: |
           git fetch origin main
-          git checkout origin/main -- crates/ui-book/tests/visual-baselines || true
+          git checkout origin/main -- crates/kit-docs/tests/visual-baselines || true
 
       - name: Build visual regression binary
         run: |
@@ -112,11 +112,11 @@ jobs:
             fi
           done
 
-          cat >> comment.md << 'EOF'
+          cat >> comment.md << EOF
 
           ### 📥 View Screenshots
 
-          Download the [visual regression artifacts](https://github.com/$REPOSITORY/actions/runs/$RUN_ID) to compare:
+          Download the [visual regression artifacts](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}) to compare:
           - `baseline/` - Screenshots from main branch
           - `new/` - Screenshots from this PR
 

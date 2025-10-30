@@ -40,8 +40,9 @@ jobs:
 
       - name: Get baseline screenshots from main
         run: |
+          # Fetch baselines from main branch - these will be used for comparison
           git fetch origin main
-          git checkout origin/main -- crates/kit-docs/tests/visual-baselines || true
+          git checkout origin/main -- crates/kit-docs/tests/visual-baselines || echo "No baselines in main"
 
       - name: Build visual regression binary
         run: |
@@ -52,23 +53,25 @@ jobs:
         env:
           CI: true
         run: |
-          # Create output directory for screenshots
+          # Create output directories for artifacts
           mkdir -p visual-regression-output/baseline
           mkdir -p visual-regression-output/new
 
-          # Copy main branch baselines (fetched earlier)
+          # Save main baselines for artifact upload
           if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
-            cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/baseline/ 2>/dev/null || echo "No baselines from main"
+            cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/baseline/ 2>/dev/null || true
           fi
 
-          # Run the visual regression tool (will exit with code 1 on failure)
+          # Run visual regression from crates/kit-docs (tool expects relative paths from there)
           set -o pipefail
-          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee visual-regression.log
+          cd crates/kit-docs
+          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee ../../visual-regression.log
           EXIT_CODE=${PIPESTATUS[0]}
+          cd ../..
 
-          # Copy new screenshots from this PR
+          # Save new screenshots for artifact upload
           if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
-            cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/new/ 2>/dev/null || echo "No new screenshots generated"
+            cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/new/ 2>/dev/null || true
           fi
 
           # Check if there were any differences

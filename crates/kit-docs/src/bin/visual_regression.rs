@@ -91,10 +91,7 @@ impl TrunkServer {
 
         // Build the app first to avoid timeout issues with trunk serve
         // Use debug build for faster compilation
-        let build_status = Command::new("trunk")
-            .args(["build"])
-            .current_dir("crates/kit-docs")
-            .status()?;
+        let build_status = Command::new("trunk").args(["build"]).status()?;
 
         if !build_status.success() {
             return Err("Failed to build WASM app".into());
@@ -105,8 +102,7 @@ impl TrunkServer {
         // In CI, show trunk output for debugging
         let is_ci = std::env::var("CI").is_ok();
         let mut cmd = Command::new("trunk");
-        cmd.args(["serve", "--port", "8080"])
-            .current_dir("crates/kit-docs");
+        cmd.args(["serve", "--port", "8080"]);
 
         if !is_ci {
             cmd.stdout(Stdio::null()).stderr(Stdio::null());

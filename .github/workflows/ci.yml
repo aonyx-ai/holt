@@ -48,21 +48,6 @@ jobs:
       matrix:
         target: ${{ fromJson(needs.targets.outputs.matrix) }}
 
-    services:
-      postgres:
-        image: postgres@sha256:1ffc019dae94eca6b09a49ca67d37398951346de3c3d0cfe23d8d4ca33da83fb
-        ports:
-          - 5433:5432
-        env:
-          POSTGRES_USER: otterdone
-          POSTGRES_PASSWORD: otterdone
-          POSTGRES_DB: otterdone
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # 5.0.0
@@ -70,7 +55,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Flox
-        uses: flox/install-flox-action@ba0eb4eb776f1d3b47279d7980f6643caffd8c41 # 2.0.0
+        uses: flox/install-flox-action@819183ecd53757be53d66f492eeb7d689687a66b # 2.1.0
         with:
           version: 1.6.1
 

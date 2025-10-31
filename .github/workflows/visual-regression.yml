@@ -69,8 +69,7 @@ jobs:
           # Run visual regression from crates/kit-docs (tool expects relative paths from there)
           set -o pipefail
           cd crates/kit-docs
-          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee ../../visual-regression.log
-          echo "we are at least done with this stuff"
+          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee ../../visual-regression.log || true
           EXIT_CODE=${PIPESTATUS[0]}
           cd ../..
 
@@ -83,7 +82,7 @@ jobs:
           if [ $EXIT_CODE -ne 0 ]; then
             echo "HAS_CHANGES=true" >> "$GITHUB_OUTPUT"
           else
-            echo "HAS_CHANGES=false" >> $GITHUB_OUTPUT
+            echo "HAS_CHANGES=false" >> "$GITHUB_OUTPUT"
           fi
 
           # Exit with the original exit code

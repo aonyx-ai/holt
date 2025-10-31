@@ -10,7 +10,7 @@ permissions: {}
 jobs:
   targets:
     name: Enumerate Just recipes
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-2x
 
     permissions:
       contents: read
@@ -35,7 +35,7 @@ jobs:
 
   checks:
     name: ${{ matrix.target }}
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-2x
 
     permissions:
       packages: write
@@ -47,21 +47,6 @@ jobs:
       fail-fast: false
       matrix:
         target: ${{ fromJson(needs.targets.outputs.matrix) }}
-
-    services:
-      postgres:
-        image: postgres@sha256:1ffc019dae94eca6b09a49ca67d37398951346de3c3d0cfe23d8d4ca33da83fb
-        ports:
-          - 5433:5432
-        env:
-          POSTGRES_USER: otterdone
-          POSTGRES_PASSWORD: otterdone
-          POSTGRES_DB: otterdone
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -81,6 +66,8 @@ jobs:
         uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # 2.8.1
         with:
           prefix-key: "v0-${{ matrix.target }}"
+          cache-on-failure: true
+          cache-provider: "warpbuild"
 
       - name: Run check with Just
         uses: flox/activate-action@bdcbcf8d84af6f503e588ae4125e48133787df95 # 1.0.0
@@ -89,7 +76,7 @@ jobs:
 
   success:
     name: All checks succeeded
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-2x
 
     permissions: {}
 

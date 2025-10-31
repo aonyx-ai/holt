@@ -54,11 +54,16 @@ impl GeckoDriver {
     fn start() -> Result<Self, Box<dyn std::error::Error>> {
         println!("Starting geckodriver...");
 
-        let process = Command::new("geckodriver")
-            .args(["--port", "4444"])
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()?;
+        // In CI, show geckodriver output for debugging
+        let is_ci = std::env::var("CI").is_ok();
+        let mut cmd = Command::new("geckodriver");
+        cmd.args(["--port", "4444"]);
+
+        if !is_ci {
+            cmd.stdout(Stdio::null()).stderr(Stdio::null());
+        }
+
+        let process = cmd.spawn()?;
 
         // Wait for geckodriver to be ready
         thread::sleep(Duration::from_secs(2));
@@ -70,8 +75,7 @@ impl GeckoDriver {
 impl Drop for GeckoDriver {
     fn drop(&mut self) {
         println!("Shutting down geckodriver...");
-        let _ = self.process.kill();
-        let _ = self.process.wait();
+        self.process.kill().expect("couldn't kill geckodriver");
     }
 }
 
@@ -82,13 +86,29 @@ struct TrunkServer {
 
 impl TrunkServer {
     fn start() -> Result<Self, Box<dyn std::error::Error>> {
+        println!("Pre-building WASM app...");
+
+        // Build the app first to avoid timeout issues with trunk serve
+        // Use debug build for faster compilation
+        let build_status = Command::new("trunk").args(["build"]).status()?;
+
+        if !build_status.success() {
+            return Err("Failed to build WASM app".into());
+        }
+
         println!("Starting trunk server...");
 
-        let process = Command::new("trunk")
-            .args(["serve", "--port", "8080"])
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()?;
+        // In CI, show trunk output for debugging
+        let is_ci = std::env::var("CI").is_ok();
+        let mut cmd = Command::new("trunk");
+        // Disable auto-reload to prevent rebuilds when baselines change during test
+        cmd.args(["serve", "--port", "8080", "--no-autoreload", "true"]);
+
+        if !is_ci {
+            cmd.stdout(Stdio::null()).stderr(Stdio::null());
+        }
+
+        let mut process = cmd.spawn()?;
 
         // Wait for server to be ready
         for i in 0..30 {
@@ -104,6 +124,10 @@ impl TrunkServer {
             }
         }
 
+        // Kill the process before returning error
+        println!("Timeout reached, killing trunk server...");
+        process.kill().expect("couldn't kill trunk server");
+
         Err("Server failed to start within 30 seconds".into())
     }
 }
@@ -111,8 +135,7 @@ impl TrunkServer {
 impl Drop for TrunkServer {
     fn drop(&mut self) {
         println!("Shutting down trunk server...");
-        let _ = self.process.kill();
-        let _ = self.process.wait();
+        self.process.kill().expect("couldn't kill trunk server");
     }
 }
 
@@ -520,14 +543,8 @@ async fn process_variant(
             );
 
             if is_ci {
-                // In CI mode, fail the test and save diff for review
-                let diff_dir = Path::new("tests/visual-diffs");
-                fs::create_dir_all(diff_dir.join(&variant.story_id))?;
-                let diff_path = diff_dir
-                    .join(&variant.story_id)
-                    .join(format!("{}.png", variant.name));
-                fs::write(&diff_path, screenshot)?;
-                println!("  → Diff saved to {}", diff_path.display());
+                fs::write(&baseline_path, screenshot)?;
+                println!("  → New screenshot saved for artifact upload");
                 Ok(false)
             } else {
                 // Interactive mode
@@ -557,7 +574,7 @@ async fn process_variant(
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<std::process::ExitCode, Box<dyn std::error::Error>> {
     println!("Holt Visual Regression Testing");
     println!("================================\n");
 
@@ -569,7 +586,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Set up WebDriver
     println!("Connecting to WebDriver...");
-    let caps = DesiredCapabilities::firefox();
+    let mut caps = DesiredCapabilities::firefox();
+
+    // Run headless in CI (no display server available)
+    let is_ci = std::env::var("CI").is_ok();
+    if is_ci {
+        caps.set_headless()?;
+        println!("Running Firefox in headless mode");
+    }
+
     let driver = WebDriver::new("http://localhost:4444", caps).await?;
 
     // Set viewport size for consistent screenshots
@@ -604,14 +629,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n================================");
     println!("Results: {} passed, {} failed", passed, failed);
 
-    // Clean up orphaned baseline images
-    cleanup_orphaned_baselines(&variants)?;
-
-    if failed > 0 {
-        std::process::exit(1);
+    if !is_ci {
+        // Clean up orphaned baseline images
+        cleanup_orphaned_baselines(&variants)?;
     }
 
-    Ok(())
+    if failed > 0 {
+        return Ok(std::process::ExitCode::FAILURE);
+    }
+
+    Ok(std::process::ExitCode::SUCCESS)
 }
 
 /// Removes baseline images that no longer have corresponding stories/variants

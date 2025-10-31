@@ -42,6 +42,9 @@ jobs:
 
       - name: Get baseline screenshots from main
         run: |
+          # Clear any existing baselines from PR branch
+          rm -rf crates/kit-docs/tests/visual-baselines
+
           # Fetch baselines from main branch - these will be used for comparison
           git fetch origin main
           git checkout origin/main -- crates/kit-docs/tests/visual-baselines || echo "No baselines in main"

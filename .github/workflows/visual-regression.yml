@@ -45,6 +45,7 @@ jobs:
           # Fetch baselines from main branch - these will be used for comparison
           git fetch origin main
           git checkout origin/main -- crates/kit-docs/tests/visual-baselines || echo "No baselines in main"
+          tree crates/kit-docs/tests/visual-baselines/
 
       - name: Build visual regression binary
         run: |

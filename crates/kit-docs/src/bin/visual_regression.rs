@@ -75,8 +75,7 @@ impl GeckoDriver {
 impl Drop for GeckoDriver {
     fn drop(&mut self) {
         println!("Shutting down geckodriver...");
-        let _ = self.process.kill();
-        let _ = self.process.wait();
+        self.process.kill().expect("couldn't kill geckodriver");
     }
 }
 
@@ -127,8 +126,7 @@ impl TrunkServer {
 
         // Kill the process before returning error
         println!("Timeout reached, killing trunk server...");
-        let _ = process.kill();
-        let _ = process.wait();
+        process.kill().expect("couldn't kill trunk server");
 
         Err("Server failed to start within 30 seconds".into())
     }
@@ -137,8 +135,7 @@ impl TrunkServer {
 impl Drop for TrunkServer {
     fn drop(&mut self) {
         println!("Shutting down trunk server...");
-        let _ = self.process.kill();
-        let _ = self.process.wait();
+        self.process.kill().expect("couldn't kill trunk server");
     }
 }
 
@@ -638,8 +635,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n================================");
     println!("Results: {} passed, {} failed", passed, failed);
 
-    // Clean up orphaned baseline images
-    cleanup_orphaned_baselines(&variants)?;
+    if !is_ci {
+        // Clean up orphaned baseline images
+        cleanup_orphaned_baselines(&variants)?;
+    }
 
     if failed > 0 {
         std::process::exit(1);

@@ -50,6 +50,7 @@ jobs:
 
       - name: Run visual regression tests
         id: visual-regression
+        timeout-minutes: 20
         env:
           CI: true
         run: |

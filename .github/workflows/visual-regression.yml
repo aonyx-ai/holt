@@ -37,6 +37,7 @@ jobs:
         uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # 2.8.1
         with:
           prefix-key: "v0-visual-regression"
+          cache-on-failure: true
 
       - name: Get baseline screenshots from main
         run: |
@@ -67,6 +68,7 @@ jobs:
           set -o pipefail
           cd crates/kit-docs
           flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee ../../visual-regression.log
+          echo "we are at least done with this stuff"
           EXIT_CODE=${PIPESTATUS[0]}
           cd ../..
 

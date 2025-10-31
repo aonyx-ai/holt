@@ -580,7 +580,7 @@ async fn process_variant(
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<std::process::ExitCode, Box<dyn std::error::Error>> {
     println!("Holt Visual Regression Testing");
     println!("================================\n");
 
@@ -641,10 +641,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if failed > 0 {
-        std::process::exit(1);
+        return Ok(std::process::ExitCode::FAILURE);
     }
 
-    Ok(())
+    Ok(std::process::ExitCode::SUCCESS)
 }
 
 /// Removes baseline images that no longer have corresponding stories/variants

@@ -38,6 +38,7 @@ jobs:
         with:
           prefix-key: "v0-visual-regression"
           cache-on-failure: true
+          cache-provider: "warpbuild"
 
       - name: Get baseline screenshots from main
         run: |

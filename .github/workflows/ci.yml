@@ -67,6 +67,7 @@ jobs:
         with:
           prefix-key: "v0-${{ matrix.target }}"
           cache-on-failure: true
+          cache-provider: "warpbuild"
 
       - name: Run check with Just
         uses: flox/activate-action@bdcbcf8d84af6f503e588ae4125e48133787df95 # 1.0.0

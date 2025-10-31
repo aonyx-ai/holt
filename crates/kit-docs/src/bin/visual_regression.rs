@@ -543,14 +543,8 @@ async fn process_variant(
             );
 
             if is_ci {
-                // In CI mode, fail the test and save diff for review
-                let diff_dir = Path::new("tests/visual-diffs");
-                fs::create_dir_all(diff_dir.join(&variant.story_id))?;
-                let diff_path = diff_dir
-                    .join(&variant.story_id)
-                    .join(format!("{}.png", variant.name));
-                fs::write(&diff_path, screenshot)?;
-                println!("  → Diff saved to {}", diff_path.display());
+                fs::write(&baseline_path, screenshot)?;
+                println!("  → New screenshot saved for artifact upload");
                 Ok(false)
             } else {
                 // Interactive mode

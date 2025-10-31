@@ -157,7 +157,7 @@ jobs:
 
             const botComment = comments.find(comment =>
               comment.user.type === 'Bot' &&
-              comment.body.includes('Visual Regression Test Results')
+              comment.body.includes('📸 Visual Changes Detected')
             );
 
             if (botComment) {

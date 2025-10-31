@@ -80,7 +80,7 @@ jobs:
           fi
 
           # Check if there were any differences
-          if grep -q "differs from baseline" visual-regression.log || grep -q "new baseline" visual-regression.log; then
+          if [ $EXIT_CODE -ne 0 ]; then
             echo "has_changes=true" >> $GITHUB_OUTPUT
           else
             echo "has_changes=false" >> $GITHUB_OUTPUT

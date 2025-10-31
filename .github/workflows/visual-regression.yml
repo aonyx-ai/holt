@@ -81,23 +81,23 @@ jobs:
 
           # Check if there were any differences
           if [ $EXIT_CODE -ne 0 ]; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "HAS_CHANGES=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "HAS_CHANGES=false" >> $GITHUB_OUTPUT
           fi
 
           # Exit with the original exit code
           exit $EXIT_CODE
 
       - name: Upload visual regression artifacts
-        if: steps.visual-regression.outputs.has_changes == 'true'
+        if: always() && steps.visual-regression.outputs.HAS_CHANGES == 'true'
         uses: actions/upload-artifact@v5
         with:
           name: visual-regression-screenshots
           path: visual-regression-output/
 
       - name: Generate comparison report
-        if: steps.visual-regression.outputs.has_changes == 'true'
+        if: always() && steps.visual-regression.outputs.HAS_CHANGES == 'true'
         env:
           REPOSITORY: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
@@ -138,7 +138,7 @@ jobs:
           EOF
 
       - name: Post PR comment
-        if: steps.visual-regression.outputs.has_changes == 'true'
+        if: always() && steps.visual-regression.outputs.HAS_CHANGES == 'true'
         uses: actions/github-script@v8
         with:
           script: |

@@ -12,11 +12,14 @@
 //!
 //! ## Workflow
 //!
-//! First run creates baselines in `tests/visual-baselines/`. Subsequent runs compare screenshots
-//! and prompt for approval on differences:
+//! First run creates baselines in `tests/visual-baselines/` but FAILS the test. Baselines must
+//! be reviewed and committed before tests pass. Subsequent runs compare screenshots and prompt
+//! for approval on differences:
 //!
 //! ```text
 //! ✓ button/default matches baseline
+//! + button/primary (new baseline)
+//!   → Baseline created (test will fail until committed)
 //! ✗ button/destructive differs from baseline
 //!   Screenshot differs for button/destructive. Accept new baseline? [y/N]:
 //! ```
@@ -567,9 +570,10 @@ async fn process_variant(
         }
 
         fs::write(&baseline_path, screenshot)?;
-        println!("  → Baseline created");
+        println!("  → Baseline created (test will fail until committed)");
 
-        Ok(true)
+        // Fail the test - new baselines must be reviewed and committed
+        Ok(false)
     }
 }
 

@@ -12,6 +12,8 @@ behavior/presentation separation.
 
 ## Development
 
+Do NOT use `cargo` commands directly.
+
 ```bash
 # Main workflow
 just kit-docs serve

@@ -1,0 +1,53 @@
+use leptos::prelude::*;
+use tailwind_fuse::*;
+
+use crate::behavior::{SwitchRoot, SwitchThumb};
+
+#[derive(TwClass)]
+#[tw(
+    class = "inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input"
+)]
+struct SwitchRootStyle {
+    size: SwitchSize,
+}
+
+#[derive(TwVariant)]
+pub enum SwitchSize {
+    #[tw(default, class = "h-6 w-11")]
+    Default,
+    #[tw(class = "h-5 w-9")]
+    Sm,
+    #[tw(class = "h-7 w-14")]
+    Lg,
+}
+
+/// A styled switch component for toggling between checked and unchecked states
+#[component]
+pub fn Switch(
+    #[prop(optional)] class: &'static str,
+    #[prop(optional)] size: SwitchSize,
+    #[prop(optional)] checked: RwSignal<bool>,
+    #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
+    #[prop(optional_no_strip, into)] id: Option<&'static str>,
+    #[prop(optional_no_strip, into)] name: Option<&'static str>,
+) -> impl IntoView {
+    let final_class = SwitchRootStyle { size }.with_class(class);
+
+    // Determine thumb size and translation based on switch size
+    let (thumb_class, translate_checked) = match size {
+        SwitchSize::Sm => ("h-4 w-4", "translate-x-4"),
+        SwitchSize::Default => ("h-5 w-5", "translate-x-5"),
+        SwitchSize::Lg => ("h-6 w-6", "translate-x-7"),
+    };
+
+    let thumb_classes = format!(
+        "pointer-events-none block {} rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:{} data-[state=unchecked]:translate-x-0",
+        thumb_class, translate_checked
+    );
+
+    view! {
+        <SwitchRoot checked=checked disabled=disabled id=id name=name class=final_class>
+            <SwitchThumb class=Signal::stored(thumb_classes) />
+        </SwitchRoot>
+    }
+}

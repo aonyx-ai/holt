@@ -12,6 +12,52 @@ serve:
 test-visual:
     cargo run --bin visual-regression --features visual-regression
 
+# Load visual regression testing baselines from a CI run artifact
+# Example: just kit-docs load-baselines-from-gh-artifact 123456789
+load-baselines-from-gh-artifact run_id:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    echo "📥 Downloading visual regression artifacts from run {{ run_id }}..."
+
+    # Download artifact to temp directory
+    TEMP_DIR=$(mktemp -d)
+    trap "rm -rf $TEMP_DIR" EXIT
+
+    if ! gh run download {{ run_id }} -n visual-regression-screenshots -D "$TEMP_DIR" 2>/dev/null; then
+        echo "❌ Error: Failed to download artifact from run {{ run_id }}"
+        echo "   Make sure the run ID is correct and the artifact exists."
+        exit 1
+    fi
+
+    # Check if the new/ directory exists
+    if [ ! -d "$TEMP_DIR/new" ]; then
+        echo "❌ Error: No new screenshots found in artifact"
+        echo "   The artifact may not contain visual changes."
+        exit 1
+    fi
+
+    # Copy new baselines to tests directory
+    echo ""
+    echo "📋 Copying new baselines to tests/visual-baselines/..."
+    rm -rf tests/visual-baselines
+    mkdir -p tests/visual-baselines
+    cp -r "$TEMP_DIR/new/"* tests/visual-baselines/
+
+    echo ""
+    echo "✅ Baselines updated successfully!"
+    echo ""
+
+    # Show git diff to see what changed
+    cd ../..
+    echo "📝 Changes:"
+    git add -N crates/kit-docs/tests/visual-baselines/
+    git diff --name-status crates/kit-docs/tests/visual-baselines/
+
+    echo ""
+    echo "Next steps:"
+    echo "  git add crates/kit-docs/tests/visual-baselines/ && git commit -m 'accept new visual baselines'"
+
 # Render a single story variant to PNG (for LLM agent use)
 # The <variant> can be either an index (0, 1, 2...) or a name ('default', 'destructive'...)
 # Examples:

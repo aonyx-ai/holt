@@ -102,6 +102,8 @@ Switch, Toggle, etc.
 - Include responsive classes when appropriate
 - Add focus-visible states for accessibility
 - Include disabled states where applicable
+- **NEVER use `format!` for building classlists** - always use `TwClass`,
+  `TwVariant`, or `tw_merge!` instead
 
 ## Size Variant Coordination
 
@@ -120,19 +122,34 @@ pub enum SwitchSize {
     Lg,
 }
 
-// Thumb must translate by: container_width - thumb_width
-let thumb_class = match size {
-    // Sm: translate-x-4 (9 - 4 = thumb fits on right)
-    SwitchSize::Sm => "h-4 w-4 data-[state=checked]:translate-x-4",
-    // Default: translate-x-5 (11 - 5 = thumb fits on right)
-    SwitchSize::Default => "h-5 w-5 data-[state=checked]:translate-x-5",
-    // Lg: translate-x-7 (14 - 6 = thumb fits on right)
-    SwitchSize::Lg => "h-6 w-6 data-[state=checked]:translate-x-7",
+// Create separate TwClass/TwVariant for moving parts - NEVER use match returning strings
+#[derive(TwClass)]
+#[tw(class = "pointer-events-none block rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=unchecked]:translate-x-0")]
+struct SwitchThumbStyle {
+    size: SwitchThumbSize,
+}
+
+#[derive(TwVariant)]
+enum SwitchThumbSize {
+    #[tw(default, class = "h-5 w-5 data-[state=checked]:translate-x-5")]
+    Default,
+    #[tw(class = "h-4 w-4 data-[state=checked]:translate-x-4")]
+    Sm,
+    #[tw(class = "h-6 w-6 data-[state=checked]:translate-x-7")]
+    Lg,
+}
+
+// Map between size enums and use type-safe system
+let thumb_size = match size {
+    SwitchSize::Sm => SwitchThumbSize::Sm,
+    SwitchSize::Default => SwitchThumbSize::Default,
+    SwitchSize::Lg => SwitchThumbSize::Lg,
 };
+let thumb_classes = SwitchThumbStyle { size: thumb_size }.to_class();
 ```
 
-**Key principle**: Moving elements need math! Container size - element size =
-movement distance.
+**Key principles**: Moving elements need math (container - element - border),
+but ALWAYS use TwClass/TwVariant, NEVER string building.
 
 ## Data Attributes for State-Based Styling
 

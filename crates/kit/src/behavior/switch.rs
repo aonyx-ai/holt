@@ -47,11 +47,7 @@ pub fn SwitchRoot(
             role="switch"
             aria-checked=move || checked.get()
             class=class
-            on:click=move |_| {
-                if !context_on_click.is_disabled() {
-                    context_on_click.toggle();
-                }
-            }
+            on:click=move |_| context_on_click.toggle()
             disabled=disabled
             data-state=move || if checked.get() { "checked" } else { "unchecked" }
             id=id

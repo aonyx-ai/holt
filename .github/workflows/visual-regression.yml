@@ -123,32 +123,34 @@ jobs:
           name: visual-regression-screenshots
           path: visual-regression-output/
 
-      - name: Generate comparison report
-        if: always() && steps.visual-regression.outputs.HAS_CHANGES == 'true'
+      - name: Generate visual regression report
+        if: always()
         env:
           REPOSITORY: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
+          HAS_CHANGES: ${{ steps.visual-regression.outputs.HAS_CHANGES }}
         run: |
-          cat > comment.md << 'EOF'
-          ## 📸 Visual Changes Detected
+          if [ "$HAS_CHANGES" == "true" ]; then
+            cat > comment.md << 'EOF'
+          ## 📸 Visual Regression Report
 
           This PR includes visual changes to the following components:
 
           EOF
 
-          # Parse the log file for changes and list them
-          grep -E "(differs from baseline|new baseline)" visual-regression.log | while read -r line; do
-            if echo "$line" | grep -q "differs from baseline"; then
-              story=$(echo "$line" | sed -n 's/.*✗ \([^/]*\)\/\([^ ]*\) differs.*/\1\/\2/p')
-              echo "- 🔄 **Modified:** \`$story\`" >> comment.md
+            # Parse the log file for changes and list them
+            grep -E "(differs from baseline|new baseline)" visual-regression.log | while read -r line; do
+              if echo "$line" | grep -q "differs from baseline"; then
+                story=$(echo "$line" | sed -n 's/.*✗ \([^/]*\)\/\([^ ]*\) differs.*/\1\/\2/p')
+                echo "- 🔄 **Modified:** \`$story\`" >> comment.md
 
-            elif echo "$line" | grep -q "new baseline"; then
-              story=$(echo "$line" | sed -n 's/.*+ \([^/]*\)\/\([^ ]*\) (new.*/\1\/\2/p')
-              echo "- ✨ **New Component:** \`$story\`" >> comment.md
-            fi
-          done
+              elif echo "$line" | grep -q "new baseline"; then
+                story=$(echo "$line" | sed -n 's/.*+ \([^/]*\)\/\([^ ]*\) (new.*/\1\/\2/p')
+                echo "- ✨ **New Component:** \`$story\`" >> comment.md
+              fi
+            done
 
-          cat >> comment.md << EOF
+            cat >> comment.md << EOF
 
           ---
 
@@ -175,14 +177,24 @@ jobs:
           Or run \`just kit-docs test-visual\` locally to review and accept changes interactively.
 
           EOF
+          else
+            cat > comment.md << 'EOF'
+          ## 📸 Visual Regression Report
 
-      - name: Post PR comment
-        if: always() && steps.visual-regression.outputs.HAS_CHANGES == 'true'
+          ✅ All component screenshots match their baselines. No visual changes detected.
+          EOF
+          fi
+
+      - name: Update PR comment
+        if: always()
         uses: actions/github-script@v8
+        env:
+          HAS_CHANGES: ${{ steps.visual-regression.outputs.HAS_CHANGES }}
         with:
           script: |
             const fs = require('fs');
             const comment = fs.readFileSync('comment.md', 'utf8');
+            const hasChanges = process.env.HAS_CHANGES === 'true';
 
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
@@ -193,7 +205,7 @@ jobs:
 
             const botComment = comments.find(comment =>
               comment.user.type === 'Bot' &&
-              comment.body.includes('📸 Visual Changes Detected')
+              comment.body.includes('📸 Visual Regression Report')
             );
 
             if (botComment) {
@@ -204,23 +216,26 @@ jobs:
                 comment_id: botComment.id,
                 body: comment
               });
-            } else {
-              // Create new comment
+              console.log('Updated existing comment');
+            } else if (hasChanges) {
+              // Only create new comment if there are changes
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
                 body: comment
               });
+              console.log('Created new comment');
+            } else {
+              console.log('No changes and no existing comment - skipping');
             }
 
       - name: Summary
+        env:
+          HAS_CHANGES: ${{ steps.visual-regression.outputs.HAS_CHANGES }}
         run: |
-          if [ "${STEPS_VISUAL_REGRESSION_OUTPUTS_HAS_CHANGES}" == "true" ]; then
+          if [ "${HAS_CHANGES}" == "true" ]; then
             echo "📸 Visual changes detected - see PR comment for details"
           else
             echo "✅ No visual changes detected"
           fi
-
-        env:
-          STEPS_VISUAL_REGRESSION_OUTPUTS_HAS_CHANGES: ${{ steps.visual-regression.outputs.has_changes }}

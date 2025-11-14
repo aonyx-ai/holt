@@ -11,6 +11,14 @@ struct SwitchRootStyle {
     size: SwitchSize,
 }
 
+#[derive(TwClass)]
+#[tw(
+    class = "pointer-events-none block rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=unchecked]:translate-x-0"
+)]
+struct SwitchThumbStyle {
+    size: SwitchThumbSize,
+}
+
 #[derive(TwVariant)]
 pub enum SwitchSize {
     #[tw(default, class = "h-6 w-11")]
@@ -18,6 +26,16 @@ pub enum SwitchSize {
     #[tw(class = "h-5 w-9")]
     Sm,
     #[tw(class = "h-7 w-14")]
+    Lg,
+}
+
+#[derive(TwVariant)]
+enum SwitchThumbSize {
+    #[tw(default, class = "h-5 w-5 data-[state=checked]:translate-x-5")]
+    Default,
+    #[tw(class = "h-4 w-4 data-[state=checked]:translate-x-4")]
+    Sm,
+    #[tw(class = "h-6 w-6 data-[state=checked]:translate-x-7")]
     Lg,
 }
 
@@ -33,17 +51,13 @@ pub fn Switch(
 ) -> impl IntoView {
     let final_class = SwitchRootStyle { size }.with_class(class);
 
-    // Determine thumb size and translation based on switch size
-    let (thumb_class, translate_checked) = match size {
-        SwitchSize::Sm => ("h-4 w-4", "translate-x-4"),
-        SwitchSize::Default => ("h-5 w-5", "translate-x-5"),
-        SwitchSize::Lg => ("h-6 w-6", "translate-x-7"),
+    let thumb_size = match size {
+        SwitchSize::Sm => SwitchThumbSize::Sm,
+        SwitchSize::Default => SwitchThumbSize::Default,
+        SwitchSize::Lg => SwitchThumbSize::Lg,
     };
 
-    let thumb_classes = format!(
-        "pointer-events-none block {} rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:{} data-[state=unchecked]:translate-x-0",
-        thumb_class, translate_checked
-    );
+    let thumb_classes = SwitchThumbStyle { size: thumb_size }.to_class();
 
     view! {
         <SwitchRoot checked=checked disabled=disabled id=id name=name class=final_class>

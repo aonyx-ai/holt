@@ -8,7 +8,7 @@ edition.workspace = true
 leptos = { workspace = true }
 tailwind_fuse = { version = "0.3.0", features = ["variant"] }
 leptos_icons = "0.7.0"
-icondata = { version = "0.6.0", default-features = false, features = [
+icondata = { version = "0.7.0", default-features = false, features = [
   "lucide",
 ] }
 web-sys = { version = "0.3.80", features = ["DomRect", "Element"] }

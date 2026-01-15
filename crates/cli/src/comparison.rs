@@ -1,229 +1,25 @@
-//! # Visual Regression Testing
-//!
-//! Captures screenshots of component stories and compares them against baseline images.
-//!
-//! ## Usage
-//!
-//! ```bash
-//! just kit-docs test-visual
-//! ```
-//!
-//! The tool automatically manages geckodriver and the storybook server.
-//!
-//! ## Workflow
-//!
-//! First run creates baselines in `tests/visual-baselines/` but FAILS the test. Baselines must
-//! be reviewed and committed before tests pass. Subsequent runs compare screenshots and prompt
-//! for approval on differences:
-//!
-//! ```text
-//! ✓ button/default matches baseline
-//! + button/primary (new baseline)
-//!   → Baseline created (test will fail until committed)
-//! ✗ button/destructive differs from baseline
-//!   Screenshot differs for button/destructive. Accept new baseline? [y/N]:
-//! ```
-//!
-//! Baseline images are committed to git and should be included in PRs when visuals change.
+//! Image comparison and baseline management
 
+use crate::discovery::StoryVariant;
+use crate::screenshot::capture_screenshot;
+use eframe::egui;
+use std::collections::HashSet;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::process::{Child, Command, Stdio};
+use std::process::Command;
 use std::sync::{Arc, Mutex, mpsc};
-use std::thread;
-use std::time::Duration;
-
-use eframe::egui;
-use thirtyfour::prelude::*;
-
-const SERVER_URL: &str = "http://localhost:8080";
-const BASELINE_DIR: &str = "tests/visual-baselines";
-
-/// Story metadata extracted from the storybook
-#[derive(Debug, Clone)]
-struct StoryVariant {
-    story_id: String,
-    variant_index: usize,
-    name: String,
-}
-
-/// Manages the geckodriver process
-struct GeckoDriver {
-    process: Child,
-}
-
-impl GeckoDriver {
-    fn start() -> Result<Self, Box<dyn std::error::Error>> {
-        println!("Starting geckodriver...");
-
-        // In CI, show geckodriver output for debugging
-        let is_ci = std::env::var("CI").is_ok();
-        let mut cmd = Command::new("geckodriver");
-        cmd.args(["--port", "4444"]);
-
-        if !is_ci {
-            cmd.stdout(Stdio::null()).stderr(Stdio::null());
-        }
-
-        let process = cmd.spawn()?;
-
-        // Wait for geckodriver to be ready
-        thread::sleep(Duration::from_secs(2));
-
-        Ok(GeckoDriver { process })
-    }
-}
-
-impl Drop for GeckoDriver {
-    fn drop(&mut self) {
-        println!("Shutting down geckodriver...");
-        self.process.kill().expect("couldn't kill geckodriver");
-    }
-}
-
-/// Manages the trunk serve process
-struct TrunkServer {
-    process: Child,
-}
-
-impl TrunkServer {
-    fn start() -> Result<Self, Box<dyn std::error::Error>> {
-        println!("Pre-building WASM app...");
-
-        // Build the app first to avoid timeout issues with trunk serve
-        // Use debug build for faster compilation
-        let build_status = Command::new("trunk").args(["build"]).status()?;
-
-        if !build_status.success() {
-            return Err("Failed to build WASM app".into());
-        }
-
-        println!("Starting trunk server...");
-
-        // In CI, show trunk output for debugging
-        let is_ci = std::env::var("CI").is_ok();
-        let mut cmd = Command::new("trunk");
-        // Disable auto-reload to prevent rebuilds when baselines change during test
-        cmd.args(["serve", "--port", "8080", "--no-autoreload", "true"]);
-
-        if !is_ci {
-            cmd.stdout(Stdio::null()).stderr(Stdio::null());
-        }
-
-        let mut process = cmd.spawn()?;
-
-        // Wait for server to be ready
-        for i in 0..30 {
-            thread::sleep(Duration::from_secs(1));
-            if let Ok(response) = ureq::get(SERVER_URL).call()
-                && response.status() == 200
-            {
-                println!("Server is ready!");
-                return Ok(TrunkServer { process });
-            }
-            if i % 5 == 0 {
-                println!("Waiting for server to start... ({}/30)", i);
-            }
-        }
-
-        // Kill the process before returning error
-        println!("Timeout reached, killing trunk server...");
-        process.kill().expect("couldn't kill trunk server");
-
-        Err("Server failed to start within 30 seconds".into())
-    }
-}
-
-impl Drop for TrunkServer {
-    fn drop(&mut self) {
-        println!("Shutting down trunk server...");
-        self.process.kill().expect("couldn't kill trunk server");
-    }
-}
-
-/// Discovers all stories and variants by scraping the storybook navigation
-async fn discover_stories(driver: &WebDriver) -> WebDriverResult<Vec<StoryVariant>> {
-    println!("Discovering stories...");
-
-    // Navigate to the storybook home page
-    driver.goto(&format!("{}/", SERVER_URL)).await?;
-
-    // Wait for stories to load
-    tokio::time::sleep(Duration::from_millis(1000)).await;
-
-    // Get all story links from the navigation
-    let story_links = driver.find_all(By::Css("nav a[href^='/story/']")).await?;
-
-    let mut story_ids = Vec::new();
-    for link in story_links {
-        if let Ok(href) = link.attr("href").await
-            && let Some(href_str) = href
-        {
-            // Extract story ID from href like "/story/button"
-            if let Some(id) = href_str.strip_prefix("/story/") {
-                story_ids.push(id.to_string());
-            }
-        }
-    }
-
-    println!("Found {} stories", story_ids.len());
-
-    // For each story, navigate to it and count variants
-    let mut variants = Vec::new();
-    for story_id in story_ids {
-        driver
-            .goto(&format!("{}/story/{}", SERVER_URL, story_id))
-            .await?;
-        tokio::time::sleep(Duration::from_millis(500)).await;
-
-        // Find the select element for variants
-        if let Ok(select) = driver.find(By::Css("select")).await
-            && let Ok(options) = select.find_all(By::Tag("option")).await
-        {
-            for (idx, option) in options.iter().enumerate() {
-                if let Ok(name) = option.text().await {
-                    variants.push(StoryVariant {
-                        story_id: story_id.clone(),
-                        variant_index: idx,
-                        name: name.to_lowercase().replace(' ', "_"),
-                    });
-                }
-            }
-        }
-    }
-
-    println!("Found {} total story variants", variants.len());
-    Ok(variants)
-}
-
-/// Captures a screenshot of a story variant
-async fn capture_screenshot(
-    driver: &WebDriver,
-    variant: &StoryVariant,
-) -> WebDriverResult<Vec<u8>> {
-    let url = format!(
-        "{}/visual-test/{}/{}",
-        SERVER_URL, variant.story_id, variant.variant_index
-    );
-
-    println!("  Capturing: {}/{}", variant.story_id, variant.name);
-    driver.goto(&url).await?;
-
-    // Wait a bit for rendering to complete
-    tokio::time::sleep(Duration::from_millis(500)).await;
-
-    driver.screenshot_as_png().await
-}
+use thirtyfour::WebDriver;
+use walkdir::WalkDir;
 
 /// Gets the baseline path for a story variant
-fn get_baseline_path(variant: &StoryVariant) -> PathBuf {
-    Path::new(BASELINE_DIR)
+pub fn get_baseline_path(baseline_dir: &Path, variant: &StoryVariant) -> PathBuf {
+    baseline_dir
         .join(&variant.story_id)
         .join(format!("{}.png", variant.name))
 }
 
-/// Compares two images (simple byte comparison for MVP)
+/// Compares two images (simple byte comparison)
 fn images_match(img1: &[u8], img2: &[u8]) -> bool {
     img1 == img2
 }
@@ -261,7 +57,7 @@ impl ImageCompareApp {
             .with_guessed_format()?
             .decode()?;
 
-        // Convert to egui ColorImage (no texture size limits)
+        // Convert to egui ColorImage
         let baseline_rgba = baseline_img.to_rgba8();
         let screenshot_rgba = screenshot_img.to_rgba8();
 
@@ -523,22 +319,42 @@ fn prompt_user_approval(
     }
 }
 
-/// Processes a single story variant
-async fn process_variant(
+/// Result of processing a variant
+pub enum ProcessResult {
+    /// Variant matches baseline
+    Passed,
+    /// Variant differs from baseline or is new
+    Failed,
+    /// Error occurred during processing
+    Error(String),
+}
+
+/// Processes a single story variant - captures screenshot and compares to baseline
+pub async fn process_variant(
     driver: &WebDriver,
+    base_url: &str,
+    baseline_dir: &Path,
     variant: &StoryVariant,
-) -> Result<bool, Box<dyn std::error::Error>> {
-    let screenshot = capture_screenshot(driver, variant).await?;
-    let baseline_path = get_baseline_path(variant);
+) -> ProcessResult {
+    // Capture screenshot
+    let screenshot = match capture_screenshot(driver, base_url, variant).await {
+        Ok(s) => s,
+        Err(e) => return ProcessResult::Error(e.to_string()),
+    };
+
+    let baseline_path = get_baseline_path(baseline_dir, variant);
     let is_ci = std::env::var("CI").is_ok();
 
     // Check if baseline exists
     if baseline_path.exists() {
-        let baseline = fs::read(&baseline_path)?;
+        let baseline = match fs::read(&baseline_path) {
+            Ok(b) => b,
+            Err(e) => return ProcessResult::Error(e.to_string()),
+        };
 
         if images_match(&screenshot, &baseline) {
             println!("  ✓ {}/{} matches baseline", variant.story_id, variant.name);
-            Ok(true)
+            ProcessResult::Passed
         } else {
             println!(
                 "  ✗ {}/{} differs from baseline",
@@ -546,18 +362,26 @@ async fn process_variant(
             );
 
             if is_ci {
-                fs::write(&baseline_path, screenshot)?;
+                if let Err(e) = fs::write(&baseline_path, screenshot) {
+                    return ProcessResult::Error(e.to_string());
+                }
                 println!("  → New screenshot saved for artifact upload");
-                Ok(false)
+                ProcessResult::Failed
             } else {
                 // Interactive mode
-                if prompt_user_approval(variant, &baseline, &screenshot, &baseline_path)? {
-                    fs::write(&baseline_path, screenshot)?;
-                    println!("  → Baseline updated");
-                    Ok(true)
-                } else {
-                    println!("  → Baseline not updated");
-                    Ok(false)
+                match prompt_user_approval(variant, &baseline, &screenshot, &baseline_path) {
+                    Ok(true) => {
+                        if let Err(e) = fs::write(&baseline_path, screenshot) {
+                            return ProcessResult::Error(e.to_string());
+                        }
+                        println!("  → Baseline updated");
+                        ProcessResult::Passed
+                    }
+                    Ok(false) => {
+                        println!("  → Baseline not updated");
+                        ProcessResult::Failed
+                    }
+                    Err(e) => ProcessResult::Error(e.to_string()),
                 }
             }
         }
@@ -566,113 +390,48 @@ async fn process_variant(
 
         // Create parent directory if needed
         if let Some(parent) = baseline_path.parent() {
-            fs::create_dir_all(parent)?;
+            if let Err(e) = fs::create_dir_all(parent) {
+                return ProcessResult::Error(e.to_string());
+            }
         }
 
-        fs::write(&baseline_path, screenshot)?;
+        if let Err(e) = fs::write(&baseline_path, screenshot) {
+            return ProcessResult::Error(e.to_string());
+        }
         println!("  → Baseline created (test will fail until committed)");
 
         // Fail the test - new baselines must be reviewed and committed
-        Ok(false)
+        ProcessResult::Failed
     }
-}
-
-#[tokio::main]
-async fn main() -> Result<std::process::ExitCode, Box<dyn std::error::Error>> {
-    println!("Holt Visual Regression Testing");
-    println!("================================\n");
-
-    // Start geckodriver
-    let _geckodriver = GeckoDriver::start()?;
-
-    // Start the trunk server
-    let _server = TrunkServer::start()?;
-
-    // Set up WebDriver
-    println!("Connecting to WebDriver...");
-    let mut caps = DesiredCapabilities::firefox();
-
-    // Run headless in CI (no display server available)
-    let is_ci = std::env::var("CI").is_ok();
-    if is_ci {
-        caps.set_headless()?;
-        println!("Running Firefox in headless mode");
-    }
-
-    let driver = WebDriver::new("http://localhost:4444", caps).await?;
-
-    // Set viewport size for consistent screenshots
-    driver.set_window_rect(0, 0, 1280, 720).await?;
-
-    // Discover stories
-    let variants = discover_stories(&driver).await?;
-
-    println!("\nProcessing {} story variants...\n", variants.len());
-
-    // Process each variant
-    let mut passed = 0;
-    let mut failed = 0;
-
-    for variant in &variants {
-        match process_variant(&driver, variant).await {
-            Ok(true) => passed += 1,
-            Ok(false) => failed += 1,
-            Err(e) => {
-                println!(
-                    "  ✗ Error processing {}/{}: {}",
-                    variant.story_id, variant.name, e
-                );
-                failed += 1;
-            }
-        }
-    }
-
-    // Clean up
-    driver.quit().await?;
-
-    println!("\n================================");
-    println!("Results: {} passed, {} failed", passed, failed);
-
-    if !is_ci {
-        // Clean up orphaned baseline images
-        cleanup_orphaned_baselines(&variants)?;
-    }
-
-    if failed > 0 {
-        return Ok(std::process::ExitCode::FAILURE);
-    }
-
-    Ok(std::process::ExitCode::SUCCESS)
 }
 
 /// Removes baseline images that no longer have corresponding stories/variants
-fn cleanup_orphaned_baselines(variants: &[StoryVariant]) -> io::Result<()> {
-    let baseline_dir = Path::new(BASELINE_DIR);
+pub fn cleanup_orphaned_baselines(
+    baseline_dir: &Path,
+    variants: &[StoryVariant],
+) -> io::Result<()> {
     if !baseline_dir.exists() {
         return Ok(());
     }
 
     // Build a set of expected baseline paths
-    let mut expected_paths = std::collections::HashSet::new();
-    for variant in variants {
-        let path = get_baseline_path(variant);
-        expected_paths.insert(path);
-    }
+    let expected_paths: HashSet<PathBuf> = variants
+        .iter()
+        .map(|v| get_baseline_path(baseline_dir, v))
+        .collect();
 
     // Walk through all baseline files
     let mut orphaned = Vec::new();
-    for entry in fs::read_dir(baseline_dir)? {
-        let entry = entry?;
-        if entry.file_type()?.is_dir() {
-            // Check files within story directories
-            for file_entry in fs::read_dir(entry.path())? {
-                let file_entry = file_entry?;
-                if file_entry.file_type()?.is_file() {
-                    let file_path = file_entry.path();
-                    if !expected_paths.contains(&file_path) {
-                        orphaned.push(file_path);
-                    }
-                }
+    for entry in WalkDir::new(baseline_dir)
+        .min_depth(2)
+        .max_depth(2)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        if entry.file_type().is_file() {
+            let path = entry.path().to_path_buf();
+            if !expected_paths.contains(&path) {
+                orphaned.push(path);
             }
         }
     }
@@ -685,11 +444,12 @@ fn cleanup_orphaned_baselines(variants: &[StoryVariant]) -> io::Result<()> {
             fs::remove_file(&path)?;
 
             // Remove parent directory if empty
-            if let Some(parent) = path.parent()
-                && let Ok(mut entries) = fs::read_dir(parent)
-                && entries.next().is_none()
-            {
-                let _ = fs::remove_dir(parent);
+            if let Some(parent) = path.parent() {
+                if let Ok(mut entries) = fs::read_dir(parent) {
+                    if entries.next().is_none() {
+                        let _ = fs::remove_dir(parent);
+                    }
+                }
             }
         }
     }

@@ -1,0 +1,44 @@
+[package]
+name = "holt-cli"
+version.workspace = true
+edition.workspace = true
+description = "CLI for the Holt UI toolkit"
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "holt"
+path = "src/main.rs"
+
+[dependencies]
+# CLI framework
+clawless = "0.4"
+clap = { version = "4", features = ["derive"] }
+
+# Config
+toml = "0.8"
+serde = { version = "1", features = ["derive"] }
+
+# Test harness (for cargo test compatible output)
+libtest-mimic = "0.8"
+
+# WebDriver
+thirtyfour = "0.35"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+# Image comparison
+image = "0.25"
+
+# Interactive UI for approving diffs
+eframe = "0.30"
+egui = "0.30"
+
+# HTTP for health checks
+ureq = "2"
+
+# Error handling
+thiserror = "2"
+
+# For orphaned baseline cleanup
+walkdir = "2"

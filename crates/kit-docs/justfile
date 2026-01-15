@@ -6,11 +6,11 @@ default:
 
 # Serve the Holt Book for our UI components
 serve:
-    trunk serve
+    cargo run -p holt-cli -- run
 
 # Run visual regression tests
-test-visual:
-    cargo run --bin visual-regression --features visual-regression
+test-visual *args:
+    cargo run -p holt-cli -- test {{ args }}
 
 # Load visual regression testing baselines from a CI run artifact
 # Example: just kit-docs load-baselines-from-gh-artifact 123456789
@@ -57,13 +57,3 @@ load-baselines-from-gh-artifact run_id:
     echo ""
     echo "Next steps:"
     echo "  git add crates/kit-docs/tests/visual-baselines/ && git commit -m 'accept new visual baselines'"
-
-# Render a single story variant to PNG (for LLM agent use)
-# The <variant> can be either an index (0, 1, 2...) or a name ('default', 'destructive'...)
-# Examples:
-#   just kit-docs render-variant button 0
-#   just kit-docs render-variant button destructive
-
-# just kit-docs render-variant select 2 ./output.png
-render-variant story_id variant output_path="./variant.png":
-    cargo run --bin render-variant --features visual-regression -- {{ story_id }} {{ variant }} {{ absolute_path(invocation_directory() / output_path) }}

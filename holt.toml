@@ -1,0 +1,13 @@
+# Holt CLI configuration
+# This file configures the `holt` CLI tool for this project.
+
+[storybook]
+# Path to the storybook crate, relative to this file
+crate = "crates/kit-docs"
+
+# Port to serve the storybook on
+port = 8080
+
+[visual-test]
+# Where to store baseline screenshots, relative to this file
+baseline-dir = "crates/kit-docs/tests/visual-baselines"

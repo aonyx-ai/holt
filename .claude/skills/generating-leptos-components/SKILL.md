@@ -184,22 +184,31 @@ const COMPONENT_NAME_STORY: () = &[default, variant_example];
 
 **CRITICAL: This step is MANDATORY and must be completed before finishing.**
 
-You MUST use `render-variant` to verify styling matches the original design. Do
+Use the Playwright MCP plugin to verify styling matches the original design. Do
 NOT skip this step or suggest it as a "next step" for the user.
 
-```bash
-# Render at least the default and one other key variant
-just kit-docs render-variant component_name default ./component-default.png
-just kit-docs render-variant component_name checked ./component-checked.png
-```
+**Prerequisites:**
 
-After rendering:
+1. Ensure the storybook is running: `holt run` (or `trunk serve` in the kit-docs
+   crate)
+2. Have the Playwright MCP server available in Claude Code
 
-- [ ] Verify the output images look correct
+**Verification Steps:**
+
+1. Use Playwright to navigate to the story URL:
+   `http://localhost:8080/stories/{component_name}/{variant_name}`
+
+2. Take a screenshot of each variant to verify styling
+
+3. Compare against the Shadcn/Radix reference design
+
+After verification:
+
+- [ ] Verify the rendered component looks correct
 - [ ] Check that styling matches the Shadcn/Radix reference
 - [ ] Confirm all variants render properly
 - [ ] Verify responsive behavior if applicable
-- [ ] If issues found, iterate on styling and re-render
+- [ ] If issues found, iterate on styling and re-verify
 - [ ] Only proceed to Quality Assurance after confirming visuals are correct
 
 ### 8. Quality Assurance
@@ -211,7 +220,7 @@ Before completion, verify:
 - [ ] Type-safe (no unwrap() in production)
 - [ ] Includes doc comments for public APIs
 - [ ] Accessibility features preserved
-- [ ] **Visual verification completed with `render-variant` (REQUIRED)**
+- [ ] **Visual verification completed with Playwright (REQUIRED)**
 - [ ] All rendered variants look correct and match reference design
 - [ ] Responsive design tested
 - [ ] Focus and disabled states styled

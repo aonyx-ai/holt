@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0 # Fetch full history to allow checking out PR commits
 
       - name: Install Flox
-        uses: flox/install-flox-action@819183ecd53757be53d66f492eeb7d689687a66b # 2.1.0
+        uses: flox/install-flox-action@e3e10c1a9c83c2caa23418edfbb3cee2cbece59f # 2.2.0
         with:
           version: 1.6.1
 

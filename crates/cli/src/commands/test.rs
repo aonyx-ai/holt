@@ -4,6 +4,7 @@ use clawless::prelude::*;
 use libtest_mimic::{Arguments, Trial};
 use std::path::PathBuf;
 use std::sync::Arc;
+use tokio::runtime::Handle;
 
 use crate::comparison::{ProcessResult, cleanup_orphaned_baselines, process_variant};
 use crate::config::HoltConfig;
@@ -52,6 +53,9 @@ pub async fn test(args: TestArgs, _ctx: Context) -> CommandResult {
 
     println!("\nProcessing {} story variants...\n", variants.len());
 
+    // Get the current runtime handle to use in test closures
+    let handle = Handle::current();
+
     // Create test cases for libtest-mimic
     let tests: Vec<Trial> = variants
         .iter()
@@ -60,13 +64,13 @@ pub async fn test(args: TestArgs, _ctx: Context) -> CommandResult {
             let baseline_dir = baseline_dir.clone();
             let variant = variant.clone();
             let driver = Arc::clone(&driver);
+            let handle = handle.clone();
 
             Trial::test(
                 format!("{}/{}", variant.story_id, variant.name),
                 move || {
-                    // Create a new runtime for each test
-                    let rt = tokio::runtime::Runtime::new().unwrap();
-                    rt.block_on(async {
+                    // Use the existing runtime via handle.block_on
+                    handle.block_on(async {
                         match process_variant(&driver, &url, &baseline_dir, &variant).await {
                             ProcessResult::Passed => Ok(()),
                             ProcessResult::Failed => {
@@ -91,8 +95,7 @@ pub async fn test(args: TestArgs, _ctx: Context) -> CommandResult {
     if let Err(e) = Arc::try_unwrap(driver)
         .map_err(|_| "Driver still in use")
         .and_then(|d| {
-            tokio::runtime::Runtime::new()
-                .unwrap()
+            Handle::current()
                 .block_on(d.quit())
                 .map_err(|_| "Failed to quit driver")
         })

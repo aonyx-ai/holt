@@ -92,15 +92,13 @@ pub async fn test(args: TestArgs, _ctx: Context) -> CommandResult {
     let conclusion = libtest_mimic::run(&test_args, tests);
 
     // Clean up WebDriver
-    if let Err(e) = Arc::try_unwrap(driver)
-        .map_err(|_| "Driver still in use")
-        .and_then(|d| {
-            Handle::current()
-                .block_on(d.quit())
-                .map_err(|_| "Failed to quit driver")
-        })
-    {
-        eprintln!("Warning: {}", e);
+    match Arc::try_unwrap(driver) {
+        Ok(d) => {
+            if let Err(e) = d.quit().await {
+                eprintln!("Warning: Failed to quit driver: {}", e);
+            }
+        }
+        Err(_) => eprintln!("Warning: Driver still in use"),
     }
 
     // Clean up orphaned baselines (only in interactive mode)

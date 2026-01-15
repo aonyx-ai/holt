@@ -1,7 +1,7 @@
 //! Configuration loading for holt.toml
 
 use serde::Deserialize;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -72,12 +72,12 @@ impl HoltConfig {
     }
 
     /// Get the absolute path to the storybook crate
-    pub fn storybook_path(&self, root: &PathBuf) -> PathBuf {
+    pub fn storybook_path(&self, root: &Path) -> PathBuf {
         root.join(&self.storybook.crate_path)
     }
 
     /// Get the absolute path to the baseline directory
-    pub fn baseline_path(&self, root: &PathBuf) -> PathBuf {
+    pub fn baseline_path(&self, root: &Path) -> PathBuf {
         root.join(&self.visual_test.baseline_dir)
     }
 }

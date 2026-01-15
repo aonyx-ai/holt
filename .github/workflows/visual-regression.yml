@@ -7,8 +7,10 @@ permissions: {}
   pull_request:
     paths:
       - "crates/book/**"
+      - "crates/cli/**"
       - "crates/kit/**"
       - "crates/kit-docs/**"
+      - "holt.toml"
 
 jobs:
   visual-regression:
@@ -56,9 +58,9 @@ jobs:
           echo "Baselines from main:"
           tree crates/kit-docs/tests/visual-baselines/ || echo "No baselines in main"
 
-      - name: Build visual regression binary
+      - name: Build holt CLI
         run: |
-          flox activate -- cargo build --bin visual-regression --features visual-regression -p holt-kit-docs --release
+          flox activate -- cargo build --bin holt -p holt-cli --release
 
       - name: Run visual regression tests
         id: visual-regression
@@ -75,13 +77,11 @@ jobs:
             cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/baseline/ 2>/dev/null || true
           fi
 
-          # Run visual regression from crates/kit-docs (tool expects relative paths from there)
-          cd crates/kit-docs
+          # Run visual regression using holt CLI
           set +e  # Disable exit on error
-          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee ../../visual-regression.log
+          flox activate -- ./target/release/holt test 2>&1 | tee visual-regression.log
           REGRESSION_EXIT_CODE=${PIPESTATUS[0]}
           set -e  # Re-enable exit on error
-          cd ../..
 
           # Save new screenshots for artifact upload
           if [ -d "crates/kit-docs/tests/visual-baselines" ]; then

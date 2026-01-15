@@ -102,10 +102,8 @@ pub async fn test(args: TestArgs, _ctx: Context) -> CommandResult {
 
     // Clean up orphaned baselines (only in interactive mode)
     let is_ci = std::env::var("CI").is_ok();
-    if !is_ci {
-        if let Err(e) = cleanup_orphaned_baselines(&baseline_dir, &variants_for_cleanup) {
-            eprintln!("Warning: Failed to clean up orphaned baselines: {}", e);
-        }
+    if !is_ci && let Err(e) = cleanup_orphaned_baselines(&baseline_dir, &variants_for_cleanup) {
+        eprintln!("Warning: Failed to clean up orphaned baselines: {}", e);
     }
 
     // Cleanup happens via Drop (geckodriver, storybook)

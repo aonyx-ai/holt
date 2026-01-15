@@ -389,10 +389,10 @@ pub async fn process_variant(
         println!("  + {}/{} (new baseline)", variant.story_id, variant.name);
 
         // Create parent directory if needed
-        if let Some(parent) = baseline_path.parent() {
-            if let Err(e) = fs::create_dir_all(parent) {
-                return ProcessResult::Error(e.to_string());
-            }
+        if let Some(parent) = baseline_path.parent()
+            && let Err(e) = fs::create_dir_all(parent)
+        {
+            return ProcessResult::Error(e.to_string());
         }
 
         if let Err(e) = fs::write(&baseline_path, screenshot) {
@@ -444,12 +444,11 @@ pub fn cleanup_orphaned_baselines(
             fs::remove_file(&path)?;
 
             // Remove parent directory if empty
-            if let Some(parent) = path.parent() {
-                if let Ok(mut entries) = fs::read_dir(parent) {
-                    if entries.next().is_none() {
-                        let _ = fs::remove_dir(parent);
-                    }
-                }
+            if let Some(parent) = path.parent()
+                && let Ok(mut entries) = fs::read_dir(parent)
+                && entries.next().is_none()
+            {
+                let _ = fs::remove_dir(parent);
             }
         }
     }

@@ -31,10 +31,15 @@ pub async fn test(args: TestArgs, _ctx: Context) -> CommandResult {
     println!("================================\n");
 
     let (config, root) = HoltConfig::find_and_load()?;
+    println!("Config root: {}", root.display());
     let crate_path = config.storybook_path(&root);
     let baseline_dir = args
         .baseline_dir
         .unwrap_or_else(|| config.baseline_path(&root));
+    println!(
+        "Configured baseline-dir: {:?}",
+        config.visual_test.baseline_dir
+    );
 
     // Parse libtest-mimic args (supports --list, filtering, etc.)
     let test_args =
@@ -51,7 +56,9 @@ pub async fn test(args: TestArgs, _ctx: Context) -> CommandResult {
     // Discover all story variants
     let variants = discover_stories(&driver, &url).await?;
 
-    println!("\nProcessing {} story variants...\n", variants.len());
+    println!("\nProcessing {} story variants...", variants.len());
+    println!("Baseline directory: {}", baseline_dir.display());
+    println!("Baseline dir exists: {}\n", baseline_dir.exists());
 
     // Get the current runtime handle to use in test closures
     let handle = Handle::current();

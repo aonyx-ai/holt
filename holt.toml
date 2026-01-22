@@ -1,0 +1,6 @@
+[book]
+path = "crates/kit-docs"
+
+[serve]
+port = 8080
+open = false

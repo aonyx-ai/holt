@@ -1,0 +1,18 @@
+[package]
+name = "holt-cli"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "holt"
+path = "src/main.rs"
+
+[dependencies]
+clawless = "0.3"
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["process", "rt-multi-thread", "macros"] }
+toml = "0.8"
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"

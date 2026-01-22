@@ -5,13 +5,33 @@ sidebar_position: 1
 # CLI Commands
 
 The `holt` CLI provides commands for developing and building component
-storybooks.
+storybooks. It wraps [Trunk](https://trunkrs.dev/) and adds project-aware
+configuration.
 
 ## Installation
 
 ```bash
-cargo install holt
+cargo install holt-cli
 ```
+
+## Configuration File
+
+Holt looks for `holt.toml` in the current directory. This lets you run commands
+from anywhere in your project:
+
+```toml
+[book]
+path = "crates/kit-docs"  # Directory containing Trunk.toml and index.html
+
+[serve]
+port = 3000               # Default port (overridable via --port)
+open = false              # Default for --open flag
+```
+
+All sections and fields are optional. Without a config file, Holt uses the
+current directory and default values.
+
+Command-line options override configuration file values.
 
 ## Commands
 
@@ -25,11 +45,13 @@ holt serve [OPTIONS]
 
 **Options:**
 
-| Option         | Default     | Description                |
-| -------------- | ----------- | -------------------------- |
-| `--port`, `-p` | `8080`      | Port to run the server on  |
-| `--host`       | `127.0.0.1` | Host address to bind to    |
-| `--open`, `-o` | `false`     | Open browser automatically |
+| Option         | Default             | Description                |
+| -------------- | ------------------- | -------------------------- |
+| `--port`, `-p` | `8080` (or config)  | Port to run the server on  |
+| `--open`, `-o` | `false` (or config) | Open browser automatically |
+
+The server runs Trunk in the directory specified by `book.path` in your config
+(or current directory if not set).
 
 **Examples:**
 
@@ -42,9 +64,6 @@ holt serve --port 3000
 
 # Start and open browser
 holt serve --open
-
-# Bind to all interfaces (for network access)
-holt serve --host 0.0.0.0
 ```
 
 ### `holt build`
@@ -57,91 +76,47 @@ holt build [OPTIONS]
 
 **Options:**
 
-| Option            | Default | Description                 |
-| ----------------- | ------- | --------------------------- |
-| `--out-dir`, `-o` | `dist`  | Output directory            |
-| `--base-path`     | `/`     | Base path for deployed site |
+| Option            | Default | Description           |
+| ----------------- | ------- | --------------------- |
+| `--release`, `-r` | `false` | Build in release mode |
+
+The build runs Trunk in the directory specified by `book.path` in your config.
 
 **Examples:**
 
 ```bash
-# Build to default directory
+# Development build
 holt build
 
-# Build to custom directory
-holt build --out-dir public
-
-# Build for subdirectory deployment
-holt build --base-path /my-project/storybook/
+# Production build
+holt build --release
 ```
 
-### `holt init`
+## Example Project Setup
 
-Initialize a new storybook in an existing Leptos project.
+For a workspace with your storybook in a subdirectory:
 
-```bash
-holt init [OPTIONS]
+```
+my-project/
+├── holt.toml
+├── crates/
+│   ├── my-lib/
+│   └── kit-docs/        # Storybook lives here
+│       ├── Trunk.toml
+│       ├── index.html
+│       └── src/
+└── ...
 ```
 
-**Options:**
-
-| Option          | Default   | Description               |
-| --------------- | --------- | ------------------------- |
-| `--stories-dir` | `stories` | Directory for story files |
-| `--force`, `-f` | `false`   | Overwrite existing files  |
-
-**Examples:**
-
-```bash
-# Initialize with defaults
-holt init
-
-# Use custom stories directory
-holt init --stories-dir src/stories
-
-# Reinitialize (overwrite existing)
-holt init --force
-```
-
-This command creates:
-
-- Story module directory
-- Basic story template
-- Configuration file (if needed)
-
-## Exit Codes
-
-| Code | Meaning           |
-| ---- | ----------------- |
-| `0`  | Success           |
-| `1`  | General error     |
-| `2`  | Invalid arguments |
-| `3`  | Build failure     |
-
-## Environment Variables
-
-| Variable         | Description                                   |
-| ---------------- | --------------------------------------------- |
-| `HOLT_BOOK_PORT` | Default port for `serve` command              |
-| `HOLT_BOOK_HOST` | Default host for `serve` command              |
-| `RUST_LOG`       | Logging level (e.g., `debug`, `info`, `warn`) |
-
-## Configuration File
-
-Holt Book looks for `holt.toml` in the project root:
+Create `holt.toml` at the project root:
 
 ```toml
+[book]
+path = "crates/kit-docs"
+
 [serve]
-port = 8080
-host = "127.0.0.1"
-open = false
-
-[build]
-out_dir = "dist"
-base_path = "/"
-
-[stories]
-dir = "stories"
+port = 3000
+open = true
 ```
 
-Command-line options override configuration file values.
+Now you can run `holt serve` from anywhere in the project.

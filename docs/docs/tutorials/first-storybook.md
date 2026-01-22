@@ -32,15 +32,9 @@ holt-kit = "0.1"
 holt = "0.1"
 ```
 
-## Step 2: Initialize the Storybook
+## Step 2: Set Up the Storybook Structure
 
-Run the initialization command:
-
-```bash
-holt init
-```
-
-This creates the basic structure:
+Create the basic directory structure for your storybook:
 
 ```
 my-components/
@@ -187,16 +181,35 @@ pub fn register_stories() -> Stories {
 }
 ```
 
-## Step 5: Run the Storybook
+## Step 5: Configure and Run the Storybook
 
-Start the development server:
+If your storybook is in a subdirectory (like a workspace), create a `holt.toml`
+at your project root:
+
+```toml
+[book]
+path = "path/to/your/storybook"
+
+[serve]
+port = 3000
+open = true
+```
+
+Then start the development server:
 
 ```bash
 holt serve
 ```
 
-Open your browser to `http://localhost:8080`. You'll see your Card component
-with all its variants in the sidebar.
+Without a config file, Holt runs in the current directory on port 8080. You can
+also override settings via flags:
+
+```bash
+holt serve --port 3000 --open
+```
+
+Open your browser to the configured port. You'll see your Card component with
+all its variants in the sidebar.
 
 ## Step 6: Iterate
 

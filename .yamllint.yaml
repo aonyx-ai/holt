@@ -1,0 +1,17 @@
+---
+extends: default
+
+ignore:
+  - "node_modules/"
+  - "docs/node_modules/"
+  - ".docusaurus/"
+  - "docs/.docusaurus/"
+  - "docs/build/"
+
+rules:
+  document-start: disable
+  line-length: disable
+  truthy:
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1

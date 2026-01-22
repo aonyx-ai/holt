@@ -58,6 +58,11 @@ const config: Config = {
           label: "Docs",
         },
         {
+          type: "html",
+          position: "left",
+          value: '<a href="/kit/" class="navbar__item navbar__link">Kit</a>',
+        },
+        {
           href: "https://github.com/aonyx-labs/holt",
           label: "GitHub",
           position: "right",

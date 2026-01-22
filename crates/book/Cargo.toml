@@ -5,12 +5,11 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-clap = { version = "4.5.38", features = ["derive"] }
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
 holt-kit = { path = "../kit" }
 inventory = "0.3.20"
-leptos = { workspace = true, features = ["csr"] }
+leptos = { workspace = true }
 leptos_router = { workspace = true }
 leptos_meta = { workspace = true }
 log = "0.4.22"
@@ -22,3 +21,9 @@ holt-story-macro = { path = "../story-macro" }
 
 [dev-dependencies]
 tempfile = "3.8"
+
+[features]
+default = ["csr"]
+csr = ["leptos/csr"]
+ssr = ["leptos/ssr", "leptos_router/ssr", "leptos_meta/ssr"]
+hydrate = ["leptos/hydrate"]

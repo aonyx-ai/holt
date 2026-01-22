@@ -2179,7 +2179,6 @@ checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
 name = "holt-book"
 version = "0.0.0"
 dependencies = [
- "clap",
  "console_error_panic_hook",
  "console_log",
  "const_format",
@@ -2232,9 +2231,12 @@ dependencies = [
  "holt-kit",
  "icondata",
  "image",
+ "inventory",
  "itertools",
  "leptos",
  "leptos_icons",
+ "leptos_meta",
+ "leptos_router",
  "thirtyfour",
  "thiserror 1.0.69",
  "tokio",
@@ -2309,11 +2311,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8714ae4adeaa846d838f380fbd72f049197de629948f91bf045329e0cf0a283"
 dependencies = [
  "futures",
+ "js-sys",
  "once_cell",
  "or_poisoned",
  "pin-project-lite",
  "serde",
  "throw_error",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2842,6 +2846,7 @@ dependencies = [
  "leptos",
  "leptos_router_macro",
  "or_poisoned",
+ "percent-encoding",
  "reactive_graph",
  "rustc_version",
  "send_wrapper",
@@ -4647,6 +4652,7 @@ dependencies = [
  "futures",
  "gloo-net",
  "http",
+ "inventory",
  "js-sys",
  "pin-project-lite",
  "rustc_version",

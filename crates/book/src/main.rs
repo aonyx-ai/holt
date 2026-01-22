@@ -1,6 +1,3 @@
-mod cli;
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    cli::run()?;
-    Ok(())
+fn main() {
+    holt_book::run_book();
 }

@@ -4,6 +4,7 @@ node_modules/
 # Build output
 build/
 .docusaurus/
+static/kit/
 
 # Misc
 .DS_Store

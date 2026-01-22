@@ -1,11 +1,12 @@
 use holt_kit::behavior::*;
 use holt_kit::visual::*;
 use leptos::prelude::*;
-use leptos_router::components::{A, Route, Routes};
+use leptos_router::components::{Route, Routes};
 use leptos_router::hooks::use_params;
 use leptos_router::params::Params;
 use leptos_router::path;
 
+use crate::ui::app::BasePath;
 use crate::ui::components::markdown::Markdown;
 use crate::ui::story::Story;
 
@@ -24,7 +25,7 @@ struct VisualTestParams {
 #[component]
 pub fn Storybook() -> impl IntoView {
     view! {
-        <div class="flex h-screen w-screen overflow-hidden">
+        <div class="flex h-full w-full overflow-hidden">
             <SidebarProvider>
                 <Sidebar collapsible=SidebarCollapsible::Icon variant=SidebarVariant::Sidebar>
                     <SidebarHeader>
@@ -60,6 +61,8 @@ pub fn Storybook() -> impl IntoView {
 /// Navigation component for the storybook sidebar
 #[component]
 fn StorybookNavigation() -> impl IntoView {
+    let base = use_context::<BasePath>().map(|b| b.0).unwrap_or_default();
+
     view! {
         <nav class="space-y-1">
             <h2 class="mb-2 text-lg font-semibold">Stories</h2>
@@ -67,15 +70,12 @@ fn StorybookNavigation() -> impl IntoView {
                 {inventory::iter::<&'static Story>
                     .into_iter()
                     .map(|story| {
+                        let story_href = format!("{}/story/{}", base, story.id);
                         view! {
                             <li>
-                                <A
-                                    href=move || format!("/story/{}", story.id)
-                                    {..}
-                                    class="block px-2 py-1 rounded hover:bg-muted"
-                                >
+                                <a href=story_href class="block px-2 py-1 rounded hover:bg-muted">
                                     {story.name}
-                                </A>
+                                </a>
                             </li>
                         }
                     })

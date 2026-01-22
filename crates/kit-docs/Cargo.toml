@@ -6,12 +6,15 @@ edition.workspace = true
 
 [dependencies]
 leptos = { workspace = true }
+leptos_router = { workspace = true }
+leptos_meta = { workspace = true }
 holt-book = { path = "../book" }
 holt-kit = { path = "../kit" }
 icondata = { version = "0.7.0", default-features = false, features = [
   "lucide",
 ] }
 leptos_icons = "0.7.0"
+inventory = "0.3.20"
 thirtyfour = { version = "0.36.0", optional = true }
 tokio = { version = "1.41", features = ["full"], optional = true }
 ureq = { version = "3.0", optional = true }
@@ -19,6 +22,10 @@ eframe = { version = "0.33", optional = true }
 image = { version = "0.25", optional = true, features = ["png"] }
 
 [features]
+default = ["csr"]
+csr = ["holt-book/csr", "leptos/csr"]
+ssr = ["holt-book/ssr", "leptos/ssr", "leptos_router/ssr", "leptos_meta/ssr"]
+hydrate = ["holt-book/hydrate", "leptos/hydrate"]
 visual-regression = ["thirtyfour", "tokio", "ureq", "eframe", "image"]
 
 [build-dependencies]
@@ -26,11 +33,6 @@ thiserror = ">=1.0.37, <2"
 itertools = "0.14.0"
 
 [[bin]]
-name = "visual-regression"
-path = "src/bin/visual_regression.rs"
-required-features = ["visual-regression"]
-
-[[bin]]
-name = "render-variant"
-path = "src/bin/render_variant.rs"
-required-features = ["visual-regression"]
+name = "ssg"
+path = "src/bin/ssg.rs"
+required-features = ["ssr"]

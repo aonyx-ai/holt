@@ -92,6 +92,64 @@ holt build
 holt build --release
 ```
 
+### `holt snapshot`
+
+Run snapshot tests by capturing screenshots of every story variant.
+
+```bash
+holt snapshot [OPTIONS]
+```
+
+**Options:**
+
+| Option         | Default            | Description               |
+| -------------- | ------------------ | ------------------------- |
+| `--port`, `-p` | `8080` (or config) | Port to run the server on |
+
+**Baseline Directory:**
+
+Screenshots are stored in `<book.path>/tests/visual-baselines/` with this
+structure:
+
+```
+tests/visual-baselines/
+├── <story-id>/
+│   ├── <variant-name>.png
+│   └── ...
+└── ...
+```
+
+**Exit Codes:**
+
+| Code | Meaning                                      |
+| ---- | -------------------------------------------- |
+| 0    | All screenshots match baselines              |
+| 1    | One or more screenshots differ from baseline |
+
+**Environment Variables:**
+
+| Variable | Effect                                                |
+| -------- | ----------------------------------------------------- |
+| `CI`     | Enables headless mode; saves new screenshots silently |
+
+In CI mode, differing screenshots are written to the baseline directory so they
+can be uploaded as artifacts for review.
+
+**Examples:**
+
+```bash
+# Run snapshot tests
+holt snapshot
+
+# Run on a custom port
+holt snapshot --port 4000
+```
+
+**Requirements:**
+
+- Firefox installed
+- geckodriver in PATH
+
 ## Example Project Setup
 
 For a workspace with your storybook in a subdirectory:

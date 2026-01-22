@@ -25,3 +25,12 @@ Implement dark mode theming:
 - Configure CSS variables
 - Create a theme toggle
 - Set up Tailwind for dark mode
+
+### [Snapshot Testing](/docs/guides/snapshot-testing)
+
+Catch unintended visual changes with screenshot testing:
+
+- Run snapshot tests locally and in CI
+- Review and accept/reject changes
+- Update baselines from CI artifacts
+- Handle flaky tests

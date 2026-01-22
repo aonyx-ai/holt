@@ -9,7 +9,7 @@ const sidebars: SidebarsConfig = {
         type: "doc",
         id: "tutorials/index",
       },
-      items: ["tutorials/first-storybook"],
+      items: ["tutorials/first-storybook", "tutorials/snapshot-testing"],
     },
     {
       type: "category",
@@ -18,7 +18,11 @@ const sidebars: SidebarsConfig = {
         type: "doc",
         id: "guides/index",
       },
-      items: ["guides/customize-styling", "guides/dark-mode"],
+      items: [
+        "guides/customize-styling",
+        "guides/dark-mode",
+        "guides/snapshot-testing",
+      ],
     },
     {
       type: "category",
@@ -31,6 +35,7 @@ const sidebars: SidebarsConfig = {
         "explanation/behavior-presentation",
         "explanation/styling",
         "explanation/architecture",
+        "explanation/snapshot-testing",
       ],
     },
     {

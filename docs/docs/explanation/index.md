@@ -23,3 +23,8 @@ without CSS-in-Rust overhead.
 
 The reasoning behind Holt's design choices: why behavior/presentation
 separation, why Tailwind, and why copy-paste components.
+
+### [Snapshot Testing](/docs/explanation/snapshot-testing)
+
+How snapshot testing works: byte-level comparison, local vs CI workflows, the
+approval GUI, and why these design choices were made.

@@ -17,3 +17,12 @@ Build a component storybook from scratch using Holt Book. You'll learn how to:
 - Create components with behavior/presentation separation
 - Write stories to showcase component variants
 - Run the development server
+
+### [Snapshot Testing](/docs/tutorials/snapshot-testing)
+
+Set up snapshot tests for your components. You'll learn how to:
+
+- Install prerequisites (geckodriver, Firefox)
+- Create baseline screenshots
+- Review and accept changes
+- Commit baselines to version control

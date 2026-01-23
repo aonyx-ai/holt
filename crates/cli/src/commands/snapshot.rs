@@ -13,7 +13,7 @@ pub struct SnapshotArgs {
 
 /// Run visual regression tests
 #[command]
-pub async fn snapshot(args: SnapshotArgs) -> CommandResult {
+pub async fn snapshot(args: SnapshotArgs, _ctx: Context) -> CommandResult {
     let config = Config::load().map_err(|e| Error::msg(format!("Failed to load config: {e}")))?;
 
     let port = args.port.unwrap_or(config.serve.port);

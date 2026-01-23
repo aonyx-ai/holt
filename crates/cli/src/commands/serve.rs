@@ -15,7 +15,7 @@ pub struct ServeArgs {
 
 /// Start the development server
 #[command]
-pub async fn serve(args: ServeArgs) -> CommandResult {
+pub async fn serve(args: ServeArgs, _ctx: Context) -> CommandResult {
     let config = Config::load().map_err(|e| Error::msg(format!("Failed to load config: {e}")))?;
 
     let port = args.port.unwrap_or(config.serve.port);

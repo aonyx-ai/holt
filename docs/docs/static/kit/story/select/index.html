@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Select - Holt UI Kit</title>
+    <link rel="stylesheet" href="/kit/styles.css" />
+  </head>
+  <body class="kit-body">
+    <nav class="kit-navbar">
+      <div class="kit-navbar-inner">
+        <a href="/" class="kit-navbar-logo">
+          <img src="/img/logo.svg" alt="Holt" height="32" />
+        </a>
+        <div class="kit-navbar-items">
+          <a href="/docs/tutorials/" class="kit-navbar-link">Docs</a>
+          <a href="/kit/" class="kit-navbar-link kit-navbar-link--active"
+            >Kit</a
+          >
+        </div>
+        <div class="kit-navbar-items kit-navbar-right">
+          <a
+            href="https://github.com/aonyx-labs/holt"
+            class="kit-navbar-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="kit-content">
+      <div class="flex h-full w-full overflow-hidden">
+        <div
+          class="group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar"
+          style="--sidebar-width: 16rem; --sidebar-width-icon: 3rem"
+        >
+          <div
+            data-state="expanded"
+            data-collapsible=""
+            data-variant="sidebar"
+            data-side="left"
+            class="group peer hidden text-sidebar-foreground md:block"
+          >
+            <div
+              class="relative w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear group-data-[collapsible=offcanvas]:w-0 group-data-[side=right]:rotate-180 group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]"
+            ></div>
+            <div
+              class="fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l"
+            >
+              <div
+                data-sidebar="sidebar"
+                class="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+              >
+                <div
+                  class="sticky top-0 h-[60px] flex items-center border-b border-sidebar-border px-4 py-2"
+                >
+                  <h1
+                    class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl"
+                  >
+                    H
+                  </h1>
+                </div>
+                <div class="flex-1 overflow-auto py-2">
+                  <nav class="space-y-1">
+                    <h2 class="mb-2 text-lg font-semibold">Stories</h2>
+                    <ul class="space-y-1">
+                      <li>
+                        <a
+                          href="/kit/story/button"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Button</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/select"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Select</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/collapsible"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Collapsible</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/label"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Label</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/card"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Card</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/breadcrumb"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Breadcrumb</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/switch"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Switch</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/badge"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Badge</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/toggle"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Toggle</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/input"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Input</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/textarea"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Textarea</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="/kit/story/checkbox"
+                          class="block px-2 py-1 rounded hover:bg-muted"
+                          >Checkbox</a
+                        >
+                      </li>
+                      <!>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <main
+            class="relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow"
+          >
+            <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+              <button
+                title="Toggle sidebar"
+                aria-label="Toggle sidebar"
+                data-state="open"
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9 px-0 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring -ml-1"
+              >
+                <span class="sr-only">Toggle sidebar</span
+                ><span aria-hidden="true">≡</span></button
+              >Components
+            </header>
+            <div class="flex flex-1 flex-col overflow-hidden">
+              <div class="flex-1 overflow-auto p-4">
+                <div class="flex flex-col space-y-6 max-w-full">
+                  <div class="space-y-2">
+                    <h1
+                      class="scroll-m-20 tracking-tight lg:text-5xl text-2xl font-bold"
+                    >
+                      Select
+                    </h1>
+                  </div>
+                  <div class="flex items-center space-x-4">
+                    <select class="px-3 py-2 border rounded-md bg-background">
+                      <option value="0" selected>Default</option>
+                      <option value="1">With Groups</option>
+                      <option value="2">Disabled</option>
+                      <option value="3">With Disabled Items</option>
+                      <option value="4">Countries</option>
+                      <option value="5">Form Example</option>
+                      <!>
+                    </select>
+                  </div>
+                  <div class="border rounded-lg">
+                    <div class="flex border-b">
+                      <button
+                        class="px-4 py-2 text-sm font-medium border-b-2 transition-colors border-primary text-primary bg-muted/50"
+                      >
+                        Preview</button
+                      ><button
+                        class="px-4 py-2 text-sm font-medium border-b-2 transition-colors border-transparent text-muted-foreground hover:text-foreground"
+                      >
+                        Code
+                      </button>
+                    </div>
+                    <div class="p-6">
+                      <div
+                        class="flex items-center justify-center min-h-[200px] bg-muted/20 rounded-lg"
+                      >
+                        <div class="w-80 space-y-2">
+                          <div data-state="closed" class="relative">
+                            <button
+                              type="button"
+                              role="combobox"
+                              aria-haspopup="listbox"
+                              data-state="closed"
+                              class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&amp;&gt;span]:line-clamp-1"
+                            >
+                              <span class="">Select a fruit</span
+                              ><svg
+                                width="1em"
+                                height="1em"
+                                viewBox="0 0 24 24"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                stroke="currentColor"
+                                fill="none"
+                                role="graphics-symbol"
+                                class="h-4 w-4 opacity-50"
+                              >
+                                <g><path d="m6 9 6 6 6-6" /></g>
+                              </svg></button
+                            ><!><!--<() />-->
+                          </div>
+                          <p class="text-sm text-gray-600">
+                            Selected:
+                            <!>None
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="max-w-full">
+                    <h2
+                      class="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0"
+                    >
+                      Documentation
+                    </h2>
+                    <div class="max-w-full overflow-hidden">
+                      <div
+                        class="prose prose-sm max-w-none overflow-hidden break-words"
+                      >
+                        <p class="mb-4 leading-relaxed break-words">
+                          Select components allow users to choose from a list of
+                          options<!>
+                        </p>
+                        <div class="relative">
+                          <div
+                            class="overflow-hidden transition-all duration-300 bg-muted/30 rounded-lg border max-h-48 cursor-pointer hover:bg-muted/40"
+                          >
+                            <pre
+                              class="overflow-x-auto text-sm p-4 whitespace-pre-wrap break-words"
+                            ><code class="rust">use leptos::prelude::*;
+use leptos_icons::Icon;
+use tailwind_fuse::*;
+
+use crate::behavior::{
+    SelectContent as SelectContentPrimitive, SelectItem as SelectItemPrimitive,
+    SelectRoot as SelectRootPrimitive, SelectTrigger as SelectTriggerPrimitive,
+    SelectValue as SelectValuePrimitive,
+};
+use crate::floating::{Align, Side};
+
+/// The main Select component
+#[component]
+pub fn Select(
+    #[prop(optional)] value: RwSignal&lt;Option&lt;String&gt;&gt;,
+    #[prop(into, default = Signal::stored(false))] disabled: Signal&lt;bool&gt;,
+    children: Children,
+) -&gt; impl IntoView {
+    view! {
+        &lt;SelectRootPrimitive value=value disabled=disabled&gt;
+            {children()}
+        &lt;/SelectRootPrimitive&gt;
+    }
+}
+
+/// Select trigger with Shadcn styling
+#[component]
+pub fn SelectTrigger(
+    #[prop(optional)] class: &amp;'static str,
+    #[prop(optional_no_strip, into)] id: Option&lt;&amp;'static str&gt;,
+    children: Children,
+) -&gt; impl IntoView {
+    let classes = tw_merge!(
+        "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&amp;&gt;span]:line-clamp-1",
+        class
+    );
+
+    view! {
+        &lt;SelectTriggerPrimitive class=classes id=id&gt;
+            {children()}
+            &lt;Icon icon=icondata::LuChevronDown attr:class="h-4 w-4 opacity-50" /&gt;
+        &lt;/SelectTriggerPrimitive&gt;
+    }
+}
+
+/// Select content with positioning and styling
+#[component]
+pub fn SelectContent(
+    #[prop(optional)] class: &amp;'static str,
+    #[prop(into, default = Side::Bottom)] side: Side,
+    #[prop(into, default = Align::Start)] align: Align,
+    #[prop(into, default = 4.0)] side_offset: f64,
+    children: ChildrenFn,
+) -&gt; impl IntoView {
+    let classes = tw_merge!(
+        "z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        class
+    );
+
+    view! {
+        &lt;SelectContentPrimitive class=classes side=side align=align side_offset=side_offset&gt;
+            &lt;div class="p-1"&gt;{children()}&lt;/div&gt;
+        &lt;/SelectContentPrimitive&gt;
+    }
+}
+
+/// Select item with hover and selection states
+#[component]
+pub fn SelectItem(
+    #[prop(into)] value: String,
+    #[prop(optional)] class: &amp;'static str,
+    #[prop(into, default = Signal::stored(false))] disabled: Signal&lt;bool&gt;,
+    children: Children,
+) -&gt; impl IntoView {
+    let classes = tw_merge!(
+        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        class
+    );
+
+    view! {
+        &lt;SelectItemPrimitive value=value.clone() class=classes disabled=disabled&gt;
+            &lt;span class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center"&gt;
+                &lt;Show when=move || {
+                    let context = crate::behavior::use_select();
+                    context.get_value().is_some_and(|v| v == value)
+                }&gt;
+                    &lt;Icon icon=icondata::LuCheck attr:class="h-4 w-4" /&gt;
+                &lt;/Show&gt;
+            &lt;/span&gt;
+            {children()}
+        &lt;/SelectItemPrimitive&gt;
+    }
+}
+
+/// Component to display selected value or placeholder
+#[component]
+pub fn SelectValue(
+    #[prop(optional, into)] placeholder: Option&lt;String&gt;,
+    #[prop(optional)] class: &amp;'static str,
+) -&gt; impl IntoView {
+    let classes = tw_merge!("", class);
+
+    view! { &lt;SelectValuePrimitive placeholder=placeholder class=classes /&gt; }
+}
+
+/// Label for select groups
+#[component]
+pub fn SelectLabel(#[prop(optional)] class: &amp;'static str, children: Children) -&gt; impl IntoView {
+    let classes = tw_merge!("py-1.5 pl-8 pr-2 text-sm font-semibold", class);
+
+    view! { &lt;div class=classes&gt;{children()}&lt;/div&gt; }
+}
+
+/// Separator between select items
+#[component]
+pub fn SelectSeparator(#[prop(optional)] class: &amp;'static str) -&gt; impl IntoView {
+    let classes = tw_merge!("-mx-1 my-1 h-px bg-muted", class);
+
+    view! { &lt;div class=classes&gt;&lt;/div&gt; }
+}
+</code></pre>
+                          </div>
+                          <div
+                            class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-muted/60 via-muted/40 to-transparent rounded-b-lg pointer-events-none"
+                          ></div>
+                          <div
+                            class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-background/95 border rounded-full px-3 py-1 text-xs font-medium shadow-md pointer-events-none"
+                          >
+                            Click to expand
+                          </div>
+                        </div>
+                        <!>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

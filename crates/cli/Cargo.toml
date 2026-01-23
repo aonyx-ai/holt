@@ -8,7 +8,7 @@ name = "holt"
 path = "src/main.rs"
 
 [dependencies]
-clawless = "0.3"
+clawless = "0.4"
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["process", "rt-multi-thread", "macros"] }
 toml = "0.8"

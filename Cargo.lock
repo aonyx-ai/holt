@@ -888,22 +888,25 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "clawless"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1dbc3641a0174d1b7d046e5b4529842227b4137c681e059439ff44aae5d6c16"
+checksum = "9c3303ddee326e0717b50a9ce204ee570f8044461e4c4eda3a9b7f5df75ca2a8"
 dependencies = [
  "anyhow",
  "clap",
  "clawless-derive",
+ "getset",
  "inventory",
  "tokio",
+ "typed-builder 0.23.2",
+ "typed-fields",
 ]
 
 [[package]]
 name = "clawless-derive"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "167583eba480a9818e48fc89c056a05001e36290ea7d16721e79f5ab115dd0da"
+checksum = "c4267b5ada6094036fcd94c39e958b6d79fd83c9b75420c81809a7abe7d93dd0"
 dependencies = [
  "darling 0.23.0",
  "proc-macro2",
@@ -1923,6 +1926,18 @@ dependencies = [
  "r-efi",
  "wasip2",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "getset"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9cf0fc11e47561d47397154977bc219f4cf809b2974facc3ccb3b89e2436f912"
+dependencies = [
+ "proc-macro-error2",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -5398,6 +5413,17 @@ name = "typed-builder-macro"
 version = "0.23.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "076a02dc54dd46795c2e9c8282ed40bcfb1e22747e955de9389a1de28190fb26"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "typed-fields"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "01f89646987d495bc5d7b953741f0023849e9b86347ebc6ef54116e6a8999e2d"
 dependencies = [
  "proc-macro2",
  "quote",

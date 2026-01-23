@@ -11,7 +11,7 @@ pub struct BuildArgs {
 
 /// Build for production
 #[command]
-pub async fn build(args: BuildArgs) -> CommandResult {
+pub async fn build(args: BuildArgs, _ctx: Context) -> CommandResult {
     let config = Config::load().map_err(|e| Error::msg(format!("Failed to load config: {e}")))?;
 
     let mut cmd = Command::new("trunk");

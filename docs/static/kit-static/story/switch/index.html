@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Switch - Holt UI Kit</title>
+    <link rel="stylesheet" href="/kit-static/styles.css" />
+  </head>
+  <body>
+    <div class="flex h-screen w-screen overflow-hidden">
+      <div
+        class="group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar"
+        style="--sidebar-width: 16rem; --sidebar-width-icon: 3rem"
+      >
+        <div
+          data-state="expanded"
+          data-collapsible=""
+          data-variant="sidebar"
+          data-side="left"
+          class="group peer hidden text-sidebar-foreground md:block"
+        >
+          <div
+            class="relative w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear group-data-[collapsible=offcanvas]:w-0 group-data-[side=right]:rotate-180 group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]"
+          ></div>
+          <div
+            class="fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l"
+          >
+            <div
+              data-sidebar="sidebar"
+              class="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+            >
+              <div
+                class="sticky top-0 h-[60px] flex items-center border-b border-sidebar-border px-4 py-2"
+              >
+                <h1
+                  class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl"
+                >
+                  H
+                </h1>
+              </div>
+              <div class="flex-1 overflow-auto py-2">
+                <nav class="space-y-1">
+                  <h2 class="mb-2 text-lg font-semibold">Stories</h2>
+                  <ul class="space-y-1">
+                    <li>
+                      <a
+                        href="/kit-static/story/breadcrumb"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Breadcrumb</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/checkbox"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Checkbox</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/select"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Select</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/collapsible"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Collapsible</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/input"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Input</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/label"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Label</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/switch"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Switch</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/toggle"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Toggle</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/button"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Button</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/card"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Card</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/textarea"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Textarea</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="/kit-static/story/badge"
+                        class="block px-2 py-1 rounded hover:bg-muted"
+                        >Badge</a
+                      >
+                    </li>
+                    <!>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+        <main
+          class="relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow"
+        >
+          <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <button
+              title="Toggle sidebar"
+              aria-label="Toggle sidebar"
+              data-state="open"
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9 px-0 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring -ml-1"
+            >
+              <span class="sr-only">Toggle sidebar</span
+              ><span aria-hidden="true">≡</span></button
+            >Components
+          </header>
+          <div class="flex flex-1 flex-col overflow-hidden">
+            <div class="flex-1 overflow-auto p-4">
+              <div class="flex flex-col space-y-6 max-w-full">
+                <div class="space-y-2">
+                  <h1
+                    class="scroll-m-20 tracking-tight lg:text-5xl text-2xl font-bold"
+                  >
+                    Switch
+                  </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                  <select class="px-3 py-2 border rounded-md bg-background">
+                    <option value="0" selected>Default</option>
+                    <option value="1">Checked</option>
+                    <option value="2">Disabled</option>
+                    <option value="3">Disabled Checked</option>
+                    <option value="4">Small</option>
+                    <option value="5">Large</option>
+                    <option value="6">With Label</option>
+                    <option value="7">Interactive</option>
+                    <option value="8">Multiple Options</option>
+                    <!>
+                  </select>
+                </div>
+                <div class="border rounded-lg">
+                  <div class="flex border-b">
+                    <button
+                      class="px-4 py-2 text-sm font-medium border-b-2 transition-colors border-primary text-primary bg-muted/50"
+                    >
+                      Preview</button
+                    ><button
+                      class="px-4 py-2 text-sm font-medium border-b-2 transition-colors border-transparent text-muted-foreground hover:text-foreground"
+                    >
+                      Code
+                    </button>
+                  </div>
+                  <div class="p-6">
+                    <div
+                      class="flex items-center justify-center min-h-[200px] bg-muted/20 rounded-lg"
+                    >
+                      <button
+                        type="button"
+                        role="switch"
+                        data-state="unchecked"
+                        class="inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input h-6 w-11"
+                      >
+                        <span
+                          data-state="unchecked"
+                          class="pointer-events-none block rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=unchecked]:translate-x-0 h-5 w-5 data-[state=checked]:translate-x-5"
+                        ></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="max-w-full">
+                  <h2
+                    class="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0"
+                  >
+                    Documentation
+                  </h2>
+                  <div class="max-w-full overflow-hidden">
+                    <div
+                      class="prose prose-sm max-w-none overflow-hidden break-words"
+                    >
+                      <p class="mb-4 leading-relaxed break-words">
+                        Switches allow users to toggle between two mutually
+                        exclusive states<!>
+                      </p>
+                      <div class="relative">
+                        <div
+                          class="overflow-hidden transition-all duration-300 bg-muted/30 rounded-lg border max-h-48 cursor-pointer hover:bg-muted/40"
+                        >
+                          <pre
+                            class="overflow-x-auto text-sm p-4 whitespace-pre-wrap break-words"
+                          ><code class="rust">use leptos::prelude::*;
+use tailwind_fuse::*;
+
+use crate::behavior::{SwitchRoot, SwitchThumb};
+
+#[derive(TwClass)]
+#[tw(
+    class = "inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input"
+)]
+struct SwitchRootStyle {
+    size: SwitchSize,
+}
+
+#[derive(TwClass)]
+#[tw(
+    class = "pointer-events-none block rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=unchecked]:translate-x-0"
+)]
+struct SwitchThumbStyle {
+    size: SwitchThumbSize,
+}
+
+#[derive(TwVariant)]
+pub enum SwitchSize {
+    #[tw(default, class = "h-6 w-11")]
+    Default,
+    #[tw(class = "h-5 w-9")]
+    Sm,
+    #[tw(class = "h-7 w-14")]
+    Lg,
+}
+
+#[derive(TwVariant)]
+enum SwitchThumbSize {
+    #[tw(default, class = "h-5 w-5 data-[state=checked]:translate-x-5")]
+    Default,
+    #[tw(class = "h-4 w-4 data-[state=checked]:translate-x-4")]
+    Sm,
+    #[tw(class = "h-6 w-6 data-[state=checked]:translate-x-7")]
+    Lg,
+}
+
+/// A styled switch component for toggling between checked and unchecked states
+#[component]
+pub fn Switch(
+    #[prop(optional)] class: &amp;'static str,
+    #[prop(optional)] size: SwitchSize,
+    #[prop(optional)] checked: RwSignal&lt;bool&gt;,
+    #[prop(into, default = Signal::stored(false))] disabled: Signal&lt;bool&gt;,
+    #[prop(optional_no_strip, into)] id: Option&lt;&amp;'static str&gt;,
+    #[prop(optional_no_strip, into)] name: Option&lt;&amp;'static str&gt;,
+) -&gt; impl IntoView {
+    let final_class = SwitchRootStyle { size }.with_class(class);
+
+    let thumb_size = match size {
+        SwitchSize::Sm =&gt; SwitchThumbSize::Sm,
+        SwitchSize::Default =&gt; SwitchThumbSize::Default,
+        SwitchSize::Lg =&gt; SwitchThumbSize::Lg,
+    };
+
+    let thumb_classes = SwitchThumbStyle { size: thumb_size }.to_class();
+
+    view! {
+        &lt;SwitchRoot checked=checked disabled=disabled id=id name=name class=final_class&gt;
+            &lt;SwitchThumb class=Signal::stored(thumb_classes) /&gt;
+        &lt;/SwitchRoot&gt;
+    }
+}
+</code></pre>
+                        </div>
+                        <div
+                          class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-muted/60 via-muted/40 to-transparent rounded-b-lg pointer-events-none"
+                        ></div>
+                        <div
+                          class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-background/95 border rounded-full px-3 py-1 text-xs font-medium shadow-md pointer-events-none"
+                        >
+                          Click to expand
+                        </div>
+                      </div>
+                      <!>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

@@ -2201,10 +2201,14 @@ version = "0.0.0"
 dependencies = [
  "assert_cmd",
  "clawless",
+ "eframe",
+ "image",
  "predicates",
  "serde",
+ "thirtyfour",
  "tokio",
  "toml 0.8.23",
+ "ureq",
 ]
 
 [[package]]

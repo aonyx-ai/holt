@@ -4,6 +4,10 @@ name = "holt-book"
 version.workspace = true
 edition.workspace = true
 
+[[bin]]
+name = "holt-book"
+required-features = ["csr"]
+
 [dependencies]
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"

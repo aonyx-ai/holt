@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 pub struct Config {
     #[serde(default)]
     pub book: BookConfig,
@@ -29,15 +29,6 @@ fn default_book_path() -> PathBuf {
 
 fn default_port() -> u16 {
     8080
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            book: BookConfig::default(),
-            serve: ServeConfig::default(),
-        }
-    }
 }
 
 impl Default for BookConfig {

@@ -20,18 +20,26 @@ pub async fn discover_stories(
     println!("Discovering stories...");
 
     driver.goto(&format!("{}/", server_url)).await?;
-    tokio::time::sleep(Duration::from_millis(1000)).await;
 
-    let story_links = driver.find_all(By::Css("nav a[href^='/story/']")).await?;
+    // Wait for the nav to be rendered (WASM needs time to hydrate)
+    let mut retries = 0;
+    let story_links = loop {
+        tokio::time::sleep(Duration::from_millis(1000)).await;
+        let links = driver.find_all(By::Css("nav a[href^='/story/']")).await?;
+        if !links.is_empty() || retries >= 10 {
+            break links;
+        }
+        retries += 1;
+        println!("Waiting for stories to load... ({}/10)", retries);
+    };
 
     let mut story_ids = Vec::new();
     for link in story_links {
         if let Ok(href) = link.attr("href").await
             && let Some(href_str) = href
+            && let Some(id) = href_str.strip_prefix("/story/")
         {
-            if let Some(id) = href_str.strip_prefix("/story/") {
-                story_ids.push(id.to_string());
-            }
+            story_ids.push(id.to_string());
         }
     }
 

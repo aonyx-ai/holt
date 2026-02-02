@@ -58,10 +58,10 @@ fn wrap_in_html_document(body: &str, title: &str) -> String {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     <link rel="stylesheet" href="/kit/styles.css">
-    <link rel="preload" href="/kit/hydrate_bg.wasm" as="fetch" crossorigin>
+    <link rel="preload" href="/kit/holt-kit-docs_bg.wasm" as="fetch" crossorigin>
     <script type="module">
-      import init from '/kit/hydrate.js';
-      init('/kit/hydrate_bg.wasm');
+      import init from '/kit/holt-kit-docs.js';
+      init('/kit/holt-kit-docs_bg.wasm');
     </script>
 </head>
 <body class="kit-body">
@@ -129,36 +129,25 @@ async fn generate_static_site() {
         println!("  Generated: {}", story_path.display());
     }
 
-    // Copy compiled styles.css to output directory
-    // First try dist/ (compiled), then fall back to public/ (source)
+    // Copy trunk build artifacts (CSS, JS, WASM) from dist/ to output directory
     let dist_dir = Path::new("crates/kit-docs/dist");
-    let styles_dest = output_path.join("styles.css");
+    let assets = ["styles.css", "holt-kit-docs.js", "holt-kit-docs_bg.wasm"];
 
-    let copied = if dist_dir.exists() {
-        // Find the compiled CSS file (has hash in name)
-        fs::read_dir(dist_dir)
-            .ok()
-            .and_then(|entries| {
-                entries.filter_map(|e| e.ok()).find(|e| {
-                    e.path()
-                        .file_name()
-                        .and_then(|n| n.to_str())
-                        .is_some_and(|n| n.starts_with("styles") && n.ends_with(".css"))
-                })
-            })
-            .map(|entry| {
-                fs::copy(entry.path(), &styles_dest).expect("Failed to copy styles.css");
-                true
-            })
-            .unwrap_or(false)
+    if dist_dir.exists() {
+        for asset in &assets {
+            let src = dist_dir.join(asset);
+            let dest = output_path.join(asset);
+            if src.exists() {
+                fs::copy(&src, &dest).unwrap_or_else(|e| panic!("Failed to copy {}: {}", asset, e));
+                println!("  Copied: {}", dest.display());
+            } else {
+                eprintln!("  Warning: {} not found in dist/", asset);
+            }
+        }
     } else {
-        false
-    };
-
-    if copied {
-        println!("  Copied: {}", styles_dest.display());
-    } else {
-        eprintln!("  Warning: No compiled styles.css found in dist/. Run `trunk build` first.");
+        eprintln!(
+            "  Warning: dist/ not found. Run `trunk build --release --filehash false --no-default-features --features hydrate` first."
+        );
     }
 
     println!("\nStatic site generation complete!");

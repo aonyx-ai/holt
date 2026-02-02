@@ -58,6 +58,11 @@ load-baselines-from-gh-artifact run_id:
     echo "Next steps:"
     echo "  git add crates/kit-docs/tests/visual-baselines/ && git commit -m 'accept new visual baselines'"
 
+# Build WASM hydration bundle for SSG pages
+build-hydrate:
+    wasm-pack build . --target web --out-dir ../../docs/static/kit --out-name hydrate --no-default-features --features hydrate --release
+    rm -f ../../docs/static/kit/package.json ../../docs/static/kit/.gitignore ../../docs/static/kit/hydrate.d.ts ../../docs/static/kit/hydrate_bg.wasm.d.ts
+
 # Render a single story variant to PNG (for LLM agent use)
 # The <variant> can be either an index (0, 1, 2...) or a name ('default', 'destructive'...)
 # Examples:

@@ -24,25 +24,6 @@ fn get_all_stories() -> Vec<&'static Story> {
 /// Base path for the kit documentation (used when serving from /kit/ in Docusaurus)
 const BASE_PATH: &str = "/kit";
 
-fn render_navbar() -> &'static str {
-    r#"<nav class="kit-navbar">
-    <div class="kit-navbar-inner">
-        <a href="/" class="kit-navbar-logo">
-            <img src="/img/logo.svg" alt="Holt" height="32" />
-        </a>
-        <div class="kit-navbar-items">
-            <a href="/docs/tutorials/" class="kit-navbar-link">Docs</a>
-            <a href="/kit/" class="kit-navbar-link kit-navbar-link--active">Kit</a>
-        </div>
-        <div class="kit-navbar-items kit-navbar-right">
-            <a href="https://github.com/aonyx-labs/holt" class="kit-navbar-link" target="_blank" rel="noopener noreferrer">
-                GitHub
-            </a>
-        </div>
-    </div>
-</nav>"#
-}
-
 fn render_route_to_html(route: &str) -> String {
     // Create a new reactive owner for this render
     let owner = Owner::new();
@@ -77,15 +58,16 @@ fn wrap_in_html_document(body: &str, title: &str) -> String {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     <link rel="stylesheet" href="/kit/styles.css">
+    <link rel="preload" href="/kit/hydrate_bg.wasm" as="fetch" crossorigin>
+    <script type="module">
+      import init from '/kit/hydrate.js';
+      init('/kit/hydrate_bg.wasm');
+    </script>
 </head>
 <body class="kit-body">
-{navbar}
-<div class="kit-content">
 {body}
-</div>
 </body>
 </html>"#,
-        navbar = render_navbar(),
         title = title,
         body = body
     )

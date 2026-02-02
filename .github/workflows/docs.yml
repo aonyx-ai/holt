@@ -40,6 +40,13 @@ jobs:
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # 2.8.2
 
+      - name: Build Kit WASM hydration bundle
+        uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0
+        with:
+          command: |
+            wasm-pack build crates/kit-docs --target web --out-dir ../../docs/static/kit --out-name hydrate --no-default-features --features hydrate --release
+            rm -f docs/static/kit/package.json docs/static/kit/.gitignore docs/static/kit/hydrate.d.ts docs/static/kit/hydrate_bg.wasm.d.ts
+
       - name: Generate Kit Storybook static files
         uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0
         with:

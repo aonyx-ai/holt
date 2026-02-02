@@ -2247,6 +2247,7 @@ name = "holt-kit-docs"
 version = "0.0.0"
 dependencies = [
  "any_spawner",
+ "console_error_panic_hook",
  "eframe",
  "holt-book",
  "holt-kit",
@@ -2262,6 +2263,7 @@ dependencies = [
  "thiserror 1.0.69",
  "tokio",
  "ureq",
+ "wasm-bindgen",
 ]
 
 [[package]]

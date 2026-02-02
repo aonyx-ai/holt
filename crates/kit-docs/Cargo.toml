@@ -15,6 +15,7 @@ icondata = { version = "0.7.0", default-features = false, features = [
 ] }
 leptos_icons = "0.7.0"
 inventory = "0.3.20"
+any_spawner = { version = "0.3.0", features = ["tokio"], optional = true }
 thirtyfour = { version = "0.36.0", optional = true }
 tokio = { version = "1.41", features = ["full"], optional = true }
 ureq = { version = "3.0", optional = true }
@@ -24,7 +25,14 @@ image = { version = "0.25", optional = true, features = ["png"] }
 [features]
 default = ["csr"]
 csr = ["holt-book/csr", "leptos/csr"]
-ssr = ["holt-book/ssr", "leptos/ssr", "leptos_router/ssr", "leptos_meta/ssr"]
+ssr = [
+  "holt-book/ssr",
+  "leptos/ssr",
+  "leptos_router/ssr",
+  "leptos_meta/ssr",
+  "any_spawner",
+  "tokio",
+]
 hydrate = ["holt-book/hydrate", "leptos/hydrate"]
 visual-regression = ["thirtyfour", "tokio", "ureq", "eframe", "image"]
 

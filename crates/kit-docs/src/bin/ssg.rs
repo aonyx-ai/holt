@@ -91,10 +91,24 @@ fn wrap_in_html_document(body: &str, title: &str) -> String {
     )
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
+    // Initialize the executor so Leptos effects can spawn futures
+    any_spawner::Executor::init_tokio().expect("Failed to initialize tokio executor");
+
     // Initialize the story registry for SSR
     init_for_ssr();
 
+    // Leptos effects use spawn_local which requires a LocalSet in tokio
+    let local = tokio::task::LocalSet::new();
+    local
+        .run_until(async {
+            generate_static_site().await;
+        })
+        .await;
+}
+
+async fn generate_static_site() {
     let output_dir = std::env::args()
         .nth(1)
         .unwrap_or_else(|| "docs/static/kit".to_string());

@@ -31,12 +31,45 @@ pub fn get_static_routes() -> Vec<String> {
 }
 
 #[component]
+fn KitNavbar() -> impl IntoView {
+    view! {
+        <nav class="kit-navbar">
+            <div class="kit-navbar-inner">
+                <a href="/" class="kit-navbar-logo">
+                    <img src="/img/logo.svg" alt="Holt" height="32" />
+                </a>
+                <div class="kit-navbar-items">
+                    <a href="/docs/tutorials/" class="kit-navbar-link">
+                        "Docs"
+                    </a>
+                    <a href="/kit/" class="kit-navbar-link kit-navbar-link--active">
+                        "Kit"
+                    </a>
+                </div>
+                <div class="kit-navbar-items kit-navbar-right">
+                    <a
+                        href="https://github.com/aonyx-labs/holt"
+                        class="kit-navbar-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        "GitHub"
+                    </a>
+                </div>
+            </div>
+        </nav>
+    }
+}
+
+#[component]
 pub fn App(#[prop(optional)] base: &'static str) -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
     // Provide base path context for components that need it
     provide_context(BasePath(base));
+
+    let show_navbar = !base.is_empty();
 
     view! {
         <Html attr:lang="en" attr:dir="ltr" attr:data-theme="light" />
@@ -48,14 +81,18 @@ pub fn App(#[prop(optional)] base: &'static str) -> impl IntoView {
         <Meta charset="UTF-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <Router base=base>
-            <Routes fallback=|| "not found">
-                <Route
-                    path=path!("/visual-test/:story_id/:variant_index")
-                    view=move || view! { <VisualTestStory /> }
-                />
-                <Route path=path!("/*any") view=move || view! { <Storybook /> } />
-            </Routes>
-        </Router>
+        {show_navbar.then(|| view! { <KitNavbar /> })}
+
+        <div class=if show_navbar { "kit-content" } else { "" }>
+            <Router base=base>
+                <Routes fallback=|| "not found">
+                    <Route
+                        path=path!("/visual-test/:story_id/:variant_index")
+                        view=move || view! { <VisualTestStory /> }
+                    />
+                    <Route path=path!("/*any") view=move || view! { <Storybook /> } />
+                </Routes>
+            </Router>
+        </div>
     }
 }

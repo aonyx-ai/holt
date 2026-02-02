@@ -30,3 +30,8 @@ pub fn run_book() {
 pub fn init_for_ssr() {
     init_story_registry();
 }
+
+#[cfg(feature = "hydrate")]
+pub fn init_for_hydrate() {
+    init_story_registry();
+}

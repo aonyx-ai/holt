@@ -7,6 +7,7 @@ permissions: {}
   pull_request:
     paths:
       - "crates/book/**"
+      - "crates/cli/**"
       - "crates/kit/**"
       - "crates/kit-docs/**"
 
@@ -56,9 +57,9 @@ jobs:
           echo "Baselines from main:"
           tree crates/kit-docs/tests/visual-baselines/ || echo "No baselines in main"
 
-      - name: Build visual regression binary
+      - name: Build holt CLI
         run: |
-          flox activate -- cargo build --bin visual-regression --features visual-regression -p holt-kit-docs --release
+          flox activate -- cargo build -p holt-cli --release
 
       - name: Run visual regression tests
         id: visual-regression
@@ -75,13 +76,11 @@ jobs:
             cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/baseline/ 2>/dev/null || true
           fi
 
-          # Run visual regression from crates/kit-docs (tool expects relative paths from there)
-          cd crates/kit-docs
+          # Run visual regression using holt CLI (uses holt.toml for config)
           set +e  # Disable exit on error
-          flox activate -- cargo run --bin visual-regression --features visual-regression -p holt-kit-docs --release 2>&1 | tee ../../visual-regression.log
+          flox activate -- cargo run -p holt-cli --release -- snapshot 2>&1 | tee visual-regression.log
           REGRESSION_EXIT_CODE=${PIPESTATUS[0]}
           set -e  # Re-enable exit on error
-          cd ../..
 
           # Save new screenshots for artifact upload
           if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
@@ -139,13 +138,13 @@ jobs:
           EOF
 
             # Parse the log file for changes and list them
-            grep -E "(differs from baseline|new baseline)" visual-regression.log | while read -r line; do
-              if echo "$line" | grep -q "differs from baseline"; then
-                story=$(echo "$line" | sed -n 's/.*✗ \([^/]*\)\/\([^ ]*\) differs.*/\1\/\2/p')
+            grep -E "(\[FAIL\]|\[new\])" visual-regression.log | while read -r line; do
+              if echo "$line" | grep -q "\[FAIL\]"; then
+                story=$(echo "$line" | sed -n 's/.*\[FAIL\] \([^/]*\/[^ ]*\) differs.*/\1/p')
                 echo "- 🔄 **Modified:** \`$story\`" >> comment.md
 
-              elif echo "$line" | grep -q "new baseline"; then
-                story=$(echo "$line" | sed -n 's/.*+ \([^/]*\)\/\([^ ]*\) (new.*/\1\/\2/p')
+              elif echo "$line" | grep -q "\[new\]"; then
+                story=$(echo "$line" | sed -n 's/.*\[new\] \([^/]*\/[^ ]*\) (new.*/\1/p')
                 echo "- ✨ **New Component:** \`$story\`" >> comment.md
               fi
             done
@@ -174,7 +173,7 @@ jobs:
           2. Download the **visual-regression-screenshots** artifact
           3. Compare the images in the \`baseline/\` and \`new/\` directories
 
-          Or run \`just kit-docs test-visual\` locally to review and accept changes interactively.
+          Or run \`holt snapshot\` locally to review and accept changes interactively.
 
           EOF
           else

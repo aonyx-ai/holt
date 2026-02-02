@@ -6,7 +6,7 @@ default:
 
 # Serve the Holt Book for our UI components
 serve:
-    trunk serve
+    cargo run -p holt-cli -- serve
 
 # Run visual regression tests
 test-visual:

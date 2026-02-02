@@ -1,0 +1,21 @@
+# Documentation site commands
+
+# Start development server
+dev:
+    npm run start
+
+# Build for production
+build:
+    npm run build
+
+# Serve production build locally
+serve:
+    npm run serve
+
+# Clear build cache
+clear:
+    npm run clear
+
+# Install dependencies
+install:
+    npm install

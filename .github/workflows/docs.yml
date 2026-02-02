@@ -11,6 +11,13 @@ on:
       - "crates/kit-docs/**"
       - "crates/kit/**"
       - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "crates/book/**"
+      - "crates/kit-docs/**"
+      - "crates/kit/**"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 concurrency:
@@ -45,7 +52,7 @@ jobs:
       - name: Build Kit WASM + CSS with Trunk
         uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0
         with:
-          command: cd crates/kit-docs && trunk build --release --filehash false --no-default-features --features hydrate
+          command: bash -c 'cd crates/kit-docs && trunk build --release --filehash false --no-default-features --features hydrate'
 
       - name: Generate Kit Storybook static files
         uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0
@@ -68,15 +75,18 @@ jobs:
         run: npm run build
 
       - name: Setup Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
 
       - name: Upload artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: docs/build
 
   deploy:
     name: Deploy to GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

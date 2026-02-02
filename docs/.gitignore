@@ -5,6 +5,8 @@ node_modules/
 build/
 .docusaurus/
 static/kit/
+static/kit-static/
+docs/static/
 
 # Misc
 .DS_Store

@@ -248,6 +248,7 @@ checksum = "1384d3fe1eecb464229fcf6eebb72306591c56bf27b373561489458a7c73027d"
 dependencies = [
  "futures",
  "thiserror 2.0.17",
+ "tokio",
  "wasm-bindgen-futures",
 ]
 
@@ -2245,6 +2246,7 @@ dependencies = [
 name = "holt-kit-docs"
 version = "0.0.0"
 dependencies = [
+ "any_spawner",
  "eframe",
  "holt-book",
  "holt-kit",

@@ -52,8 +52,7 @@ jobs:
       - name: Build Kit WASM + CSS with Trunk
         uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0
         with:
-          command: |
-            cd crates/kit-docs && trunk build --release --filehash false --no-default-features --features hydrate
+          command: bash -c 'cd crates/kit-docs && trunk build --release --filehash false --no-default-features --features hydrate'
 
       - name: Generate Kit Storybook static files
         uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0

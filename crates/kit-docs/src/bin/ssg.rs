@@ -72,11 +72,11 @@ async fn render_route_to_html(route: &str, title: &str) -> String {
     }
 
     // If Leptos didn't set a title, inject our fallback
-    if !html.contains("<title>") {
-        if let Some(pos) = html.find("<!--HEAD-->") {
-            let insert_at = pos + "<!--HEAD-->".len();
-            html.insert_str(insert_at, &format!("<title>{}</title>", title));
-        }
+    if !html.contains("<title>")
+        && let Some(pos) = html.find("<!--HEAD-->")
+    {
+        let insert_at = pos + "<!--HEAD-->".len();
+        html.insert_str(insert_at, &format!("<title>{}</title>", title));
     }
 
     owner.cleanup();

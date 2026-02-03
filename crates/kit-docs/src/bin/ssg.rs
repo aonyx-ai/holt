@@ -57,6 +57,7 @@ fn wrap_in_html_document(body: &str, title: &str) -> String {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
+    <!--HEAD-->
     <link rel="stylesheet" href="/kit/styles.css">
     <link rel="preload" href="/kit/holt-kit-docs_bg.wasm" as="fetch" crossorigin>
     <script type="module">

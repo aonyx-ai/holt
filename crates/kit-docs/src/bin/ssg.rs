@@ -38,10 +38,10 @@ async fn render_route_to_html(route: &str, title: &str) -> String {
     let (meta_context, meta_output) = ServerMetaContext::new();
     provide_context(meta_context);
 
-    // Render the App component to HTML with branch markers for hydration
+    // Render the App component to HTML
     let body_html = owner.with(|| {
         let app = App(AppProps { base: BASE_PATH });
-        app.to_html_branching()
+        app.to_html()
     });
 
     // Build the HTML shell with bare <html> and <body> tags for inject_meta_context to fill in

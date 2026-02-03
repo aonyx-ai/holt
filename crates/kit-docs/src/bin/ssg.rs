@@ -40,8 +40,8 @@ fn render_route_to_html(route: &str) -> String {
     // Render the App component to HTML with base path
     let html = owner.with(|| {
         let app = App(AppProps { base: BASE_PATH });
-        // Use Leptos's to_html() method available in SSR mode
-        app.to_html()
+        // Use to_html_branching() to emit branch marker comments needed for hydration
+        app.to_html_branching()
     });
 
     owner.cleanup();

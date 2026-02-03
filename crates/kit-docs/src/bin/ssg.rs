@@ -65,9 +65,7 @@ fn wrap_in_html_document(body: &str, title: &str) -> String {
       init('/kit/holt-kit-docs_bg.wasm');
     </script>
 </head>
-<body class="kit-body">
-{body}
-</body>
+<body class="kit-body">{body}</body>
 </html>"#,
         title = title,
         body = body

@@ -2249,6 +2249,7 @@ dependencies = [
  "any_spawner",
  "console_error_panic_hook",
  "eframe",
+ "futures",
  "holt-book",
  "holt-kit",
  "icondata",

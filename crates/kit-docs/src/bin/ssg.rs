@@ -7,6 +7,7 @@
 #[allow(unused_imports)]
 use holt_kit_docs::stories as _;
 
+use futures::StreamExt;
 use holt_book::{App, AppProps, Story, init_for_ssr};
 use leptos::prelude::*;
 use leptos_meta::ServerMetaContext;
@@ -24,7 +25,7 @@ fn get_all_stories() -> Vec<&'static Story> {
 /// Base path for the kit documentation (used when serving from /kit/ in Docusaurus)
 const BASE_PATH: &str = "/kit";
 
-fn render_route_to_html(route: &str) -> String {
+async fn render_route_to_html(route: &str, title: &str) -> String {
     // Create a new reactive owner for this render
     let owner = Owner::new();
     owner.set();
@@ -33,30 +34,21 @@ fn render_route_to_html(route: &str) -> String {
     let full_route = format!("{}{}", BASE_PATH, route);
     provide_context(RequestUrl::new(&full_route));
 
-    // Create server meta context - returns (context, output)
-    let (meta_context, _meta_output) = ServerMetaContext::new();
+    // Create server meta context — the output receives meta tags from leptos_meta components
+    let (meta_context, meta_output) = ServerMetaContext::new();
     provide_context(meta_context);
 
-    // Render the App component to HTML with base path
-    let html = owner.with(|| {
+    // Render the App component to HTML with branch markers for hydration
+    let body_html = owner.with(|| {
         let app = App(AppProps { base: BASE_PATH });
-        // Use to_html_branching() to emit branch marker comments needed for hydration
         app.to_html_branching()
     });
 
-    owner.cleanup();
-
-    html
-}
-
-fn wrap_in_html_document(body: &str, title: &str) -> String {
-    format!(
+    // Build the HTML shell with bare <html> and <body> tags for inject_meta_context to fill in
+    let shell = format!(
         r#"<!DOCTYPE html>
-<html lang="en" dir="ltr" data-theme="light">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
     <!--HEAD-->
     <link rel="stylesheet" href="/kit/styles.css">
     <link rel="preload" href="/kit/holt-kit-docs_bg.wasm" as="fetch" crossorigin>
@@ -65,11 +57,31 @@ fn wrap_in_html_document(body: &str, title: &str) -> String {
       init('/kit/holt-kit-docs_bg.wasm');
     </script>
 </head>
-<body class="kit-body">{body}</body>
+<body class="kit-body">{body_html}</body>
 </html>"#,
-        title = title,
-        body = body
-    )
+        body_html = body_html,
+    );
+
+    // Use inject_meta_context to insert Leptos-rendered meta elements, html attrs, body attrs
+    let input_stream = futures::stream::iter(std::iter::once(shell));
+    let mut output_stream = std::pin::pin!(meta_output.inject_meta_context(input_stream).await);
+
+    let mut html = String::new();
+    while let Some(chunk) = output_stream.next().await {
+        html.push_str(&chunk);
+    }
+
+    // If Leptos didn't set a title, inject our fallback
+    if !html.contains("<title>") {
+        if let Some(pos) = html.find("<!--HEAD-->") {
+            let insert_at = pos + "<!--HEAD-->".len();
+            html.insert_str(insert_at, &format!("<title>{}</title>", title));
+        }
+    }
+
+    owner.cleanup();
+
+    html
 }
 
 #[tokio::main]
@@ -106,8 +118,7 @@ async fn generate_static_site() {
 
     // Generate index page
     println!("  Rendering: /");
-    let index_body = render_route_to_html("/");
-    let index_html = wrap_in_html_document(&index_body, "Holt UI Kit");
+    let index_html = render_route_to_html("/", "Holt UI Kit").await;
     let index_path = output_path.join("index.html");
     fs::write(&index_path, index_html).expect("Failed to write index.html");
     println!("  Generated: {}", index_path.display());
@@ -120,9 +131,8 @@ async fn generate_static_site() {
         let story_dir = output_path.join("story").join(story.id);
         fs::create_dir_all(&story_dir).expect("Failed to create story directory");
 
-        let story_body = render_route_to_html(&route);
         let story_html =
-            wrap_in_html_document(&story_body, &format!("{} - Holt UI Kit", story.name));
+            render_route_to_html(&route, &format!("{} - Holt UI Kit", story.name)).await;
         let story_path = story_dir.join("index.html");
         fs::write(&story_path, story_html).expect("Failed to write story page");
         println!("  Generated: {}", story_path.display());

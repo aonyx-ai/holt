@@ -31,6 +31,31 @@ just pre-commit         # Run all checks
 just
 ```
 
+## Testing
+
+When claiming a feature is "complete", verify that ALL applicable test types
+have been written and are passing. Never claim completeness without running the
+test suite.
+
+- New features MUST include E2E tests (`just kit test-e2e`) in addition to unit
+  tests
+- Before declaring work done, explicitly list what tests were written and show
+  they pass
+- If a test category doesn't apply, state why — don't silently skip it
+
+## Pre-PR Checklist
+
+Before opening a PR or claiming work is done:
+
+1. Run `just pre-commit` — this runs formatting, linting, and unit tests
+2. Run `just lint-rust` — catches clippy warnings that CI will flag
+3. Run `git status` and address any untracked files (commit, `.gitignore`, or
+   delete them)
+4. Verify no warnings in build output
+
+Do NOT rely solely on pre-commit hooks — run the full check suite manually since
+CI runs additional checks that pre-commit doesn't cover.
+
 ## Requirements
 
 These are installed via Flox.

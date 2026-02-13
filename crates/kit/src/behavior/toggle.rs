@@ -64,3 +64,13 @@ pub fn ToggleRoot(
 pub fn use_toggle() -> ToggleContext {
     use_context::<ToggleContext>().expect("use_toggle must be called within ToggleRoot")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(ToggleRootProps);
+    }
+}

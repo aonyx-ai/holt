@@ -65,3 +65,13 @@ pub fn Switch(
         </SwitchRoot>
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(SwitchProps);
+    }
+}

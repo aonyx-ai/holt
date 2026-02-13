@@ -80,3 +80,24 @@ pub fn Muted(#[prop(optional, into)] class: String, children: Children) -> impl 
 
     view! { <p class=classes>{children()}</p> }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(
+            H1Props,
+            H2Props,
+            H3Props,
+            H4Props,
+            PProps,
+            BlockquoteProps,
+            LeadProps,
+            LargeProps,
+            SmallProps,
+            MutedProps,
+        );
+    }
+}

@@ -490,3 +490,29 @@ pub fn SidebarInset(#[prop(optional, into)] class: String, children: Children) -
 
     view! { <main class=classes>{children()}</main> }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(
+            SidebarProps,
+            SidebarRailProps,
+            SidebarMenuBadgeProps,
+            SidebarHeaderProps,
+            SidebarContentProps,
+            SidebarGroupProps,
+            SidebarGroupLabelProps,
+            SidebarGroupContentProps,
+            SidebarMenuProps,
+            SidebarMenuItemProps,
+            SidebarMenuButtonProps,
+            SidebarFooterProps,
+            SidebarSeparatorProps,
+            SidebarTriggerProps,
+            SidebarInsetProps,
+        );
+    }
+}

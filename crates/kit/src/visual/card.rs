@@ -46,3 +46,20 @@ pub fn CardFooter(#[prop(optional, into)] class: String, children: Children) -> 
 
     view! { <div class=classes>{children()}</div> }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(
+            CardProps,
+            CardHeaderProps,
+            CardTitleProps,
+            CardDescriptionProps,
+            CardContentProps,
+            CardFooterProps,
+        );
+    }
+}

@@ -58,3 +58,17 @@ pub fn CollapsibleContent(
     let class = CollapsibleContentStyle {}.with_class(&class);
     view! { <CollapsibleContentPrimitive class=class>{children()}</CollapsibleContentPrimitive> }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(
+            CollapsibleProps,
+            CollapsibleTriggerProps,
+            CollapsibleContentProps,
+        );
+    }
+}

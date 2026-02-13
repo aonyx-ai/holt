@@ -204,3 +204,18 @@ pub fn SelectValue(
         </span>
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(
+            SelectTriggerProps,
+            SelectContentProps,
+            SelectItemProps,
+            SelectValueProps,
+        );
+    }
+}

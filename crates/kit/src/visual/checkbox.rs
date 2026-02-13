@@ -24,14 +24,14 @@ pub enum CheckboxSize {
 
 #[component]
 pub fn Checkbox(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] size: CheckboxSize,
     #[prop(optional)] checked: RwSignal<bool>,
     #[prop(optional, into)] disabled: Signal<bool>,
     #[prop(optional_no_strip, into)] id: Option<&'static str>,
     #[prop(optional_no_strip, into)] name: Option<&'static str>,
 ) -> impl IntoView {
-    let final_class = CheckboxStyle { size }.with_class(class);
+    let final_class = CheckboxStyle { size }.with_class(&class);
 
     view! {
         <CheckboxRoot checked=checked disabled=disabled id=id name=name class=final_class>

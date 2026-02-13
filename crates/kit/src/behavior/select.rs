@@ -82,7 +82,7 @@ pub fn use_select() -> SelectContext {
 /// Trigger button that opens/closes the select
 #[component]
 pub fn SelectTrigger(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(optional_no_strip, into)] id: Option<&'static str>,
     children: Children,
 ) -> impl IntoView {
@@ -111,7 +111,7 @@ pub fn SelectTrigger(
 /// Content area that shows when select is open
 #[component]
 pub fn SelectContent(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(into, default = Side::Bottom)] side: Side,
     #[prop(into, default = Align::Start)] align: Align,
     #[prop(into, default = 4.0)] side_offset: f64,
@@ -156,7 +156,7 @@ pub fn SelectContent(
 #[component]
 pub fn SelectItem(
     #[prop(into)] value: String,
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     children: Children,
 ) -> impl IntoView {
@@ -193,7 +193,7 @@ pub fn SelectItem(
 #[component]
 pub fn SelectValue(
     #[prop(optional_no_strip, into)] placeholder: Option<String>,
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
 ) -> impl IntoView {
     let context = use_select();
     let placeholder_text = placeholder.unwrap_or_default();

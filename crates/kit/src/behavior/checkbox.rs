@@ -30,7 +30,7 @@ impl CheckboxContext {
 /// Root checkbox primitive that provides context and handles the underlying button
 #[component]
 pub fn CheckboxRoot(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] checked: RwSignal<bool>,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     #[prop(optional_no_strip, into)] id: Option<&'static str>,
@@ -69,14 +69,14 @@ pub fn use_checkbox() -> CheckboxContext {
 
 #[component]
 pub fn CheckboxIndicator(
-    #[prop(optional, into)] class: Signal<String>,
+    #[prop(optional, into)] class: String,
     children: ChildrenFn,
 ) -> impl IntoView {
     let context = use_checkbox();
 
     view! {
         <Show when=move || context.checked.get()>
-            <div class=class>{children()}</div>
+            <div class=class.clone()>{children()}</div>
         </Show>
     }
 }

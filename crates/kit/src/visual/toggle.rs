@@ -33,7 +33,7 @@ pub enum ToggleSize {
 
 #[component]
 pub fn Toggle(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] variant: ToggleVariant,
     #[prop(optional)] size: ToggleSize,
     #[prop(optional)] pressed: RwSignal<bool>,
@@ -41,7 +41,7 @@ pub fn Toggle(
     #[prop(optional_no_strip, into)] aria_label: Option<&'static str>,
     children: Children,
 ) -> impl IntoView {
-    let final_class = ToggleStyle { variant, size }.with_class(class);
+    let final_class = ToggleStyle { variant, size }.with_class(&class);
 
     view! {
         <ToggleRoot pressed=pressed disabled=disabled aria_label=aria_label class=final_class>

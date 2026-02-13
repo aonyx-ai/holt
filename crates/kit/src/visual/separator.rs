@@ -16,10 +16,10 @@ impl Default for Orientation {
 /// A separator or divider that can be used to separate content
 #[component]
 pub fn Separator(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] orientation: Orientation,
 ) -> impl IntoView {
-    let classes = move || {
+    let classes = {
         let base_class = match orientation {
             Orientation::Horizontal => "h-[1px] w-full shrink-0 bg-border",
             Orientation::Vertical => "h-full w-[1px] shrink-0 bg-border",

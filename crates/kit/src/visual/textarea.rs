@@ -21,7 +21,7 @@ pub enum TextareaSize {
 
 #[component]
 pub fn Textarea(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] size: TextareaSize,
     /// Two‑way bound via `bind:value`.
     #[prop(optional, default = RwSignal::new(String::new()))]
@@ -35,7 +35,7 @@ pub fn Textarea(
     #[prop(optional_no_strip, into)] rows: Option<u32>,
     #[prop(optional_no_strip, into)] cols: Option<u32>,
 ) -> impl IntoView {
-    let class = TextareaStyle { size }.with_class(class);
+    let class = TextareaStyle { size }.with_class(&class);
 
     view! {
         <textarea

@@ -37,5 +37,5 @@ pub fn Badge(
     children: Children,
 ) -> impl IntoView {
     let final_class = BadgeStyle { variant }.with_class(class);
-    view! { <button class=final_class>{children()}</button> }
+    view! { <span class=final_class>{children()}</span> }
 }

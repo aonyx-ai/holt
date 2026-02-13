@@ -20,3 +20,6 @@ node_modules/
 dist/
 .idea/
 .playwright-mcp/
+
+# Nix build artifact symlink
+result

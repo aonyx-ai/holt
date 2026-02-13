@@ -7,6 +7,8 @@ mod collapsible;
 mod input;
 mod label;
 mod select;
+mod separator;
 mod switch;
 mod textarea;
 mod toggle;
+mod typography;

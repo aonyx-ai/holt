@@ -1,0 +1,20 @@
+[package]
+name = "leptos-floating"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+leptos = { workspace = true }
+web-sys = { version = "0.3.80", features = ["DomRect", "Element"] }
+
+[dev-dependencies]
+wasm-bindgen-test = { workspace = true }
+web-sys = { version = "0.3.80", features = [
+  "Document",
+  "HtmlButtonElement",
+  "HtmlDivElement",
+  "HtmlElement",
+  "CssStyleDeclaration",
+  "Window",
+  "Node",
+] }

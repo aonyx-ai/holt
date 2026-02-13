@@ -1,7 +1,7 @@
-use crate::floating::{Align, FloatingOptions, Side, use_floating};
 use leptos::html::Div;
 use leptos::portal::Portal;
 use leptos::prelude::*;
+use leptos_floating::{Align, FloatingOptions, Side, use_floating};
 
 /// Select behavior context that manages state and interactions
 #[derive(Clone)]

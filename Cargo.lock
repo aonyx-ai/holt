@@ -2235,6 +2235,7 @@ dependencies = [
  "console_log",
  "icondata",
  "leptos",
+ "leptos-floating",
  "leptos_icons",
  "log",
  "tailwind_fuse",
@@ -2759,6 +2760,15 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm_split_helpers",
+ "web-sys",
+]
+
+[[package]]
+name = "leptos-floating"
+version = "0.0.0"
+dependencies = [
+ "leptos",
+ "wasm-bindgen-test",
  "web-sys",
 ]
 

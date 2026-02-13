@@ -7,7 +7,7 @@ use crate::behavior::{
     SelectRoot as SelectRootPrimitive, SelectTrigger as SelectTriggerPrimitive,
     SelectValue as SelectValuePrimitive,
 };
-use crate::floating::{Align, Side};
+use leptos_floating::{Align, Side};
 
 /// The main Select component
 #[component]

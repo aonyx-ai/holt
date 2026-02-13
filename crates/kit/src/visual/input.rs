@@ -21,7 +21,7 @@ pub enum InputSize {
 
 #[component]
 pub fn Input(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] size: InputSize,
     /// Two‑way bound via `bind:value`.
     #[prop(optional, default = RwSignal::new(String::new()))]
@@ -34,7 +34,7 @@ pub fn Input(
     #[prop(optional_no_strip, into)] placeholder: Option<&'static str>,
     #[prop(optional_no_strip, into)] r#type: Option<&'static str>,
 ) -> impl IntoView {
-    let class = InputStyle { size }.with_class(class);
+    let class = InputStyle { size }.with_class(&class);
     let ty = r#type.unwrap_or("text");
 
     view! {
@@ -52,5 +52,15 @@ pub fn Input(
                 if required.get() && value.get().is_empty() { Some("true") } else { None }
             }
         />
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(InputProps);
     }
 }

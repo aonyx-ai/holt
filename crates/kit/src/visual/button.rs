@@ -46,14 +46,14 @@ pub enum ButtonSize {
 
 #[component]
 pub fn Button(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] variant: ButtonVariant,
     #[prop(optional)] size: ButtonSize,
     // TODO: add support for behaviour like @radix-ui/react-slot?
     // #[prop(optional)] as_child: bool,
     children: Children,
 ) -> impl IntoView {
-    let final_class = ButtonStyle { variant, size }.with_class(class);
+    let final_class = ButtonStyle { variant, size }.with_class(&class);
     let element: NodeRef<html::Button> = NodeRef::new();
 
     let on_click = move |e: MouseEvent| {
@@ -64,5 +64,15 @@ pub fn Button(
         <button on:click=on_click node_ref=element class=final_class>
             {children()}
         </button>
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(ButtonProps);
     }
 }

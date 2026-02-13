@@ -26,13 +26,13 @@ pub fn Select(
 /// Select trigger with Shadcn styling
 #[component]
 pub fn SelectTrigger(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional_no_strip, into)] id: Option<&'static str>,
     children: Children,
 ) -> impl IntoView {
     let classes = tw_merge!(
         "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-        class
+        &class
     );
 
     view! {
@@ -46,7 +46,7 @@ pub fn SelectTrigger(
 /// Select content with positioning and styling
 #[component]
 pub fn SelectContent(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(into, default = Side::Bottom)] side: Side,
     #[prop(into, default = Align::Start)] align: Align,
     #[prop(into, default = 4.0)] side_offset: f64,
@@ -54,7 +54,7 @@ pub fn SelectContent(
 ) -> impl IntoView {
     let classes = tw_merge!(
         "z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        class
+        &class
     );
 
     view! {
@@ -68,13 +68,13 @@ pub fn SelectContent(
 #[component]
 pub fn SelectItem(
     #[prop(into)] value: String,
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     children: Children,
 ) -> impl IntoView {
     let classes = tw_merge!(
         "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        class
+        &class
     );
 
     view! {
@@ -96,25 +96,25 @@ pub fn SelectItem(
 #[component]
 pub fn SelectValue(
     #[prop(optional, into)] placeholder: Option<String>,
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
 ) -> impl IntoView {
-    let classes = tw_merge!("", class);
+    let classes = tw_merge!("", &class);
 
     view! { <SelectValuePrimitive placeholder=placeholder class=classes /> }
 }
 
 /// Label for select groups
 #[component]
-pub fn SelectLabel(#[prop(optional)] class: &'static str, children: Children) -> impl IntoView {
-    let classes = tw_merge!("py-1.5 pl-8 pr-2 text-sm font-semibold", class);
+pub fn SelectLabel(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
+    let classes = tw_merge!("py-1.5 pl-8 pr-2 text-sm font-semibold", &class);
 
     view! { <div class=classes>{children()}</div> }
 }
 
 /// Separator between select items
 #[component]
-pub fn SelectSeparator(#[prop(optional)] class: &'static str) -> impl IntoView {
-    let classes = tw_merge!("-mx-1 my-1 h-px bg-muted", class);
+pub fn SelectSeparator(#[prop(optional, into)] class: String) -> impl IntoView {
+    let classes = tw_merge!("-mx-1 my-1 h-px bg-muted", &class);
 
     view! { <div class=classes></div> }
 }

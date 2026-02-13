@@ -30,12 +30,53 @@ pub enum BadgeVariant {
 
 #[component]
 pub fn Badge(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] variant: BadgeVariant,
     // TODO: add support for behaviour like @radix-ui/react-slot?
     // #[prop(optional)] as_child: bool,
     children: Children,
 ) -> impl IntoView {
     let final_class = BadgeStyle { variant }.with_class(class);
-    view! { <button class=final_class>{children()}</button> }
+    view! { <span class=final_class>{children()}</span> }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use wasm_bindgen_test::*;
+
+    wasm_bindgen_test_configure!(run_in_browser);
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(BadgeProps);
+    }
+
+    #[wasm_bindgen_test(unsupported = test)]
+    #[cfg_attr(not(target_family = "wasm"), ignore)]
+    fn badge_renders_as_span() {
+        let document = web_sys::window().unwrap().document().unwrap();
+        let container = document.create_element("div").unwrap();
+        document.body().unwrap().append_child(&container).unwrap();
+
+        let _owner = Owner::new();
+        _owner.with(|| {
+            let view = view! { <Badge>"Test"</Badge> };
+            let mut mounted = view.build();
+            use leptos::tachys::view::Mountable;
+            mounted.mount(&container, None);
+        });
+
+        let first_child = container
+            .first_element_child()
+            .expect("Badge should render an element");
+
+        assert_eq!(
+            first_child.tag_name().to_lowercase(),
+            "span",
+            "Badge root element should be a <span>"
+        );
+
+        document.body().unwrap().remove_child(&container).unwrap();
+    }
 }

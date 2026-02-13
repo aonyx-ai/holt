@@ -11,11 +11,24 @@ leptos_icons = "0.7.0"
 icondata = { version = "0.7.0", default-features = false, features = [
   "lucide",
 ] }
-web-sys = { version = "0.3.80", features = ["DomRect", "Element"] }
+web-sys = { version = "0.3.80", features = [
+  "DomRect",
+  "Element",
+  "HtmlElement",
+  "KeyboardEvent",
+  "NodeList",
+] }
 
 [dev-dependencies]
 wasm-bindgen-test = { workspace = true }
 console_log = "1.0"
 console_error_panic_hook = "0.1.7"
 log = "0.4.22"
-web-sys = "0.3.80"
+web-sys = { version = "0.3.80", features = [
+  "Document",
+  "HtmlButtonElement",
+  "HtmlDivElement",
+  "HtmlElement",
+  "NodeList",
+  "Window",
+] }

@@ -3,6 +3,7 @@
 mod checkbox;
 mod collapsible;
 mod select;
+pub mod select_keyboard;
 mod sidebar;
 mod switch;
 mod toggle;

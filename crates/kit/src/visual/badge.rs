@@ -49,7 +49,7 @@ mod tests {
 
     #[wasm_bindgen_test(unsupported = test)]
     #[cfg_attr(not(target_family = "wasm"), ignore)]
-    fn badge_renders_as_span_not_button() {
+    fn badge_renders_as_span() {
         let document = web_sys::window().unwrap().document().unwrap();
         let container = document.create_element("div").unwrap();
         document.body().unwrap().append_child(&container).unwrap();
@@ -69,7 +69,7 @@ mod tests {
         assert_eq!(
             first_child.tag_name().to_lowercase(),
             "span",
-            "Badge root element should be a <span>, not a <button>"
+            "Badge root element should be a <span>"
         );
 
         document.body().unwrap().remove_child(&container).unwrap();

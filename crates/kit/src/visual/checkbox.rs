@@ -30,11 +30,19 @@ pub fn Checkbox(
     #[prop(optional, into)] disabled: Signal<bool>,
     #[prop(optional_no_strip, into)] id: Option<&'static str>,
     #[prop(optional_no_strip, into)] name: Option<&'static str>,
+    #[prop(optional_no_strip)] on_change: Option<Callback<bool>>,
 ) -> impl IntoView {
     let final_class = CheckboxStyle { size }.with_class(&class);
 
     view! {
-        <CheckboxRoot checked=checked disabled=disabled id=id name=name class=final_class>
+        <CheckboxRoot
+            checked=checked
+            disabled=disabled
+            id=id
+            name=name
+            class=final_class
+            on_change=on_change
+        >
             <CheckboxIndicator class="flex items-center justify-center text-current transition-none">
                 <Icon
                     icon=icondata::LuCheck

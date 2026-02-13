@@ -14,10 +14,11 @@ use leptos_floating::{Align, Side};
 pub fn Select(
     #[prop(optional)] value: RwSignal<Option<String>>,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
+    #[prop(optional_no_strip)] on_change: Option<Callback<Option<String>>>,
     children: Children,
 ) -> impl IntoView {
     view! {
-        <SelectRootPrimitive value=value disabled=disabled>
+        <SelectRootPrimitive value=value disabled=disabled on_change=on_change>
             {children()}
         </SelectRootPrimitive>
     }

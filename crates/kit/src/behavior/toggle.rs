@@ -5,11 +5,20 @@ use leptos::prelude::*;
 pub struct ToggleContext {
     pub pressed: RwSignal<bool>,
     pub disabled: Signal<bool>,
+    pub on_change: Option<Callback<bool>>,
 }
 
 impl ToggleContext {
-    pub fn new(pressed: RwSignal<bool>, disabled: Signal<bool>) -> Self {
-        Self { pressed, disabled }
+    pub fn new(
+        pressed: RwSignal<bool>,
+        disabled: Signal<bool>,
+        on_change: Option<Callback<bool>>,
+    ) -> Self {
+        Self {
+            pressed,
+            disabled,
+            on_change,
+        }
     }
 
     pub fn is_pressed(&self) -> bool {
@@ -23,6 +32,9 @@ impl ToggleContext {
     pub fn toggle(&self) {
         if !self.is_disabled() {
             self.pressed.update(|p| *p = !*p);
+            if let Some(cb) = &self.on_change {
+                cb.run(self.pressed.get());
+            }
         }
     }
 }
@@ -34,9 +46,10 @@ pub fn ToggleRoot(
     #[prop(optional)] pressed: RwSignal<bool>,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     #[prop(optional_no_strip, into)] aria_label: Option<&'static str>,
+    #[prop(optional_no_strip)] on_change: Option<Callback<bool>>,
     children: Children,
 ) -> impl IntoView {
-    let context = ToggleContext::new(pressed, disabled);
+    let context = ToggleContext::new(pressed, disabled, on_change);
     let context_on_click = context.clone();
     provide_context(context);
 

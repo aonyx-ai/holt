@@ -1,9 +1,9 @@
-use crate::floating::{Align, FloatingOptions, Side, use_floating};
 use leptos::html::Div;
 use leptos::portal::Portal;
 use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
 use leptos::web_sys::KeyboardEvent;
+use leptos_floating::{Align, FloatingOptions, Side, use_floating};
 
 /// Select behavior context that manages state and interactions
 #[derive(Clone, Copy)]
@@ -12,15 +12,21 @@ pub struct SelectContext {
     pub open: RwSignal<bool>,
     pub disabled: Signal<bool>,
     pub trigger_ref: NodeRef<leptos::html::Button>,
+    pub on_change: Option<Callback<Option<String>>>,
 }
 
 impl SelectContext {
-    pub fn new(value: RwSignal<Option<String>>, disabled: Signal<bool>) -> Self {
+    pub fn new(
+        value: RwSignal<Option<String>>,
+        disabled: Signal<bool>,
+        on_change: Option<Callback<Option<String>>>,
+    ) -> Self {
         Self {
             value,
             open: RwSignal::new(false),
             disabled,
             trigger_ref: NodeRef::new(),
+            on_change,
         }
     }
 
@@ -51,6 +57,9 @@ impl SelectContext {
     pub fn select_value(&self, new_value: String) {
         if !self.is_disabled() {
             self.value.set(Some(new_value));
+            if let Some(cb) = &self.on_change {
+                cb.run(self.value.get());
+            }
             self.close();
         }
     }
@@ -71,9 +80,10 @@ impl SelectContext {
 pub fn SelectRoot(
     #[prop(optional)] value: RwSignal<Option<String>>,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
+    #[prop(optional_no_strip)] on_change: Option<Callback<Option<String>>>,
     children: Children,
 ) -> impl IntoView {
-    let context = SelectContext::new(value, disabled);
+    let context = SelectContext::new(value, disabled, on_change);
 
     provide_context(context);
 

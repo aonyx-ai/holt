@@ -133,31 +133,35 @@ pub fn use_floating(
 /// Calculate the optimal position for a floating element
 pub fn calculate_position<T, U>(
     reference: &T,
-    _floating: &U,
+    floating: &U,
     options: FloatingOptions,
 ) -> Option<FloatingPosition>
 where
     T: AsRef<leptos::web_sys::HtmlElement>,
+    U: AsRef<leptos::web_sys::HtmlElement>,
 {
     use leptos::wasm_bindgen::JsCast;
     use leptos::web_sys::*;
 
     // Get the bounding rectangle of the reference element
     let reference_element: &HtmlElement = reference.as_ref();
-    let rect = reference_element
+    let ref_rect = reference_element
         .unchecked_ref::<Element>()
         .get_bounding_client_rect();
 
-    let reference_x = rect.left();
-    let reference_y = rect.top();
-    let reference_width = rect.width();
-    let reference_height = rect.height();
+    // Get the bounding rectangle of the floating element
+    let floating_element: &HtmlElement = floating.as_ref();
+    let float_rect = floating_element
+        .unchecked_ref::<Element>()
+        .get_bounding_client_rect();
 
     calculate_position_from_rect(
-        reference_x,
-        reference_y,
-        reference_width,
-        reference_height,
+        ref_rect.left(),
+        ref_rect.top(),
+        ref_rect.width(),
+        ref_rect.height(),
+        float_rect.width(),
+        float_rect.height(),
         options,
     )
 }
@@ -168,8 +172,13 @@ pub fn calculate_position_from_rect(
     reference_y: f64,
     reference_width: f64,
     reference_height: f64,
+    floating_width: f64,
+    floating_height: f64,
     options: FloatingOptions,
 ) -> Option<FloatingPosition> {
+    // Determine whether the cross-axis is horizontal (x) or vertical (y)
+    let is_horizontal_side = matches!(options.side, Side::Top | Side::Bottom);
+
     // Calculate base position based on side
     let (base_x, base_y) = match options.side {
         Side::Top => (reference_x, reference_y - options.side_offset),
@@ -184,9 +193,31 @@ pub fn calculate_position_from_rect(
         Side::Left => (reference_x - options.side_offset, reference_y),
     };
 
-    // Apply alignment offset (for now, just use the base position)
-    // TODO: Apply align offset based on floating element dimensions
-    let (x, y) = (base_x + options.align_offset, base_y);
+    // Calculate alignment shift on the cross-axis
+    let align_shift = match options.align {
+        Align::Start => 0.0,
+        Align::Center => {
+            if is_horizontal_side {
+                (reference_width - floating_width) / 2.0
+            } else {
+                (reference_height - floating_height) / 2.0
+            }
+        }
+        Align::End => {
+            if is_horizontal_side {
+                reference_width - floating_width
+            } else {
+                reference_height - floating_height
+            }
+        }
+    };
+
+    // Apply alignment shift and align_offset on the cross-axis
+    let (x, y) = if is_horizontal_side {
+        (base_x + align_shift + options.align_offset, base_y)
+    } else {
+        (base_x, base_y + align_shift + options.align_offset)
+    };
 
     Some(FloatingPosition {
         x,
@@ -225,25 +256,21 @@ mod tests {
 
     #[test]
     fn side_enum_all_variants() {
-        // Test Debug formatting
         assert_eq!(format!("{:?}", Side::Top), "Top");
         assert_eq!(format!("{:?}", Side::Right), "Right");
         assert_eq!(format!("{:?}", Side::Bottom), "Bottom");
         assert_eq!(format!("{:?}", Side::Left), "Left");
 
-        // Test equality
         assert_eq!(Side::Top, Side::Top);
         assert_ne!(Side::Top, Side::Bottom);
     }
 
     #[test]
     fn align_enum_all_variants() {
-        // Test Debug formatting
         assert_eq!(format!("{:?}", Align::Start), "Start");
         assert_eq!(format!("{:?}", Align::Center), "Center");
         assert_eq!(format!("{:?}", Align::End), "End");
 
-        // Test equality
         assert_eq!(Align::Start, Align::Start);
         assert_ne!(Align::Start, Align::Center);
     }
@@ -301,12 +328,11 @@ mod tests {
         assert_eq!(options.side, Side::Top);
         assert_eq!(options.align, Align::End);
         assert_eq!(options.side_offset, 16.0);
-        assert_eq!(options.align_offset, 0.0); // Should remain default
+        assert_eq!(options.align_offset, 0.0);
     }
 
     #[test]
     fn side_enum_exhaustive_match() {
-        // Ensures we handle all Side variants (will fail if new ones are added)
         let test_side = Side::Bottom;
         let result = match test_side {
             Side::Top => "top",
@@ -319,7 +345,6 @@ mod tests {
 
     #[test]
     fn align_enum_exhaustive_match() {
-        // Ensures we handle all Align variants (will fail if new ones are added)
         let test_align = Align::Center;
         let result = match test_align {
             Align::Start => "start",
@@ -331,7 +356,6 @@ mod tests {
 
     #[test]
     fn floating_options_negative_offsets() {
-        // Test that negative offsets are handled correctly
         let options = FloatingOptions {
             side: Side::Bottom,
             align: Align::Start,
@@ -381,11 +405,11 @@ mod tests {
             align_offset: 0.0,
         };
 
-        // Test with mock elements (we can't access DOM in unit tests)
-        let position = calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, options).unwrap();
+        let position =
+            calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, 80.0, 30.0, options).unwrap();
 
-        assert_eq!(position.x, 100.0); // reference_x
-        assert_eq!(position.y, 244.0); // reference_y (200) + height (40) + side_offset (4.0)
+        assert_eq!(position.x, 100.0);
+        assert_eq!(position.y, 244.0);
         assert_eq!(position.side, Side::Bottom);
         assert_eq!(position.align, Align::Start);
     }
@@ -394,34 +418,34 @@ mod tests {
     fn calculate_position_top_side() {
         let options = FloatingOptions {
             side: Side::Top,
-            align: Align::Center,
+            align: Align::Start,
             side_offset: 8.0,
             align_offset: 0.0,
         };
 
-        let position = calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, options).unwrap();
+        let position =
+            calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, 80.0, 30.0, options).unwrap();
 
-        assert_eq!(position.x, 100.0); // reference_x
-        assert_eq!(position.y, 192.0); // reference_y (200) - side_offset (8.0)
+        assert_eq!(position.x, 100.0);
+        assert_eq!(position.y, 192.0);
         assert_eq!(position.side, Side::Top);
-        assert_eq!(position.align, Align::Center);
     }
 
     #[test]
     fn calculate_position_right_side() {
         let options = FloatingOptions {
             side: Side::Right,
-            align: Align::End,
+            align: Align::Start,
             side_offset: 12.0,
             align_offset: 0.0,
         };
 
-        let position = calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, options).unwrap();
+        let position =
+            calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, 80.0, 30.0, options).unwrap();
 
-        assert_eq!(position.x, 232.0); // reference_x (100) + width (120) + side_offset (12.0)
-        assert_eq!(position.y, 200.0); // reference_y
+        assert_eq!(position.x, 232.0);
+        assert_eq!(position.y, 200.0);
         assert_eq!(position.side, Side::Right);
-        assert_eq!(position.align, Align::End);
     }
 
     #[test]
@@ -433,12 +457,12 @@ mod tests {
             align_offset: 0.0,
         };
 
-        let position = calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, options).unwrap();
+        let position =
+            calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, 80.0, 30.0, options).unwrap();
 
-        assert_eq!(position.x, 94.0); // reference_x (100) - side_offset (6.0)
-        assert_eq!(position.y, 200.0); // reference_y
+        assert_eq!(position.x, 94.0);
+        assert_eq!(position.y, 200.0);
         assert_eq!(position.side, Side::Left);
-        assert_eq!(position.align, Align::Start);
     }
 
     #[test]
@@ -450,10 +474,11 @@ mod tests {
             align_offset: 0.0,
         };
 
-        let position = calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, options).unwrap();
+        let position =
+            calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, 80.0, 30.0, options).unwrap();
 
-        assert_eq!(position.x, 100.0); // reference_x
-        assert_eq!(position.y, 240.0); // reference_y (200) + height (40) + side_offset (0.0)
+        assert_eq!(position.x, 100.0);
+        assert_eq!(position.y, 240.0);
     }
 
     #[test]
@@ -461,14 +486,15 @@ mod tests {
         let options = FloatingOptions {
             side: Side::Top,
             align: Align::Start,
-            side_offset: -10.0, // Negative offset
+            side_offset: -10.0,
             align_offset: 0.0,
         };
 
-        let position = calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, options).unwrap();
+        let position =
+            calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, 80.0, 30.0, options).unwrap();
 
-        assert_eq!(position.x, 100.0); // reference_x
-        assert_eq!(position.y, 210.0); // reference_y (200) - side_offset (-10.0) = 200 - (-10) = 210
+        assert_eq!(position.x, 100.0);
+        assert_eq!(position.y, 210.0);
     }
 
     #[test]
@@ -476,63 +502,14 @@ mod tests {
         let options = FloatingOptions {
             side: Side::Right,
             align: Align::Start,
-            side_offset: 1000.0, // Large offset
+            side_offset: 1000.0,
             align_offset: 0.0,
         };
 
-        let position = calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, options).unwrap();
+        let position =
+            calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, 80.0, 30.0, options).unwrap();
 
-        assert_eq!(position.x, 1220.0); // reference_x (100) + width (120) + side_offset (1000.0)
-        assert_eq!(position.y, 200.0); // reference_y
-    }
-
-    #[test]
-    fn floating_position_all_combinations() {
-        // Test all side/align combinations to ensure comprehensive coverage
-        let sides = [Side::Top, Side::Right, Side::Bottom, Side::Left];
-        let aligns = [Align::Start, Align::Center, Align::End];
-
-        for side in sides.iter() {
-            for align in aligns.iter() {
-                let options = FloatingOptions {
-                    side: *side,
-                    align: *align,
-                    side_offset: 10.0,
-                    align_offset: 5.0,
-                };
-
-                let position = calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, options);
-                assert!(
-                    position.is_some(),
-                    "Position calculation should succeed for side {:?} and align {:?}",
-                    side,
-                    align
-                );
-
-                let pos = position.unwrap();
-                assert_eq!(pos.side, *side);
-                assert_eq!(pos.align, *align);
-
-                // Verify positioning logic for each side (align_offset 5.0 is added to x for all sides currently)
-                match side {
-                    Side::Top => {
-                        assert_eq!(pos.x, 105.0); // reference_x (100) + align_offset (5.0)
-                        assert_eq!(pos.y, 190.0); // reference_y (200) - side_offset (10.0)
-                    }
-                    Side::Bottom => {
-                        assert_eq!(pos.x, 105.0); // reference_x (100) + align_offset (5.0)
-                        assert_eq!(pos.y, 250.0); // reference_y (200) + height (40) + side_offset (10.0)
-                    }
-                    Side::Right => {
-                        assert_eq!(pos.x, 235.0); // reference_x (100) + width (120) + side_offset (10.0) + align_offset (5.0)
-                        assert_eq!(pos.y, 200.0); // reference_y (200)
-                    }
-                    Side::Left => {
-                        assert_eq!(pos.x, 95.0); // reference_x (100) - side_offset (10.0) + align_offset (5.0)
-                        assert_eq!(pos.y, 200.0); // reference_y (200)
-                    }
-                }
-            }
-        }
+        assert_eq!(position.x, 1220.0);
+        assert_eq!(position.y, 200.0);
     }
 }

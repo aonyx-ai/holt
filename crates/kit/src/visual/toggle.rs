@@ -39,12 +39,19 @@ pub fn Toggle(
     #[prop(optional)] pressed: RwSignal<bool>,
     #[prop(optional, into)] disabled: Signal<bool>,
     #[prop(optional_no_strip, into)] aria_label: Option<&'static str>,
+    #[prop(optional_no_strip)] on_change: Option<Callback<bool>>,
     children: Children,
 ) -> impl IntoView {
     let final_class = ToggleStyle { variant, size }.with_class(&class);
 
     view! {
-        <ToggleRoot pressed=pressed disabled=disabled aria_label=aria_label class=final_class>
+        <ToggleRoot
+            pressed=pressed
+            disabled=disabled
+            aria_label=aria_label
+            class=final_class
+            on_change=on_change
+        >
             {children()}
         </ToggleRoot>
     }

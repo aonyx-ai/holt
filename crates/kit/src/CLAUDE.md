@@ -7,7 +7,8 @@ visual components add styling.
 
 - **`behavior/`** - State management and interactions (Leptos primitives)
 - **`visual/`** - Tailwind styling wrappers
-- **`floating.rs`** - Positioning for dropdowns, tooltips, popovers
+- **`leptos-floating`** (external crate) - Positioning for dropdowns, tooltips,
+  popovers
 
 ## Development Pattern
 

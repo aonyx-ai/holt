@@ -1,4 +1,4 @@
-use holt_kit::floating::*;
+use leptos_floating::*;
 use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);
@@ -82,7 +82,9 @@ fn test_calculate_position_from_rect_in_browser() {
         align_offset: 0.0,
     };
 
-    let position = calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, options).unwrap();
+    // floating_width=80, floating_height=30 (not used for Align::Start)
+    let position =
+        calculate_position_from_rect(100.0, 200.0, 120.0, 40.0, 80.0, 30.0, options).unwrap();
 
     assert_eq!(position.x, 100.0); // reference_x
     assert_eq!(position.y, 244.0); // reference_y + height + side_offset

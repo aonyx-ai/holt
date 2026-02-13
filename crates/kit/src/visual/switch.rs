@@ -48,6 +48,7 @@ pub fn Switch(
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     #[prop(optional_no_strip, into)] id: Option<&'static str>,
     #[prop(optional_no_strip, into)] name: Option<&'static str>,
+    #[prop(optional_no_strip)] on_change: Option<Callback<bool>>,
 ) -> impl IntoView {
     let final_class = SwitchRootStyle { size }.with_class(class);
 
@@ -60,7 +61,14 @@ pub fn Switch(
     let thumb_classes = SwitchThumbStyle { size: thumb_size }.to_class();
 
     view! {
-        <SwitchRoot checked=checked disabled=disabled id=id name=name class=final_class>
+        <SwitchRoot
+            checked=checked
+            disabled=disabled
+            id=id
+            name=name
+            class=final_class
+            on_change=on_change
+        >
             <SwitchThumb class=Signal::stored(thumb_classes) />
         </SwitchRoot>
     }

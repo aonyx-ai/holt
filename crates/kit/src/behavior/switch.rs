@@ -5,11 +5,20 @@ use leptos::prelude::*;
 pub struct SwitchContext {
     pub checked: RwSignal<bool>,
     pub disabled: Signal<bool>,
+    pub on_change: Option<Callback<bool>>,
 }
 
 impl SwitchContext {
-    pub fn new(checked: RwSignal<bool>, disabled: Signal<bool>) -> Self {
-        Self { checked, disabled }
+    pub fn new(
+        checked: RwSignal<bool>,
+        disabled: Signal<bool>,
+        on_change: Option<Callback<bool>>,
+    ) -> Self {
+        Self {
+            checked,
+            disabled,
+            on_change,
+        }
     }
 
     pub fn is_checked(&self) -> bool {
@@ -23,6 +32,9 @@ impl SwitchContext {
     pub fn toggle(&self) {
         if !self.is_disabled() {
             self.checked.update(|c| *c = !*c);
+            if let Some(cb) = &self.on_change {
+                cb.run(self.checked.get());
+            }
         }
     }
 }
@@ -35,9 +47,10 @@ pub fn SwitchRoot(
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     #[prop(optional_no_strip, into)] id: Option<&'static str>,
     #[prop(optional_no_strip, into)] name: Option<&'static str>,
+    #[prop(optional_no_strip)] on_change: Option<Callback<bool>>,
     children: Children,
 ) -> impl IntoView {
-    let context = SwitchContext::new(checked, disabled);
+    let context = SwitchContext::new(checked, disabled, on_change);
     let context_on_click = context.clone();
     provide_context(context);
 

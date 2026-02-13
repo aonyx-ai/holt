@@ -30,7 +30,7 @@ pub enum BadgeVariant {
 
 #[component]
 pub fn Badge(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] variant: BadgeVariant,
     // TODO: add support for behaviour like @radix-ui/react-slot?
     // #[prop(optional)] as_child: bool,
@@ -46,6 +46,11 @@ mod tests {
     use wasm_bindgen_test::*;
 
     wasm_bindgen_test_configure!(run_in_browser);
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(BadgeProps);
+    }
 
     #[wasm_bindgen_test(unsupported = test)]
     #[cfg_attr(not(target_family = "wasm"), ignore)]

@@ -24,11 +24,11 @@ struct CollapsibleContentStyle {}
 
 #[component]
 pub fn Collapsible(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     open: RwSignal<bool>,
     children: Children,
 ) -> impl IntoView {
-    let class = CollapsibleStyle {}.with_class(class);
+    let class = CollapsibleStyle {}.with_class(&class);
     view! {
         <CollapsibleRootPrimitive class=class open=open>
             {children()}
@@ -38,11 +38,11 @@ pub fn Collapsible(
 
 #[component]
 pub fn CollapsibleTrigger(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional, into)] disabled: Signal<bool>,
     children: Children,
 ) -> impl IntoView {
-    let class = CollapsibleTriggerStyle {}.with_class(class);
+    let class = CollapsibleTriggerStyle {}.with_class(&class);
     view! {
         <CollapsibleTriggerPrimitive class=class disabled=disabled>
             {children()}
@@ -52,9 +52,23 @@ pub fn CollapsibleTrigger(
 
 #[component]
 pub fn CollapsibleContent(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     children: ChildrenFn,
 ) -> impl IntoView {
-    let class = CollapsibleContentStyle {}.with_class(class);
+    let class = CollapsibleContentStyle {}.with_class(&class);
     view! { <CollapsibleContentPrimitive class=class>{children()}</CollapsibleContentPrimitive> }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(
+            CollapsibleProps,
+            CollapsibleTriggerProps,
+            CollapsibleContentProps,
+        );
+    }
 }

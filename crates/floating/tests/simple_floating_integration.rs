@@ -1,4 +1,4 @@
-use holt_kit::floating::*;
+use leptos_floating::*;
 use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);

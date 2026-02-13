@@ -33,7 +33,7 @@ pub enum ToggleSize {
 
 #[component]
 pub fn Toggle(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] variant: ToggleVariant,
     #[prop(optional)] size: ToggleSize,
     #[prop(optional)] pressed: RwSignal<bool>,
@@ -42,7 +42,7 @@ pub fn Toggle(
     #[prop(optional_no_strip)] on_change: Option<Callback<bool>>,
     children: Children,
 ) -> impl IntoView {
-    let final_class = ToggleStyle { variant, size }.with_class(class);
+    let final_class = ToggleStyle { variant, size }.with_class(&class);
 
     view! {
         <ToggleRoot
@@ -54,5 +54,15 @@ pub fn Toggle(
         >
             {children()}
         </ToggleRoot>
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(ToggleProps);
     }
 }

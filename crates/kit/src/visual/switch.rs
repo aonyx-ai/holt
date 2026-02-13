@@ -42,7 +42,7 @@ enum SwitchThumbSize {
 /// A styled switch component for toggling between checked and unchecked states
 #[component]
 pub fn Switch(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] size: SwitchSize,
     #[prop(optional)] checked: RwSignal<bool>,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
@@ -50,7 +50,7 @@ pub fn Switch(
     #[prop(optional_no_strip, into)] name: Option<&'static str>,
     #[prop(optional_no_strip)] on_change: Option<Callback<bool>>,
 ) -> impl IntoView {
-    let final_class = SwitchRootStyle { size }.with_class(class);
+    let final_class = SwitchRootStyle { size }.with_class(&class);
 
     let thumb_size = match size {
         SwitchSize::Sm => SwitchThumbSize::Sm,
@@ -69,7 +69,17 @@ pub fn Switch(
             class=final_class
             on_change=on_change
         >
-            <SwitchThumb class=Signal::stored(thumb_classes) />
+            <SwitchThumb class=thumb_classes />
         </SwitchRoot>
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(SwitchProps);
     }
 }

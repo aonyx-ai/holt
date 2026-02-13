@@ -42,7 +42,7 @@ impl SwitchContext {
 /// Root switch primitive that provides context and handles the underlying button
 #[component]
 pub fn SwitchRoot(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] checked: RwSignal<bool>,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     #[prop(optional_no_strip, into)] id: Option<&'static str>,
@@ -78,7 +78,7 @@ pub fn use_switch() -> SwitchContext {
 
 /// Switch thumb component that translates based on checked state
 #[component]
-pub fn SwitchThumb(#[prop(optional, into)] class: Signal<String>) -> impl IntoView {
+pub fn SwitchThumb(#[prop(optional, into)] class: String) -> impl IntoView {
     let context = use_switch();
 
     view! {
@@ -86,5 +86,15 @@ pub fn SwitchThumb(#[prop(optional, into)] class: Signal<String>) -> impl IntoVi
             class=class
             data-state=move || if context.is_checked() { "checked" } else { "unchecked" }
         />
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(SwitchRootProps, SwitchThumbProps);
     }
 }

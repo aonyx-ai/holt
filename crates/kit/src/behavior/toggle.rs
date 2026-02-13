@@ -42,7 +42,7 @@ impl ToggleContext {
 /// Root toggle primitive that provides context and handles the underlying button
 #[component]
 pub fn ToggleRoot(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] pressed: RwSignal<bool>,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     #[prop(optional_no_strip, into)] aria_label: Option<&'static str>,
@@ -76,4 +76,14 @@ pub fn ToggleRoot(
 /// Hook to access toggle context
 pub fn use_toggle() -> ToggleContext {
     use_context::<ToggleContext>().expect("use_toggle must be called within ToggleRoot")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(ToggleRootProps);
+    }
 }

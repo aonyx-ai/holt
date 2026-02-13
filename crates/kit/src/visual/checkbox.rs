@@ -24,7 +24,7 @@ pub enum CheckboxSize {
 
 #[component]
 pub fn Checkbox(
-    #[prop(optional)] class: &'static str,
+    #[prop(optional, into)] class: String,
     #[prop(optional)] size: CheckboxSize,
     #[prop(optional)] checked: RwSignal<bool>,
     #[prop(optional, into)] disabled: Signal<bool>,
@@ -32,7 +32,7 @@ pub fn Checkbox(
     #[prop(optional_no_strip, into)] name: Option<&'static str>,
     #[prop(optional_no_strip)] on_change: Option<Callback<bool>>,
 ) -> impl IntoView {
-    let final_class = CheckboxStyle { size }.with_class(class);
+    let final_class = CheckboxStyle { size }.with_class(&class);
 
     view! {
         <CheckboxRoot
@@ -54,5 +54,15 @@ pub fn Checkbox(
                 />
             </CheckboxIndicator>
         </CheckboxRoot>
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(CheckboxProps);
     }
 }

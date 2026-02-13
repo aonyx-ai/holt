@@ -1,7 +1,7 @@
-use crate::floating::{Align, FloatingOptions, Side, use_floating};
 use leptos::html::Div;
 use leptos::portal::Portal;
 use leptos::prelude::*;
+use leptos_floating::{Align, FloatingOptions, Side, use_floating};
 
 /// Select behavior context that manages state and interactions
 #[derive(Clone)]
@@ -92,7 +92,7 @@ pub fn use_select() -> SelectContext {
 /// Trigger button that opens/closes the select
 #[component]
 pub fn SelectTrigger(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(optional_no_strip, into)] id: Option<&'static str>,
     children: Children,
 ) -> impl IntoView {
@@ -121,7 +121,7 @@ pub fn SelectTrigger(
 /// Content area that shows when select is open
 #[component]
 pub fn SelectContent(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(into, default = Side::Bottom)] side: Side,
     #[prop(into, default = Align::Start)] align: Align,
     #[prop(into, default = 4.0)] side_offset: f64,
@@ -166,7 +166,7 @@ pub fn SelectContent(
 #[component]
 pub fn SelectItem(
     #[prop(into)] value: String,
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     children: Children,
 ) -> impl IntoView {
@@ -203,7 +203,7 @@ pub fn SelectItem(
 #[component]
 pub fn SelectValue(
     #[prop(optional_no_strip, into)] placeholder: Option<String>,
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
 ) -> impl IntoView {
     let context = use_select();
     let placeholder_text = placeholder.unwrap_or_default();
@@ -212,5 +212,20 @@ pub fn SelectValue(
         <span class=class>
             {move || context.get_value().unwrap_or_else(|| placeholder_text.clone())}
         </span>
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(
+            SelectTriggerProps,
+            SelectContentProps,
+            SelectItemProps,
+            SelectValueProps,
+        );
     }
 }

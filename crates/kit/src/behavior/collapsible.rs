@@ -15,7 +15,7 @@ impl CollapsibleContext {
 /// Root collapsible primitive that provides context
 #[component]
 pub fn CollapsibleRoot(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     open: RwSignal<bool>,
     children: Children,
 ) -> impl IntoView {
@@ -38,7 +38,7 @@ pub fn use_collapsible() -> CollapsibleContext {
 /// A trigger button that toggles the collapsible state
 #[component]
 pub fn CollapsibleTrigger(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     children: Children,
 ) -> impl IntoView {
@@ -68,7 +68,7 @@ pub fn CollapsibleTrigger(
 /// Content area that is shown/hidden based on state
 #[component]
 pub fn CollapsibleContent(
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)] class: String,
     children: ChildrenFn,
 ) -> impl IntoView {
     let ctx = use_collapsible();
@@ -82,4 +82,18 @@ pub fn CollapsibleContent(
         </div>
     }
     .into_any()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(
+            CollapsibleRootProps,
+            CollapsibleTriggerProps,
+            CollapsibleContentProps,
+        );
+    }
 }

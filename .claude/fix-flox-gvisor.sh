@@ -12,9 +12,9 @@
 
 set -euo pipefail
 
-# Detect gVisor
-if [ "$(hostname)" != "runsc" ]; then
-    echo "Not a gVisor environment (hostname=$(hostname)), skipping."
+# Detect remote/gVisor environment
+if [ "$CLAUDE_CODE_REMOTE" != "true" ] && [ "$(hostname)" != "runsc" ]; then
+    echo "Not a remote/gVisor environment, skipping."
     exit 0
 fi
 

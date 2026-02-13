@@ -47,7 +47,11 @@ If `just` commands fail because `flox activate` crashes with
 container. gVisor's pty implementation is incomplete, which breaks the
 Nix build log channel even though builds complete successfully.
 
-Run the fix script before doing anything else:
+A **SessionStart hook** (`.claude/settings.json`) automatically runs the fix
+on every new session when `$CLAUDE_CODE_REMOTE` is set. No manual action is
+needed for Claude Code web sessions.
+
+To run the fix manually:
 
 ```bash
 bash .claude/fix-flox-gvisor.sh

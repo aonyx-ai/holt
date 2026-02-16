@@ -64,7 +64,7 @@ pub fn SidebarProvider(
 
     view! {
         <div
-            class="group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar"
+            class="group/sidebar-wrapper flex h-full w-full overflow-hidden has-[[data-variant=inset]]:bg-sidebar"
             style="--sidebar-width: 16rem; --sidebar-width-icon: 3rem; --sidebar-width-mobile: 18rem"
         >
             {children()}

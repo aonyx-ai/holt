@@ -2764,10 +2764,11 @@ dependencies = [
 
 [[package]]
 name = "leptos-floating"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eed6c359758dbf5daf9df0fc9046c2df0cf218684670c2a204d51d02feeee45e"
 dependencies = [
  "leptos",
- "wasm-bindgen-test",
  "web-sys",
 ]
 

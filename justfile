@@ -1,3 +1,4 @@
+mod book "crates/book"
 mod kit-docs "crates/kit-docs"
 mod kit "crates/kit"
 

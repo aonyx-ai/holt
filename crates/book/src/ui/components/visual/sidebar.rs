@@ -19,6 +19,7 @@ pub enum SidebarSide {
 }
 
 #[derive(Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 pub enum SidebarCollapsible {
     OffCanvas,
     Icon,
@@ -58,7 +59,7 @@ pub fn Sidebar(
             format!(" {class}")
         };
         let mobile_classes = move || {
-            let mut classes = "fixed inset-y-0 z-50 flex h-svh w-[var(--sidebar-width-mobile)] flex-col bg-sidebar p-0 text-sidebar-foreground transition-transform".to_string();
+            let mut classes = "fixed inset-y-0 z-50 flex h-svh w-[var(--sidebar-width-mobile)] flex-col bg-sidebar p-0 text-sidebar-foreground shadow-xl transition-transform duration-200 ease-in-out".to_string();
 
             if !context.is_open() {
                 match side {
@@ -77,14 +78,25 @@ pub fn Sidebar(
             classes
         };
 
+        let overlay_classes = move || {
+            if context.is_open() {
+                "fixed inset-0 z-40 bg-black/50 transition-opacity duration-200 ease-in-out"
+            } else {
+                "fixed inset-0 z-40 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-200 ease-in-out"
+            }
+        };
+
         return view! {
-            <div
-                data-sidebar="sidebar"
-                data-mobile="true"
-                class=mobile_classes
-                style="var(--sidebar-width): SIDEBAR_WIDTH_MOBILE"
-            >
-                <div class="flex h-full w-full flex-col">{children()}</div>
+            <div class="md:hidden">
+                <div class=overlay_classes on:click=move |_| context.toggle()></div>
+                <div
+                    data-sidebar="sidebar"
+                    data-mobile="true"
+                    class=mobile_classes
+                    style="var(--sidebar-width): SIDEBAR_WIDTH_MOBILE"
+                >
+                    <div class="flex h-full w-full flex-col">{children()}</div>
+                </div>
             </div>
         }
         .into_any();
@@ -97,7 +109,7 @@ pub fn Sidebar(
             "collapsed"
         }
     };
-    let other_state = state.clone();
+    let other_state = state;
     let collapsible_value = move || {
         if other_state() == "collapsed" {
             match collapsible {

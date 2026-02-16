@@ -1,10 +1,9 @@
 use super::behavior::*;
 use super::visual::*;
 use leptos::prelude::*;
-use leptos_router::components::{Route, Routes};
+use leptos_router::components::Outlet;
 use leptos_router::hooks::use_params;
 use leptos_router::params::Params;
-use leptos_router::path;
 
 use crate::ui::app::BasePath;
 use crate::ui::components::markdown::Markdown;
@@ -21,13 +20,13 @@ struct VisualTestParams {
     variant_index: Option<String>,
 }
 
-/// Main storybook layout component
+/// Main storybook layout component — wraps child routes via `<Outlet />`
 #[component]
-pub fn Storybook() -> impl IntoView {
+pub fn StorybookLayout() -> impl IntoView {
     view! {
         <div class="flex h-full w-full overflow-hidden">
             <SidebarProvider>
-                <Sidebar collapsible=SidebarCollapsible::Icon variant=SidebarVariant::Sidebar>
+                <Sidebar variant=SidebarVariant::Sidebar>
                     <SidebarHeader>
                         <H1>H</H1>
                     </SidebarHeader>
@@ -37,24 +36,23 @@ pub fn Storybook() -> impl IntoView {
                 </Sidebar>
 
                 <SidebarInset>
-                    <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                        <SidebarTrigger class="-ml-1" />
-                        "Components"
-                    </header>
                     <div class="flex flex-1 flex-col overflow-hidden">
-                        <div class="flex-1 overflow-auto p-4">
-                            <Routes fallback=|| "not found">
-                                <Route path=path!("/") view=|| "no story selected" />
-                                <Route
-                                    path=path!("/story/:story_id")
-                                    view=move || view! { <StorybookStory /> }
-                                />
-                            </Routes>
-                        </div>
+                        <Outlet />
                     </div>
                 </SidebarInset>
             </SidebarProvider>
         </div>
+    }
+}
+
+/// Mobile-only header with sidebar trigger and optional story name
+#[component]
+pub fn MobileHeader(#[prop(optional)] story_name: Option<&'static str>) -> impl IntoView {
+    view! {
+        <header class="flex md:hidden h-14 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger class="-ml-1" />
+            {story_name.map(|name| view! { <span class="text-sm font-medium">{name}</span> })}
+        </header>
     }
 }
 
@@ -87,7 +85,7 @@ fn StorybookNavigation() -> impl IntoView {
 
 /// Component display area that shows the selected component and its variants
 #[component]
-fn StorybookStory() -> impl IntoView {
+pub fn StorybookStory() -> impl IntoView {
     let params = use_params::<StoryParams>();
 
     move || {
@@ -104,16 +102,26 @@ fn StorybookStory() -> impl IntoView {
                 .map_or_else(
                     || {
                         view! {
+                            <MobileHeader />
                             <div class="flex flex-col items-center justify-center h-full">
                                 <p class="text-center">Unknown story</p>
                             </div>
                         }
                         .into_any()
                     },
-                    |story| view! { <StoryVariantDisplay story=story /> }.into_any(),
+                    |story| {
+                        view! {
+                            <MobileHeader story_name=story.name />
+                            <div class="flex-1 overflow-auto p-4">
+                                <StoryVariantDisplay story=story />
+                            </div>
+                        }
+                        .into_any()
+                    },
                 )
         } else {
             view! {
+                <MobileHeader />
                 <div class="flex flex-col items-center justify-center h-full">
                     <p class="text-center">No story selected</p>
                 </div>

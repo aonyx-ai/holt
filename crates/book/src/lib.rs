@@ -1,6 +1,7 @@
 mod ui;
 
 pub use crate::ui::app::{App, AppProps};
+pub use crate::ui::components::behavior::SidebarContext;
 use crate::ui::story::init_story_registry;
 pub use crate::ui::story::{Story, StoryVariant};
 pub use const_format::concatcp;

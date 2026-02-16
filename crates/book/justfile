@@ -1,0 +1,8 @@
+set shell := ["flox", "activate", "--", "sh", "-cu"]
+
+[private]
+default:
+    @just --list --list-submodules
+
+test-e2e:
+    wasm-pack test --firefox --headless

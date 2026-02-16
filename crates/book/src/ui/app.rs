@@ -1,9 +1,9 @@
 use leptos::prelude::*;
 use leptos_meta::*;
-use leptos_router::components::{Route, Router, Routes};
+use leptos_router::components::{ParentRoute, Route, Router, Routes};
 use leptos_router::path;
 
-use crate::ui::components::{Storybook, VisualTestStory};
+use crate::ui::components::{MobileHeader, StorybookLayout, StorybookStory, VisualTestStory};
 #[cfg(feature = "ssr")]
 use crate::ui::story::Story;
 
@@ -90,7 +90,21 @@ pub fn App(#[prop(optional)] base: &'static str) -> impl IntoView {
                         path=path!("/visual-test/:story_id/:variant_index")
                         view=move || view! { <VisualTestStory /> }
                     />
-                    <Route path=path!("/*any") view=move || view! { <Storybook /> } />
+                    <ParentRoute path=path!("/") view=move || view! { <StorybookLayout /> }>
+                        <Route
+                            path=path!("/")
+                            view=|| {
+                                view! {
+                                    <MobileHeader />
+                                    <div class="flex-1 overflow-auto p-4">"no story selected"</div>
+                                }
+                            }
+                        />
+                        <Route
+                            path=path!("/story/:story_id")
+                            view=move || view! { <StorybookStory /> }
+                        />
+                    </ParentRoute>
                 </Routes>
             </Router>
         </div>

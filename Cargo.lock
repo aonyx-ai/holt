@@ -2192,12 +2192,11 @@ checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
 
 [[package]]
 name = "holt-book"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
  "const_format",
- "holt-kit",
  "holt-macros",
  "inventory",
  "leptos",
@@ -2212,7 +2211,7 @@ dependencies = [
 
 [[package]]
 name = "holt-cli"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "assert_cmd",
  "clawless",
@@ -2228,7 +2227,7 @@ dependencies = [
 
 [[package]]
 name = "holt-kit"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -2244,7 +2243,7 @@ dependencies = [
 
 [[package]]
 name = "holt-kit-docs"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "any_spawner",
  "console_error_panic_hook",
@@ -2269,7 +2268,7 @@ dependencies = [
 
 [[package]]
 name = "holt-macros"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "const_format",
  "holt-book",

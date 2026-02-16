@@ -3,6 +3,7 @@ name = "holt-kit-docs"
 
 version.workspace = true
 edition.workspace = true
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -30,7 +31,12 @@ image = { version = "0.25", optional = true, features = ["png"] }
 
 [features]
 default = ["csr"]
-csr = ["holt-book/csr", "leptos/csr"]
+csr = [
+  "holt-book/csr",
+  "leptos/csr",
+  "wasm-bindgen",
+  "console_error_panic_hook",
+]
 ssr = [
   "holt-book/ssr",
   "leptos/ssr",

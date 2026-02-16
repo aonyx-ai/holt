@@ -3,6 +3,9 @@ name = "holt-book"
 
 version.workspace = true
 edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [[bin]]
 name = "holt-book"
@@ -11,7 +14,6 @@ required-features = ["csr"]
 [dependencies]
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
-holt-kit = { path = "../kit" }
 inventory = "0.3.20"
 leptos = { workspace = true }
 leptos_router = { workspace = true }

@@ -3,6 +3,9 @@ name = "holt-macros"
 
 version.workspace = true
 edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [lib]
 proc-macro = true
@@ -13,6 +16,7 @@ syn = { version = ">=2.0.104,<3", default-features = false, features = [
   "full",
   "proc-macro",
   "printing",
+  "clone-impls",
 ] }
 quote = ">=1.0.40,<2"
 proc-macro2 = ">=1.0.95, <2"

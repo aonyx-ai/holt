@@ -3,6 +3,7 @@ name = "holt-kit"
 
 version.workspace = true
 edition.workspace = true
+publish = false
 
 [dependencies]
 leptos = { workspace = true }

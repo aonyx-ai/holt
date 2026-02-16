@@ -6,7 +6,7 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.package]
-version = "0.0.0"
+version = "0.1.0"
 edition = "2024"
 
 description = "A UI toolkit for Leptos"

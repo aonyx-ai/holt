@@ -4,6 +4,7 @@ use leptos::prelude::*;
 use super::super::behavior::SidebarContext;
 
 #[derive(Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 pub enum SidebarVariant {
     Sidebar,
     Floating,
@@ -11,6 +12,7 @@ pub enum SidebarVariant {
 }
 
 #[derive(Clone, Copy)]
+#[allow(dead_code)]
 pub enum SidebarSide {
     Left,
     Right,

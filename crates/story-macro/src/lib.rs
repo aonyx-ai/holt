@@ -38,7 +38,7 @@ use crate::{
 /// ```
 /// # use leptos::prelude::*;
 /// # use holt_book::StoryVariant;
-/// use holt_story_macro::{story, variant};
+/// use holt_macros::{story, variant};
 ///
 /// #[variant]
 /// fn default() {
@@ -57,7 +57,7 @@ use crate::{
 /// ```
 /// # use leptos::prelude::*;
 /// # use holt_book::StoryVariant;
-/// # use holt_story_macro::{story, variant};
+/// # use holt_macros::{story, variant};
 /// #
 /// # #[variant]
 /// # fn default() {
@@ -106,7 +106,7 @@ pub fn story(args: TS1, body: TS1) -> TS1 {
 ///
 /// ```
 /// # use leptos::prelude::*;
-/// use holt_story_macro::variant;
+/// use holt_macros::variant;
 ///
 /// #[variant]
 /// fn default() -> AnyView {

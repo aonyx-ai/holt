@@ -109,7 +109,7 @@ prettier fix="false" extension="*":
 
 # Publish crates to crates.io
 publish:
-    cargo publish -p holt-story-macro -v --all-features
+    cargo publish -p holt-macros -v --all-features
     cargo publish -p holt-book -v --all-features
     cargo publish -p holt-cli -v --all-features
 

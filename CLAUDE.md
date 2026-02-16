@@ -8,7 +8,7 @@ behavior/presentation separation.
 - **`holt-kit`** (`crates/ui/`) - Core UI library
 - **`holt-kit-docs`** (`crates/ui-book/`) - Storybook app
 - **`holt-book`** (`crates/book/`) - Storybook framework
-- **`holt-story-macro`** (`crates/story-macro/`) - Story macros
+- **`holt-macros`** (`crates/story-macro/`) - Story macros
 
 ## Development
 

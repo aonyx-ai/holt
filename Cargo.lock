@@ -2198,7 +2198,7 @@ dependencies = [
  "console_log",
  "const_format",
  "holt-kit",
- "holt-story-macro",
+ "holt-macros",
  "inventory",
  "leptos",
  "leptos_meta",
@@ -2268,7 +2268,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "holt-story-macro"
+name = "holt-macros"
 version = "0.0.0"
 dependencies = [
  "const_format",

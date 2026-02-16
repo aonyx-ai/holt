@@ -4,7 +4,7 @@ pub use crate::ui::app::{App, AppProps};
 use crate::ui::story::init_story_registry;
 pub use crate::ui::story::{Story, StoryVariant};
 pub use const_format::concatcp;
-pub use holt_story_macro::{story, variant};
+pub use holt_macros::{story, variant};
 pub use inventory::submit;
 
 #[cfg(feature = "ssr")]

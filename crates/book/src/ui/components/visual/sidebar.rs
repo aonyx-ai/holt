@@ -26,6 +26,13 @@ pub enum SidebarCollapsible {
     None,
 }
 
+/// Responsive sidebar that works with both CSR and SSR/hydration.
+///
+/// Renders a single DOM structure with responsive CSS classes so SSR output
+/// contains everything needed for both mobile and desktop viewports.
+///
+/// - **Mobile (<md):** fixed overlay with translate, backdrop, shadow
+/// - **Desktop (>=md):** static in-flow sidebar with collapsible width
 #[component]
 pub fn Sidebar(
     #[prop(optional, into)] class: String,
@@ -51,74 +58,11 @@ pub fn Sidebar(
         return view! { <div class=simple_classes>{children()}</div> }.into_any();
     }
 
-    let is_mobile = context.is_mobile.get();
-    if is_mobile {
-        let class_suffix = if class.is_empty() {
-            String::new()
-        } else {
-            format!(" {class}")
-        };
-        let mobile_classes = move || {
-            let mut classes = "fixed inset-y-0 z-50 flex h-svh w-[var(--sidebar-width-mobile)] flex-col bg-sidebar p-0 text-sidebar-foreground shadow-xl transition-transform duration-200 ease-in-out".to_string();
-
-            if !context.is_open() {
-                match side {
-                    SidebarSide::Left => classes.push_str(" -translate-x-full"),
-                    SidebarSide::Right => classes.push_str(" translate-x-full"),
-                }
-            }
-
-            match side {
-                SidebarSide::Left => classes.push_str(" left-0"),
-                SidebarSide::Right => classes.push_str(" right-0"),
-            }
-
-            classes.push_str(&class_suffix);
-
-            classes
-        };
-
-        let overlay_classes = move || {
-            if context.is_open() {
-                "fixed inset-0 z-40 bg-black/50 transition-opacity duration-200 ease-in-out"
-            } else {
-                "fixed inset-0 z-40 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-200 ease-in-out"
-            }
-        };
-
-        return view! {
-            <div class="md:hidden">
-                <div class=overlay_classes on:click=move |_| context.toggle()></div>
-                <div
-                    data-sidebar="sidebar"
-                    data-mobile="true"
-                    class=mobile_classes
-                    style="var(--sidebar-width): SIDEBAR_WIDTH_MOBILE"
-                >
-                    <div class="flex h-full w-full flex-col">{children()}</div>
-                </div>
-            </div>
-        }
-        .into_any();
-    }
-
     let state = move || {
         if context.is_open() {
             "expanded"
         } else {
             "collapsed"
-        }
-    };
-    let other_state = state;
-    let collapsible_value = move || {
-        if other_state() == "collapsed" {
-            match collapsible {
-                SidebarCollapsible::Icon => "icon",
-                SidebarCollapsible::OffCanvas => "offcanvas",
-                SidebarCollapsible::None => "",
-            }
-        } else {
-            ""
         }
     };
 
@@ -133,74 +77,84 @@ pub fn Sidebar(
         SidebarSide::Right => "right",
     };
 
-    let outer_classes = "group peer hidden text-sidebar-foreground md:block";
-
-    let gap_classes = move || {
-        let base = "relative w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear".to_string();
-        let mut classes = vec![base];
-
-        classes.push(String::from("group-data-[collapsible=offcanvas]:w-0"));
-        classes.push(String::from("group-data-[side=right]:rotate-180"));
-
-        match variant {
-            SidebarVariant::Floating | SidebarVariant::Inset => {
-                classes.push("group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+_theme(spacing.4))]".to_string());
-            }
-            _ => {
-                classes.push(
-                    "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]".to_string(),
-                );
-            }
+    // Overlay backdrop — only visible on mobile when sidebar is open
+    let overlay_classes = move || {
+        let base =
+            "fixed inset-0 z-40 bg-black/50 md:hidden transition-opacity duration-200 ease-in-out";
+        if context.is_open() {
+            base.to_string()
+        } else {
+            format!("{base} opacity-0 pointer-events-none")
         }
-
-        classes.join(" ")
     };
 
-    let sidebar_base_classes = {
-        let mut classes = vec![
-            "fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex".to_string()
-        ];
+    // Single sidebar element with responsive classes:
+    // Mobile: fixed overlay with translate-x to show/hide
+    // Desktop: static in-flow with width transition for collapse
+    let sidebar_classes = {
+        let class_extra = class;
+        move || {
+            let mut c = String::with_capacity(512);
 
-        match side {
-            SidebarSide::Left => {
-                classes.push("left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]".to_string());
+            // Base
+            c.push_str("peer flex h-svh flex-col bg-sidebar text-sidebar-foreground");
+
+            // Mobile: fixed overlay
+            c.push_str(" fixed inset-y-0 z-50 w-[var(--sidebar-width-mobile)] shadow-xl");
+            c.push_str(" transition-transform duration-200 ease-in-out");
+
+            // Mobile side
+            match side {
+                SidebarSide::Left => c.push_str(" left-0"),
+                SidebarSide::Right => c.push_str(" right-0"),
             }
-            SidebarSide::Right => {
-                classes.push("right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]".to_string());
+
+            // Mobile: hidden when closed
+            if !context.is_open() {
+                match side {
+                    SidebarSide::Left => c.push_str(" -translate-x-full"),
+                    SidebarSide::Right => c.push_str(" translate-x-full"),
+                }
             }
+
+            // Desktop: static in-flow, reset fixed positioning
+            c.push_str(" md:static md:z-auto md:translate-x-0 md:shadow-none");
+            c.push_str(" md:w-[var(--sidebar-width)] md:transition-[width] md:duration-200");
+
+            // Desktop: border
+            match (variant, side) {
+                (SidebarVariant::Floating | SidebarVariant::Inset, _) => {}
+                (_, SidebarSide::Left) => c.push_str(" md:border-r"),
+                (_, SidebarSide::Right) => c.push_str(" md:border-l"),
+            }
+
+            // Desktop: collapsed state
+            if !context.is_open() {
+                match collapsible {
+                    SidebarCollapsible::OffCanvas => {
+                        c.push_str(" md:w-0 md:overflow-hidden md:border-0");
+                    }
+                    SidebarCollapsible::Icon => {
+                        c.push_str(" md:w-[var(--sidebar-width-icon)]");
+                    }
+                    SidebarCollapsible::None => {}
+                }
+            }
+
+            if !class_extra.is_empty() {
+                c.push(' ');
+                c.push_str(&class_extra);
+            }
+
+            c
         }
-
-        match variant {
-            SidebarVariant::Floating | SidebarVariant::Inset => {
-                classes.push("p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+theme(spacing.4)+2px)]".to_string());
-            }
-            _ => {
-                classes.push("group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l".to_string());
-            }
-        }
-
-        if !class.is_empty() {
-            classes.push(class);
-        }
-
-        classes.join(" ")
     };
-
-    let content_classes = "flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow";
 
     view! {
-        <div
-            class=outer_classes
-            data-state=state
-            data-collapsible=collapsible_value
-            data-variant=variant_value
-            data-side=side_value
-        >
-            <div class=gap_classes></div>
-            <div class=sidebar_base_classes>
-                <div data-sidebar="sidebar" class=content_classes>
-                    {children()}
-                </div>
+        <div data-state=state data-variant=variant_value data-side=side_value>
+            <div class=overlay_classes on:click=move |_| context.toggle()></div>
+            <div data-sidebar="sidebar" class=sidebar_classes>
+                <div class="flex h-full w-full flex-col">{children()}</div>
             </div>
         </div>
     }
@@ -271,7 +225,8 @@ pub fn SidebarTrigger(#[prop(optional, into)] class: String) -> impl IntoView {
 #[component]
 pub fn SidebarInset(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = {
-        let mut classes = "relative flex w-full flex-1 flex-col bg-background".to_string();
+        let mut classes =
+            "relative flex w-full flex-1 flex-col bg-background overflow-auto".to_string();
         classes.push_str(" md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow");
 
         if !class.is_empty() {

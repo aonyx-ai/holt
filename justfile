@@ -107,6 +107,12 @@ lint-yaml:
 prettier fix="false" extension="*":
     prettier {{ if fix == "true" { "--write" } else { "--list-different" } }} --ignore-unknown "**/*.{{ extension }}"
 
+# Publish crates to crates.io
+publish:
+    cargo publish -p holt-macros -v --all-features
+    cargo publish -p holt-book -v --all-features
+    cargo publish -p holt-cli -v --all-features
+
 # Run the tests
 test-rust:
     cargo test --all-features --all-targets

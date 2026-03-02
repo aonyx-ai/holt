@@ -117,7 +117,7 @@ jobs:
 
       - name: Upload visual regression artifacts
         if: always() && steps.visual-regression.outputs.HAS_CHANGES == 'true'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: visual-regression-screenshots
           path: visual-regression-output/

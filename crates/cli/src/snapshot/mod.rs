@@ -9,7 +9,7 @@ use std::process::Command;
 
 use compare::prompt_user_approval;
 use doco::Mount;
-use holt_regression::{Comparison, StoryVariant, VariantOutcome};
+use holt_regression::{Comparison, VariantOutcome};
 
 const BASELINE_DIR: &str = "tests/visual-baselines";
 
@@ -17,6 +17,12 @@ const BASELINE_DIR: &str = "tests/visual-baselines";
 pub struct SnapshotConfig<'a> {
     pub book_path: &'a Path,
     pub stories_path: &'a Path,
+    /// Run the browser headless (no visible window).
+    pub headless: bool,
+    /// Save new and mismatched screenshots to the baseline directory.
+    pub save: bool,
+    /// Check mode: purely pass/fail, no saving, no prompts.
+    pub check: bool,
 }
 
 /// Run `trunk build` in the book path to produce `dist/`.
@@ -55,7 +61,6 @@ fn trunk_build(book_path: &Path) -> Result<std::path::PathBuf, String> {
 /// Run visual regression tests.
 pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
     let baseline_dir = config.book_path.join(BASELINE_DIR);
-    let is_ci = std::env::var("CI").is_ok();
 
     println!("Holt Visual Regression Testing");
     println!("================================\n");
@@ -84,7 +89,7 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
                 .cmd_arg("/index.html")
                 .build(),
         )
-        .headless(is_ci)
+        .headless(config.headless)
         .viewport(doco::Viewport::new(1280, 720))
         .build();
 
@@ -106,7 +111,7 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
     let mut failed = 0;
 
     for outcome in &result.outcomes {
-        match handle_outcome(outcome, &baseline_dir, is_ci) {
+        match handle_outcome(outcome, &baseline_dir, &config) {
             Ok(true) => passed += 1,
             Ok(false) => failed += 1,
             Err(e) => {
@@ -124,7 +129,7 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
     println!("\n================================");
     println!("Results: {} passed, {} failed", passed, failed);
 
-    if !is_ci {
+    if !config.check && !config.headless {
         let orphaned = holt_regression::cleanup_orphaned(&baseline_dir, &variants)
             .map_err(|e| e.to_string())?;
         if !orphaned.is_empty() {
@@ -147,7 +152,7 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
 fn handle_outcome(
     outcome: &VariantOutcome,
     baseline_dir: &Path,
-    is_ci: bool,
+    config: &SnapshotConfig<'_>,
 ) -> Result<bool, String> {
     let variant = &outcome.variant;
     let label = format!("{}/{}", variant.story_id, variant.name);
@@ -162,9 +167,14 @@ fn handle_outcome(
             Ok(true)
         }
         Ok(Comparison::New { screenshot }) => {
-            println!("  [new] {} (new baseline)", label);
-            holt_regression::save(baseline_dir, variant, screenshot).map_err(|e| e.to_string())?;
-            println!("  -> Baseline created (test will fail until committed)");
+            if config.save {
+                println!("  [new] {} (new baseline)", label);
+                holt_regression::save(baseline_dir, variant, screenshot)
+                    .map_err(|e| e.to_string())?;
+                println!("  -> Baseline created");
+            } else {
+                println!("  [FAIL] {} no baseline", label);
+            }
             Ok(false)
         }
         Ok(Comparison::Mismatch {
@@ -172,37 +182,34 @@ fn handle_outcome(
             screenshot,
         }) => {
             println!("  [FAIL] {} differs from baseline", label);
-            handle_mismatch(variant, baseline, screenshot, baseline_dir, is_ci)
+
+            if !config.save {
+                return Ok(false);
+            }
+
+            // Headless: save screenshot, no prompt
+            if config.headless {
+                holt_regression::save(baseline_dir, variant, screenshot)
+                    .map_err(|e| e.to_string())?;
+                println!("  -> New screenshot saved");
+                return Ok(false);
+            }
+
+            // Interactive: prompt for approval
+            let baseline_path = baseline_dir
+                .join(&variant.story_id)
+                .join(format!("{}.png", variant.name));
+            let approved = prompt_user_approval(variant, baseline, screenshot, &baseline_path)
+                .map_err(|e| e.to_string())?;
+            if approved {
+                holt_regression::save(baseline_dir, variant, screenshot)
+                    .map_err(|e| e.to_string())?;
+                println!("  -> Baseline updated");
+                Ok(true)
+            } else {
+                println!("  -> Baseline not updated");
+                Ok(false)
+            }
         }
-    }
-}
-
-fn handle_mismatch(
-    variant: &StoryVariant,
-    baseline: &[u8],
-    screenshot: &[u8],
-    baseline_dir: &Path,
-    is_ci: bool,
-) -> Result<bool, String> {
-    if is_ci {
-        holt_regression::save(baseline_dir, variant, screenshot).map_err(|e| e.to_string())?;
-        println!("  -> New screenshot saved for artifact upload");
-        return Ok(false);
-    }
-
-    let baseline_path = baseline_dir
-        .join(&variant.story_id)
-        .join(format!("{}.png", variant.name));
-
-    let approved = prompt_user_approval(variant, baseline, screenshot, &baseline_path)
-        .map_err(|e| e.to_string())?;
-
-    if approved {
-        holt_regression::save(baseline_dir, variant, screenshot).map_err(|e| e.to_string())?;
-        println!("  -> Baseline updated");
-        Ok(true)
-    } else {
-        println!("  -> Baseline not updated");
-        Ok(false)
     }
 }

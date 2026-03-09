@@ -10,6 +10,7 @@ permissions: {}
       - "crates/cli/**"
       - "crates/kit/**"
       - "crates/kit-docs/**"
+      - "crates/regression/**"
 
 concurrency:
   group: "visual-regression-${{ github.ref }}"
@@ -61,6 +62,19 @@ jobs:
           echo "Baselines from main:"
           tree crates/kit-docs/tests/visual-baselines/ || echo "No baselines in main"
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      - name: Build kit-docs Docker image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: .
+          file: crates/kit-docs/Dockerfile
+          load: true
+          tags: holt-kit-docs:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Build holt CLI
         run: |
           flox activate -- cargo build -p holt-cli --release
@@ -68,8 +82,6 @@ jobs:
       - name: Run visual regression tests
         id: visual-regression
         timeout-minutes: 20
-        env:
-          CI: true
         run: |
           # Create output directories for artifacts
           mkdir -p visual-regression-output/baseline
@@ -80,32 +92,36 @@ jobs:
             cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/baseline/ 2>/dev/null || true
           fi
 
-          # Run visual regression using holt CLI (uses holt.toml for config)
-          set +e  # Disable exit on error
+          # Run visual regression (saves new screenshots for artifact upload)
+          set +e
           flox activate -- cargo run -p holt-cli --release -- snapshot 2>&1 | tee visual-regression.log
           REGRESSION_EXIT_CODE=${PIPESTATUS[0]}
-          set -e  # Re-enable exit on error
+          set -e
+
+          # Fail fast if the snapshot command itself crashed (not a visual diff)
+          if [ $REGRESSION_EXIT_CODE -ne 0 ] && ! grep -q "\[ok\]\|\[FAIL\]\|\[new\]" visual-regression.log; then
+            echo "Snapshot command failed before producing any results"
+            cat visual-regression.log
+            exit 1
+          fi
 
           # Save new screenshots for artifact upload
           if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
             cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/new/ 2>/dev/null || true
           fi
 
-          # If visual regression found differences, check if they're already committed in PR
           if [ $REGRESSION_EXIT_CODE -ne 0 ]; then
             echo "Visual differences detected compared to main"
 
-            # Check if PR branch has baselines
+            # Check if PR branch already committed these baselines
             if [ -d "crates/kit-docs/tests/pr-baselines" ]; then
               echo "Checking if changes are already committed in PR branch..."
-
-              # Compare new screenshots with PR's committed baselines
-              if diff -r crates/kit-docs/tests/visual-baselines crates/kit-docs/tests/pr-baselines > /dev/null 2>&1; then
-                echo "✅ New screenshots match PR's committed baselines - changes already accepted!"
+              if diff -r visual-regression-output/new crates/kit-docs/tests/pr-baselines > /dev/null 2>&1; then
+                echo "New screenshots match PR's committed baselines - changes already accepted"
                 echo "HAS_CHANGES=false" >> "$GITHUB_OUTPUT"
                 exit 0
               else
-                echo "❌ New screenshots differ from PR's committed baselines"
+                echo "New screenshots differ from PR's committed baselines"
                 echo "HAS_CHANGES=true" >> "$GITHUB_OUTPUT"
                 exit 1
               fi

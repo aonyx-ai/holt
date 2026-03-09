@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout PR
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           persist-credentials: true
           fetch-depth: 0 # Fetch full history to allow checking out PR commits
@@ -117,7 +117,7 @@ jobs:
 
       - name: Upload visual regression artifacts
         if: always() && steps.visual-regression.outputs.HAS_CHANGES == 'true'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: visual-regression-screenshots
           path: visual-regression-output/
@@ -186,7 +186,7 @@ jobs:
 
       - name: Update PR comment
         if: always()
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           HAS_CHANGES: ${{ steps.visual-regression.outputs.HAS_CHANGES }}
         with:

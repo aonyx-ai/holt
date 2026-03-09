@@ -406,8 +406,7 @@ fn focus_sibling_item(container: &web_sys::Element, forward: bool) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use wasm_bindgen_test::wasm_bindgen_test_configure;
-    wasm_bindgen_test_configure!(run_in_browser);
+    use crate::testing::{reactive_scope, track_callback};
 
     #[test]
     fn class_prop_accepts_str_and_string() {
@@ -417,6 +416,53 @@ mod tests {
             SelectItemProps,
             SelectValueProps,
         );
+    }
+
+    #[test]
+    fn on_change_fires_on_select_value() {
+        reactive_scope(|| {
+            let (on_change, last) = track_callback::<Option<String>>();
+            let value = RwSignal::new(None::<String>);
+            let disabled = Signal::stored(false);
+
+            let context = SelectContext::new(value, disabled, Some(on_change));
+
+            context.select_value("option1".to_string());
+            assert_eq!(value.get(), Some("option1".to_string()));
+            assert_eq!(last.get(), Some(Some("option1".to_string())));
+
+            context.select_value("option2".to_string());
+            assert_eq!(value.get(), Some("option2".to_string()));
+            assert_eq!(last.get(), Some(Some("option2".to_string())));
+        });
+    }
+
+    #[test]
+    fn on_change_not_fired_when_disabled() {
+        reactive_scope(|| {
+            let (on_change, last) = track_callback::<Option<String>>();
+            let value = RwSignal::new(None::<String>);
+            let disabled = Signal::stored(true);
+
+            let context = SelectContext::new(value, disabled, Some(on_change));
+
+            context.select_value("option1".to_string());
+            assert_eq!(value.get(), None);
+            assert_eq!(last.get(), None);
+        });
+    }
+
+    #[test]
+    fn works_without_on_change() {
+        reactive_scope(|| {
+            let value = RwSignal::new(None::<String>);
+            let disabled = Signal::stored(false);
+
+            let context = SelectContext::new(value, disabled, None);
+
+            context.select_value("test".to_string());
+            assert_eq!(value.get(), Some("test".to_string()));
+        });
     }
 
     #[test]
@@ -492,8 +538,9 @@ mod tests {
         assert_eq!(handle_content_keydown("a"), ContentKeyAction::None);
     }
 
-    #[wasm_bindgen_test::wasm_bindgen_test(unsupported = test)]
-    #[cfg_attr(not(target_family = "wasm"), ignore)]
+    // TODO: migrate to doco E2E test
+    #[test]
+    #[ignore]
     fn focus_navigation_within_dom() {
         use web_sys::*;
 

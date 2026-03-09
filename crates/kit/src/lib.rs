@@ -10,4 +10,5 @@ macro_rules! assert_class_prop {
 }
 
 pub mod behavior;
+pub mod testing;
 pub mod visual;

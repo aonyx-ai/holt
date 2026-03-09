@@ -2583,14 +2583,16 @@ version = "0.1.0"
 dependencies = [
  "assert_cmd",
  "clawless",
+ "doco",
  "eframe",
+ "holt-book",
+ "holt-regression",
  "image",
+ "inventory",
  "predicates",
  "serde",
- "thirtyfour",
  "tokio",
  "toml",
- "ureq",
 ]
 
 [[package]]

@@ -1,17 +1,12 @@
 //! Image comparison UI for reviewing visual differences.
 
-use super::story::StoryVariant;
 use eframe::egui;
+use holt_regression::StoryVariant;
 use std::fs;
 use std::io::{self, Write as IoWrite};
 use std::path::Path;
 use std::process::Command;
 use std::sync::{Arc, Mutex, mpsc};
-
-/// Compares two images (simple byte comparison).
-pub fn images_match(img1: &[u8], img2: &[u8]) -> bool {
-    img1 == img2
-}
 
 /// egui app for comparing images.
 struct ImageCompareApp {

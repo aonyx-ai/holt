@@ -26,8 +26,8 @@ const_format = "0.2.34"
 holt-macros = "0.1.0"
 
 [dev-dependencies]
+holt-kit = { path = "../kit" }
 tempfile = "3.8"
-wasm-bindgen-test = { workspace = true }
 
 [features]
 default = ["csr"]

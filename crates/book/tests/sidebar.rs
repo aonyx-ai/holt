@@ -1,14 +1,10 @@
 use holt_book::SidebarContext;
+use holt_kit::testing::reactive_scope;
 use leptos::prelude::*;
-use wasm_bindgen_test::*;
 
-wasm_bindgen_test_configure!(run_in_browser);
-
-#[wasm_bindgen_test(unsupported = test)]
-#[cfg_attr(not(target_family = "wasm"), ignore)]
+#[test]
 fn sidebar_starts_open_by_default() {
-    let owner = Owner::new();
-    owner.with(|| {
+    reactive_scope(|| {
         let (is_open, _set_open) = signal(true);
         let (_is_mobile, _set_mobile) = signal(false);
 
@@ -22,11 +18,9 @@ fn sidebar_starts_open_by_default() {
     });
 }
 
-#[wasm_bindgen_test(unsupported = test)]
-#[cfg_attr(not(target_family = "wasm"), ignore)]
+#[test]
 fn sidebar_toggle_flips_open_state() {
-    let owner = Owner::new();
-    owner.with(|| {
+    reactive_scope(|| {
         let (is_open, set_open) = signal(true);
         let (is_mobile, _set_mobile) = signal(false);
 

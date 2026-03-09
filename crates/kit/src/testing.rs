@@ -45,6 +45,7 @@ pub fn reactive_scope<R>(f: impl FnOnce() -> R) -> R {
 ///
 /// ```
 /// use holt_kit::testing::{reactive_scope, track_callback};
+/// use leptos::prelude::*;
 ///
 /// reactive_scope(|| {
 ///     let (cb, last) = track_callback::<i32>();

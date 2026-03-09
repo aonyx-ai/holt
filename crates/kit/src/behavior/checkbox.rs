@@ -97,9 +97,57 @@ pub fn CheckboxIndicator(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::testing::{reactive_scope, track_callback};
 
     #[test]
     fn class_prop_accepts_str_and_string() {
         assert_class_prop!(CheckboxRootProps, CheckboxIndicatorProps);
+    }
+
+    #[test]
+    fn on_change_fires_on_toggle() {
+        reactive_scope(|| {
+            let (on_change, last) = track_callback::<bool>();
+            let checked = RwSignal::new(false);
+            let disabled = Signal::stored(false);
+
+            let context = CheckboxContext::new(checked, disabled, Some(on_change));
+
+            context.toggle();
+            assert!(checked.get());
+            assert_eq!(last.get(), Some(true));
+
+            context.toggle();
+            assert!(!checked.get());
+            assert_eq!(last.get(), Some(false));
+        });
+    }
+
+    #[test]
+    fn on_change_not_fired_when_disabled() {
+        reactive_scope(|| {
+            let (on_change, last) = track_callback::<bool>();
+            let checked = RwSignal::new(false);
+            let disabled = Signal::stored(true);
+
+            let context = CheckboxContext::new(checked, disabled, Some(on_change));
+
+            context.toggle();
+            assert!(!checked.get());
+            assert_eq!(last.get(), None);
+        });
+    }
+
+    #[test]
+    fn works_without_on_change() {
+        reactive_scope(|| {
+            let checked = RwSignal::new(false);
+            let disabled = Signal::stored(false);
+
+            let context = CheckboxContext::new(checked, disabled, None);
+
+            context.toggle();
+            assert!(checked.get());
+        });
     }
 }

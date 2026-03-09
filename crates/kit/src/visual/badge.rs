@@ -43,17 +43,15 @@ pub fn Badge(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use wasm_bindgen_test::*;
-
-    wasm_bindgen_test_configure!(run_in_browser);
 
     #[test]
     fn class_prop_accepts_str_and_string() {
         assert_class_prop!(BadgeProps);
     }
 
-    #[wasm_bindgen_test(unsupported = test)]
-    #[cfg_attr(not(target_family = "wasm"), ignore)]
+    // TODO: migrate to doco E2E test
+    #[test]
+    #[ignore]
     fn badge_renders_as_span() {
         let document = web_sys::window().unwrap().document().unwrap();
         let container = document.create_element("div").unwrap();

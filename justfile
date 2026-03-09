@@ -116,4 +116,5 @@ publish:
 
 # Run the tests
 test-rust:
-    cargo test --all-features --all-targets
+    cargo test --all-targets -p holt-kit -p holt-cli -p holt-macros
+    cargo test --all-targets -p holt-book -p holt-kit-docs --features ssr --no-default-features

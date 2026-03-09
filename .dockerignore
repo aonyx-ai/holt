@@ -1,0 +1,13 @@
+target/
+dist/
+node_modules/
+.git/
+.bin/
+.prettiercache
+.idea/
+.playwright-mcp/
+planning/
+result
+*.pdb
+**/*.rs.bk
+**/tests/visual-baselines/

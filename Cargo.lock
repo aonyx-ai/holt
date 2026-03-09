@@ -2187,7 +2187,7 @@ dependencies = [
  "console_log",
  "const_format",
  "holt-kit",
- "holt-macros 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "holt-macros",
  "inventory",
  "leptos",
  "leptos_meta",
@@ -2262,19 +2262,6 @@ dependencies = [
  "const_format",
  "holt-book",
  "leptos",
- "prettyplease",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "holt-macros"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85210f3767b1f90ff59caaa25c2883f76cedcea3a990aa2a4a03c477ff5f8ddf"
-dependencies = [
- "const_format",
  "prettyplease",
  "proc-macro2",
  "quote",

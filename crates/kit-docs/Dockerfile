@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------
 # Stage 1 – Build the kit-docs WASM app with Trunk
 # ---------------------------------------------------------------------------
-FROM rust:1.93-bookworm AS builder
+FROM rust:1.94-bookworm AS builder
 
 # Install wasm target
 RUN rustup target add wasm32-unknown-unknown

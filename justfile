@@ -28,9 +28,9 @@ pre-commit:
 check-docs:
     cargo doc --all-features --no-deps
 
-# Check features with cargo-hack
-check-features:
-    cargo hack --workspace --feature-powerset --mutually-exclusive-features csr,ssr,hydrate check --tests
+# Check features with cargo-hack [ci-partitions: 3]
+check-features partition="1/1":
+    cargo hack --workspace --feature-powerset --mutually-exclusive-features csr,ssr,hydrate --partition {{ partition }} check --tests
 
 # Check latest dependencies with cargo-update
 check-deps-latest:

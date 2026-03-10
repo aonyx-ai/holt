@@ -122,3 +122,7 @@ test-rust:
 # Run integration test with the example crate
 test-example:
     cd examples/basic && cargo run -p holt-cli -- snapshot --check
+
+# Run browser integration tests for the example crate
+test-example-e2e:
+    cd examples/basic && trunk build --release && cargo test --test e2e

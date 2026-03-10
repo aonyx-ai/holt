@@ -2598,9 +2598,13 @@ name = "holt-example-basic"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
+ "doco",
+ "futures",
  "holt-book",
  "inventory",
  "leptos",
+ "thirtyfour",
+ "tokio",
  "wasm-bindgen",
 ]
 

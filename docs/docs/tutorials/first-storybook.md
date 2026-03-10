@@ -29,7 +29,7 @@ Add dependencies to your `Cargo.toml`:
 [dependencies]
 leptos = "0.8"
 holt-kit = "0.1"
-holt = "0.1"
+holt-book = "0.1"
 ```
 
 ## Step 2: Set Up the Storybook Structure
@@ -121,11 +121,12 @@ pub use card::*;
 Stories showcase your component in different states. Create `stories/card.rs`:
 
 ```rust
-use holt_book::prelude::*;
+use holt_book::{story, variant};
 use crate::components::*;
+use leptos::prelude::*;
 
-#[story]
-pub fn CardDefault() -> impl IntoView {
+#[variant]
+fn default() -> AnyView {
     view! {
         <Card>
             <CardHeader>
@@ -135,11 +136,11 @@ pub fn CardDefault() -> impl IntoView {
                 <p>"Card content goes here."</p>
             </CardContent>
         </Card>
-    }
+    }.into_any()
 }
 
-#[story]
-pub fn CardWithCustomClass() -> impl IntoView {
+#[variant]
+fn fixed_width() -> AnyView {
     view! {
         <Card class="w-96">
             <CardHeader>
@@ -149,37 +150,28 @@ pub fn CardWithCustomClass() -> impl IntoView {
                 <p>"This card has a fixed width of 24rem."</p>
             </CardContent>
         </Card>
-    }
+    }.into_any()
 }
 
-#[story]
-pub fn CardMinimal() -> impl IntoView {
+#[variant]
+fn minimal() -> AnyView {
     view! {
         <Card>
             <CardContent>
                 <p>"A card with just content, no header."</p>
             </CardContent>
         </Card>
-    }
+    }.into_any()
 }
+
+/// A container for grouping related content
+#[story(id = "card", name = "Card")]
+const CARD_STORY: () = &[default, fixed_width, minimal];
 ```
 
-Register stories in `stories/mod.rs`:
-
-```rust
-mod card;
-pub use card::*;
-
-use holt_book::prelude::*;
-
-pub fn register_stories() -> Stories {
-    stories![
-        CardDefault,
-        CardWithCustomClass,
-        CardMinimal,
-    ]
-}
-```
+Stories are registered automatically — no manual registration step needed. Just
+make sure the module is included somewhere in your crate so the `#[story]` macro
+can run.
 
 ## Step 5: Configure and Run the Storybook
 
@@ -216,11 +208,11 @@ all its variants in the sidebar.
 With the server running, edit your component or stories. Changes appear
 automatically thanks to hot reloading.
 
-Try adding a new variant:
+Try adding a new variant to your story:
 
 ```rust
-#[story]
-pub fn CardHighlighted() -> impl IntoView {
+#[variant]
+fn highlighted() -> AnyView {
     view! {
         <Card class="border-primary">
             <CardHeader>
@@ -230,11 +222,18 @@ pub fn CardHighlighted() -> impl IntoView {
                 <p>"This card has a highlighted border."</p>
             </CardContent>
         </Card>
-    }
+    }.into_any()
 }
 ```
 
-The new story appears in the sidebar immediately.
+Then add `highlighted` to your story's variant array:
+
+```rust
+#[story(id = "card", name = "Card")]
+const CARD_STORY: () = &[default, fixed_width, minimal, highlighted];
+```
+
+The new variant appears in the storybook automatically.
 
 ## Next Steps
 

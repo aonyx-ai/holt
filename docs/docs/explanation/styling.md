@@ -20,14 +20,16 @@ Holt uses Tailwind CSS via `tailwind_fuse` for type-safe, composable styling.
 Components use a variant system for consistent styling:
 
 ```rust
-use holt_kit::prelude::*;
+use holt_kit::visual::*;
 
 // Different visual variants
 view! {
-    <Button variant=ButtonVariant::Primary>"Primary"</Button>
+    <Button>"Default"</Button>
     <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
     <Button variant=ButtonVariant::Destructive>"Destructive"</Button>
+    <Button variant=ButtonVariant::Outline>"Outline"</Button>
     <Button variant=ButtonVariant::Ghost>"Ghost"</Button>
+    <Button variant=ButtonVariant::Link>"Link"</Button>
 }
 ```
 
@@ -38,8 +40,9 @@ Components support size variations:
 ```rust
 view! {
     <Button size=ButtonSize::Sm>"Small"</Button>
-    <Button size=ButtonSize::Md>"Medium"</Button>
+    <Button>"Default"</Button>
     <Button size=ButtonSize::Lg>"Large"</Button>
+    <Button size=ButtonSize::Icon>"🔍"</Button>
 }
 ```
 

@@ -128,7 +128,7 @@ Create a toggle button to switch themes:
 
 ```rust
 use leptos::prelude::*;
-use holt_kit::prelude::*;
+use holt_kit::visual::*;
 
 #[component]
 pub fn ThemeToggle() -> impl IntoView {

@@ -12,7 +12,7 @@ approaches, from quick overrides to full component modifications.
 Every Holt component accepts a `class` prop for adding or overriding styles:
 
 ```rust
-use holt_kit::prelude::*;
+use holt_kit::visual::*;
 
 view! {
     // Add rounded corners
@@ -66,7 +66,7 @@ let base_classes = "inline-flex items-center justify-center rounded-xl text-base
 Import your modified component instead of Holt's:
 
 ```rust
-// Instead of: use holt_kit::prelude::*;
+// Instead of: use holt_kit::visual::*;
 use crate::components::button::Button;
 ```
 
@@ -82,10 +82,12 @@ Add a new enum variant:
 #[derive(Default, Clone, Copy)]
 pub enum ButtonVariant {
     #[default]
-    Primary,
-    Secondary,
+    Default,
     Destructive,
+    Outline,
+    Secondary,
     Ghost,
+    Link,
     // Your new variant
     Gradient,
 }
@@ -98,10 +100,12 @@ Update the style function:
 ```rust
 fn button_variant_classes(variant: ButtonVariant) -> &'static str {
     match variant {
-        ButtonVariant::Primary => "bg-primary text-primary-foreground hover:bg-primary/90",
-        ButtonVariant::Secondary => "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ButtonVariant::Default => "bg-primary text-primary-foreground hover:bg-primary/90",
         ButtonVariant::Destructive => "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        ButtonVariant::Outline => "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        ButtonVariant::Secondary => "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ButtonVariant::Ghost => "hover:bg-accent hover:text-accent-foreground",
+        ButtonVariant::Link => "text-primary underline-offset-4 hover:underline",
         // New variant
         ButtonVariant::Gradient => "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600",
     }

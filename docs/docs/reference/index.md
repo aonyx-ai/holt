@@ -15,7 +15,7 @@ Complete reference for the `holt` command-line interface:
 
 - `serve` - Run development server
 - `build` - Build static storybook
-- `init` - Initialize new storybook
+- `snapshot` - Run snapshot tests
 
 ### [Story Macro](/docs/reference/story-macro)
 

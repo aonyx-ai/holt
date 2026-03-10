@@ -4,226 +4,123 @@ sidebar_position: 2
 
 # Story Macro
 
-The `#[story]` attribute macro registers Leptos components as stories in Holt
-Book.
+The `#[story]` and `#[variant]` attribute macros define stories and their
+variants in Holt Book. Stories are registered automatically via the `inventory`
+crate — no manual registration step is needed.
 
 ## Basic Usage
 
-Apply `#[story]` to a function that returns `impl IntoView`:
+A story consists of one or more **variant functions** annotated with
+`#[variant]` and a **story constant** annotated with `#[story]`.
 
 ```rust
-use holt_book::prelude::*;
+use holt_book::{story, variant};
+use holt_kit::visual::Button;
 use leptos::prelude::*;
 
-#[story]
-pub fn ButtonDefault() -> impl IntoView {
+#[variant]
+fn default() -> AnyView {
+    view! { <Button>"Click me!"</Button> }.into_any()
+}
+
+#[variant]
+fn secondary() -> AnyView {
     view! {
-        <Button>"Click me"</Button>
-    }
+        <Button variant=ButtonVariant::Secondary>"Click me!"</Button>
+    }.into_any()
 }
+
+/// Buttons are for clicking and doing button things
+#[story(id = "button", name = "Button")]
+const BUTTON_STORY: () = &[default, secondary];
 ```
 
-The function name becomes the story name in the UI, converted from `PascalCase`
-to a readable format (e.g., `ButtonDefault` becomes "Button Default").
+## `#[variant]`
 
-## Story Metadata
-
-Add metadata attributes to customize how stories appear:
-
-### `name`
-
-Override the display name:
+Applied to a function that returns `AnyView`. Each variant function represents
+one visual state of the component.
 
 ```rust
-#[story(name = "Primary Button")]
-pub fn ButtonPrimary() -> impl IntoView {
+#[variant]
+fn outline() -> AnyView {
     view! {
-        <Button variant=ButtonVariant::Primary>"Primary"</Button>
-    }
+        <Button variant=ButtonVariant::Outline>"Click me!"</Button>
+    }.into_any()
 }
 ```
 
-### `description`
+Variant functions take no arguments and must return `AnyView` (use `.into_any()`
+on the `view!` result).
 
-Add a description shown in the story panel:
+## `#[story]`
+
+Applied to a `const` that references an array of variant functions. The macro
+accepts these attributes:
+
+| Attribute    | Required | Description                                      |
+| ------------ | -------- | ------------------------------------------------ |
+| `id`         | yes      | Unique identifier used in URLs and snapshots     |
+| `name`       | yes      | Display name shown in the storybook sidebar      |
+| `extra_docs` | no       | Additional documentation (typically source code) |
 
 ```rust
-#[story(description = "The default button style used for most actions")]
-pub fn ButtonDefault() -> impl IntoView {
+#[story(id = "button", name = "Button")]
+const BUTTON_STORY: () = &[default, outline, destructive];
+```
+
+The const's **doc comment** becomes the story description displayed in the UI:
+
+```rust
+/// Buttons are for clicking and doing button things
+#[story(id = "button", name = "Button")]
+const BUTTON_STORY: () = &[default, outline];
+```
+
+## Source Code Display
+
+Stories can optionally include their own source code in the UI. This uses a
+build-time `include!` macro that pulls in a generated file:
+
+```rust
+include!(concat!(env!("OUT_DIR"), "/stories/button_source.rs"));
+
+#[story(id = "button", name = "Button", extra_docs = BUTTON_SOURCE)]
+const BUTTON_STORY: () = &[default, outline];
+```
+
+The `extra_docs` attribute references a constant produced by the build script.
+This is an advanced feature used in the Holt Kit storybook itself — most stories
+don't need it.
+
+## Complete Example
+
+From the Holt Kit storybook (`crates/kit-docs/src/stories/button.rs`):
+
+```rust
+use holt_book::{story, variant};
+use holt_kit::visual::{Button, ButtonVariant};
+use leptos::prelude::*;
+
+#[variant]
+fn default() -> AnyView {
+    view! { <Button>"Click me!"</Button> }.into_any()
+}
+
+#[variant]
+fn outline() -> AnyView {
     view! {
-        <Button>"Default"</Button>
-    }
+        <Button variant=ButtonVariant::Outline>"Click me!"</Button>
+    }.into_any()
 }
-```
 
-### `category`
-
-Group stories by category:
-
-```rust
-#[story(category = "Forms")]
-pub fn InputText() -> impl IntoView {
+#[variant]
+fn destructive() -> AnyView {
     view! {
-        <Input placeholder="Enter text..." />
-    }
+        <Button variant=ButtonVariant::Destructive>"Click me!"</Button>
+    }.into_any()
 }
 
-#[story(category = "Forms")]
-pub fn InputPassword() -> impl IntoView {
-    view! {
-        <Input type_="password" placeholder="Password" />
-    }
-}
-```
-
-Stories with the same category appear together in the sidebar.
-
-### Combining Attributes
-
-Attributes can be combined:
-
-```rust
-#[story(
-    name = "Destructive Action",
-    category = "Buttons",
-    description = "Use for dangerous actions like delete"
-)]
-pub fn ButtonDestructive() -> impl IntoView {
-    view! {
-        <Button variant=ButtonVariant::Destructive>"Delete"</Button>
-    }
-}
-```
-
-## Multiple Variants
-
-Show multiple variants in a single story:
-
-```rust
-#[story(name = "All Variants")]
-pub fn ButtonVariants() -> impl IntoView {
-    view! {
-        <div class="flex gap-4">
-            <Button variant=ButtonVariant::Primary>"Primary"</Button>
-            <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
-            <Button variant=ButtonVariant::Destructive>"Destructive"</Button>
-            <Button variant=ButtonVariant::Ghost>"Ghost"</Button>
-        </div>
-    }
-}
-```
-
-## Interactive Stories
-
-Stories can include state and interactivity:
-
-```rust
-#[story(name = "Counter Button")]
-pub fn ButtonCounter() -> impl IntoView {
-    let count = RwSignal::new(0);
-
-    view! {
-        <Button on:click=move |_| count.update(|n| *n += 1)>
-            "Clicked: " {count}
-        </Button>
-    }
-}
-```
-
-## Registering Stories
-
-Stories must be registered to appear in the storybook. Create a registration
-function:
-
-```rust
-// stories/mod.rs
-mod button;
-mod card;
-mod input;
-
-pub use button::*;
-pub use card::*;
-pub use input::*;
-
-use holt_book::prelude::*;
-
-pub fn register_stories() -> Stories {
-    stories![
-        // Button stories
-        ButtonDefault,
-        ButtonPrimary,
-        ButtonVariants,
-        ButtonCounter,
-
-        // Card stories
-        CardDefault,
-        CardWithHeader,
-
-        // Input stories
-        InputText,
-        InputPassword,
-    ]
-}
-```
-
-The `stories!` macro collects stories into a `Stories` collection.
-
-## Story Context
-
-Access the story context for advanced use cases:
-
-```rust
-#[story]
-pub fn ResponsiveComponent() -> impl IntoView {
-    let ctx = use_story_context();
-
-    view! {
-        <div class="p-4" style:width=ctx.viewport_width>
-            <Card>"Responsive content"</Card>
-        </div>
-    }
-}
-```
-
-Context provides:
-
-- `viewport_width` - Current viewport width
-- `viewport_height` - Current viewport height
-- `dark_mode` - Whether dark mode is active
-
-## Generated Code
-
-The `#[story]` macro generates:
-
-1. A struct implementing the `Story` trait
-2. Registration in the story registry
-3. Metadata accessors
-
-For a story like:
-
-```rust
-#[story(name = "My Button", category = "Buttons")]
-pub fn ButtonExample() -> impl IntoView {
-    view! { <Button>"Example"</Button> }
-}
-```
-
-The macro generates approximately:
-
-```rust
-pub struct ButtonExample;
-
-impl Story for ButtonExample {
-    fn name(&self) -> &'static str {
-        "My Button"
-    }
-
-    fn category(&self) -> Option<&'static str> {
-        Some("Buttons")
-    }
-
-    fn render(&self) -> impl IntoView {
-        view! { <Button>"Example"</Button> }
-    }
-}
+/// Buttons are for clicking and doing button things
+#[story(id = "button", name = "Button")]
+const BUTTON_STORY: () = &[default, outline, destructive];
 ```

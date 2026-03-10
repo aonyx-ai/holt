@@ -1599,9 +1599,9 @@ dependencies = [
 
 [[package]]
 name = "doco"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de98238fd36035160174bac56d993cb7f1999bc375567038d589220cfb0d995e"
+checksum = "034f2e1a9cbf240e3ef40318c55a78211fb481bea6df7efe1aa15fd695398074"
 dependencies = [
  "anyhow",
  "doco-derive",
@@ -1617,9 +1617,9 @@ dependencies = [
 
 [[package]]
 name = "doco-derive"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0664357e25cb3498c61694497ee8a28209c44238b098f385d422e1bf51068008"
+checksum = "313d3906a414e01efbf6fcce14877dc9af706cdbe2f84e9f4c4625559810c10e"
 dependencies = [
  "quote",
  "syn",
@@ -2652,6 +2652,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "doco",
+ "regex",
  "tempfile",
  "thiserror 2.0.17",
  "tokio",

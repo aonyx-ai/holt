@@ -118,3 +118,7 @@ publish:
 test-rust:
     cargo test --all-targets -p holt-kit -p holt-cli -p holt-regression -p holt-macros
     cargo test --all-targets -p holt-book -p holt-kit-docs --features ssr --no-default-features
+
+# Run integration test with the example crate
+test-example:
+    cd examples/basic && cargo run -p holt-cli -- snapshot --check

@@ -2594,6 +2594,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "holt-example-basic"
+version = "0.1.0"
+dependencies = [
+ "console_error_panic_hook",
+ "holt-book",
+ "inventory",
+ "leptos",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "holt-kit"
 version = "0.1.0"
 dependencies = [

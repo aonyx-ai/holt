@@ -12,10 +12,8 @@ path = "src/main.rs"
 
 [dependencies]
 clawless = "0.5"
-doco = "0.2.2"
+doco = "0.2.3"
 eframe = "0.33"
-holt-book = { path = "../book", default-features = false }
-inventory = "0.3"
 holt-regression = { path = "../regression" }
 image = { version = "0.25", features = ["png"] }
 serde = { version = "1", features = ["derive"] }

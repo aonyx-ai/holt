@@ -86,7 +86,7 @@ format-yaml fix="false": (prettier fix "{yaml,yml}")
 
 # Lint GitHub Actions workflows
 lint-github-actions:
-    zizmor -p .
+    zizmor -p -c .zizmor.yml .
 
 # Lint Markdown files
 lint-markdown:

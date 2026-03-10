@@ -7,13 +7,17 @@ name: Continuous Integration
 
 permissions: {}
 
+concurrency:
+  group: "ci-${{ github.ref }}"
+  cancel-in-progress: true
+
 jobs:
   targets:
     name: Enumerate Just recipes
     runs-on: warp-ubuntu-latest-x64-2x
 
     permissions:
-      contents: read
+      contents: read # Checkout code
 
     outputs:
       matrix: ${{ steps.export-targets.outputs.targets }}
@@ -38,8 +42,8 @@ jobs:
     runs-on: warp-ubuntu-latest-x64-2x
 
     permissions:
-      packages: write
-      contents: read
+      packages: write # Push Docker images for visual regression
+      contents: read # Checkout code
 
     needs: targets
 
@@ -57,7 +61,7 @@ jobs:
       - name: Install Flox
         uses: flox/install-flox-action@9428713e8d3883274c334b4b95b8830beebd24d2 # 2.3.0
         with:
-          version: 1.6.1
+          version: 1.9.1
 
       - name: Remove Flox installer (if it exists)
         run: rm -f flox.x86_64-linux.deb

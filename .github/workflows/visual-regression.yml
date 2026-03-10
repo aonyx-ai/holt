@@ -11,13 +11,17 @@ permissions: {}
       - "crates/kit/**"
       - "crates/kit-docs/**"
 
+concurrency:
+  group: "visual-regression-${{ github.ref }}"
+  cancel-in-progress: true
+
 jobs:
   visual-regression:
     name: Visual Regression
     runs-on: warp-ubuntu-latest-x64-2x
     permissions:
-      pull-requests: write
-      contents: read
+      pull-requests: write # Post regression report comments
+      contents: read # Checkout code
 
     steps:
       - name: Checkout PR
@@ -29,7 +33,7 @@ jobs:
       - name: Install Flox
         uses: flox/install-flox-action@9428713e8d3883274c334b4b95b8830beebd24d2 # 2.3.0
         with:
-          version: 1.6.1
+          version: 1.9.1
 
       - name: Remove Flox installer (if it exists)
         run: rm -f flox.x86_64-linux.deb

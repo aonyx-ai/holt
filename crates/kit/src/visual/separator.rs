@@ -1,16 +1,11 @@
 use leptos::prelude::*;
 
 /// Orientation options for the separator
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Default, PartialEq)]
 pub enum Orientation {
+    #[default]
     Horizontal,
     Vertical,
-}
-
-impl Default for Orientation {
-    fn default() -> Self {
-        Self::Horizontal
-    }
 }
 
 /// A separator or divider that can be used to separate content

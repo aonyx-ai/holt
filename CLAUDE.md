@@ -40,6 +40,40 @@ These are installed via Flox.
 - Tailwind CSS via `tailwind_fuse`
 - `cargo install just trunk wasm-pack`
 
+## Releases
+
+Releases follow [Keep a Changelog](https://keepachangelog.com/) and
+[Semantic Versioning](https://semver.org/).
+
+1. Update `CHANGELOG.md`: move items from `[Unreleased]` into a new version
+   section dated today.
+2. Bump the version in the root `Cargo.toml` `[workspace.package]`.
+3. Run `cargo check` to update `Cargo.lock`.
+4. Commit, open a PR, and merge.
+5. Create a GitHub release with tag `vX.Y.Z` targeting main. The release
+   workflow automatically publishes to crates.io (`just publish` runs
+   `holt-macros` first, then `holt-book`, then `holt-cli`).
+
+Published crates: `holt-macros`, `holt-book`, `holt-cli`. The `holt-kit`,
+`holt-kit-docs`, `holt-regression`, and example crates are `publish = false`.
+
+### Labels
+
+PRs are categorized in release notes using these labels:
+
+| Label          | Release notes section |
+| -------------- | --------------------- |
+| `R-added`      | Added                 |
+| `R-changed`    | Changed               |
+| `R-deprecated` | Deprecated            |
+| `R-removed`    | Removed               |
+| `R-fixed`      | Fixed                 |
+| `R-security`   | Security              |
+| `R-ignore`     | Excluded              |
+
+Area labels: `A-kit`, `A-book`, `A-macros`, `A-cli`, `A-docs`,
+`A-github-actions`.
+
 ## gVisor / Cloud Sandbox Environments
 
 If `just` commands fail because `flox activate` crashes with

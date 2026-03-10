@@ -13,6 +13,8 @@ pub struct Config {
 pub struct BookConfig {
     #[serde(default = "default_book_path")]
     pub path: PathBuf,
+    #[serde(default = "default_stories_path")]
+    pub stories: PathBuf,
 }
 
 #[derive(Debug, Deserialize)]
@@ -27,6 +29,10 @@ fn default_book_path() -> PathBuf {
     PathBuf::from(".")
 }
 
+fn default_stories_path() -> PathBuf {
+    PathBuf::from("src/stories")
+}
+
 fn default_port() -> u16 {
     8080
 }
@@ -35,6 +41,7 @@ impl Default for BookConfig {
     fn default() -> Self {
         Self {
             path: default_book_path(),
+            stories: default_stories_path(),
         }
     }
 }

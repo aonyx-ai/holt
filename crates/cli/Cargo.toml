@@ -12,13 +12,13 @@ path = "src/main.rs"
 
 [dependencies]
 clawless = "0.5"
+doco = "0.2.3"
+eframe = "0.33"
+holt-regression = { path = "../regression" }
+image = { version = "0.25", features = ["png"] }
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["process", "rt-multi-thread", "macros"] }
 toml = "0.9"
-thirtyfour = "0.36.0"
-eframe = "0.33"
-image = { version = "0.25", features = ["png"] }
-ureq = "3.0"
 
 [dev-dependencies]
 assert_cmd = "2"

@@ -11,6 +11,8 @@ use compare::prompt_user_approval;
 use doco::Mount;
 use holt_regression::{Comparison, VariantOutcome};
 
+static CADDYFILE: &str = include_str!("Caddyfile");
+
 const BASELINE_DIR: &str = "tests/visual-baselines";
 
 /// Configuration for running visual regression tests.
@@ -71,22 +73,23 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
         .to_str()
         .ok_or_else(|| "dist path is not valid UTF-8".to_string())?;
 
+    // Write the Caddyfile to a temp path for the Docker bind mount
+    let caddyfile_path = std::env::temp_dir().join("holt-Caddyfile");
+    std::fs::write(&caddyfile_path, CADDYFILE)
+        .map_err(|e| format!("Failed to write Caddyfile: {e}"))?;
+    let caddyfile_str = caddyfile_path
+        .to_str()
+        .ok_or_else(|| "Caddyfile path is not valid UTF-8".to_string())?;
+
     let doco = doco::Doco::builder()
         .server(
             doco::Server::builder()
                 .image("caddy")
                 .tag("alpine")
                 .port(80)
+                .wait(doco::WaitFor::message_on_stderr("server running"))
                 .mount(Mount::bind_mount(dist_str, "/srv"))
-                .cmd_arg("caddy")
-                .cmd_arg("file-server")
-                .cmd_arg("--root")
-                .cmd_arg("/srv")
-                .cmd_arg("--listen")
-                .cmd_arg(":80")
-                .cmd_arg("--try-files")
-                .cmd_arg("{path}")
-                .cmd_arg("/index.html")
+                .mount(Mount::bind_mount(caddyfile_str, "/etc/caddy/Caddyfile"))
                 .build(),
         )
         .headless(config.headless)

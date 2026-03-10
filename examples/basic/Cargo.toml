@@ -1,0 +1,19 @@
+[package]
+name = "holt-example-basic"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+holt-book = { path = "../../crates/book" }
+leptos = { workspace = true }
+inventory = "0.3.20"
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1.7"
+
+[features]
+default = ["csr"]
+csr = ["holt-book/csr", "leptos/csr"]

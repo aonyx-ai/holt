@@ -1,0 +1,15 @@
+[package]
+name = "holt-regression"
+
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+anyhow = "1"
+doco = "0.2.2"
+thiserror = "2"
+tokio = { version = "1", features = ["time"] }
+
+[dev-dependencies]
+tempfile = "3"

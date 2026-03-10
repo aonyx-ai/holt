@@ -30,7 +30,7 @@ check-docs:
 
 # Check features with cargo-hack
 check-features:
-    cargo hack --workspace --feature-powerset check --tests
+    cargo hack --workspace --feature-powerset --mutually-exclusive-features csr,ssr,hydrate check --tests
 
 # Check latest dependencies with cargo-update
 check-deps-latest:

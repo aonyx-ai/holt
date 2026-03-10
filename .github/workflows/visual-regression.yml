@@ -5,12 +5,6 @@ permissions: {}
 
 "on":
   pull_request:
-    paths:
-      - "crates/book/**"
-      - "crates/cli/**"
-      - "crates/kit/**"
-      - "crates/kit-docs/**"
-      - "crates/regression/**"
 
 concurrency:
   group: "visual-regression-${{ github.ref }}"
@@ -31,15 +25,33 @@ jobs:
           persist-credentials: true
           fetch-depth: 0 # Fetch full history to allow checking out PR commits
 
+      - name: Check for relevant changes
+        id: changed-files
+        uses: tj-actions/changed-files@666c9d29fba3ec8116a7f2003c8e4235e89e3e8e # v46
+        with:
+          files: |
+            crates/book/**
+            crates/cli/**
+            crates/kit/**
+            crates/kit-docs/**
+            crates/regression/**
+
+      - name: Skip if no relevant changes
+        if: steps.changed-files.outputs.any_changed != 'true'
+        run: echo "No visual-regression-relevant files changed — skipping."
+
       - name: Install Flox
+        if: steps.changed-files.outputs.any_changed == 'true'
         uses: flox/install-flox-action@9428713e8d3883274c334b4b95b8830beebd24d2 # 2.3.0
         with:
           version: 1.9.1
 
       - name: Remove Flox installer (if it exists)
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: rm -f flox.x86_64-linux.deb
 
       - name: Cache Rust artifacts
+        if: steps.changed-files.outputs.any_changed == 'true'
         uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # 2.8.2
         with:
           prefix-key: "v0-visual-regression"
@@ -47,6 +59,7 @@ jobs:
           cache-provider: "warpbuild"
 
       - name: Prepare baselines for comparison
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           # Save PR branch baselines (if they exist)
           if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
@@ -63,10 +76,12 @@ jobs:
           tree crates/kit-docs/tests/visual-baselines/ || echo "No baselines in main"
 
       - name: Build holt CLI
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           flox activate -- cargo build -p holt-cli --release
 
       - name: Run visual regression tests
+        if: steps.changed-files.outputs.any_changed == 'true'
         id: visual-regression
         timeout-minutes: 20
         run: |
@@ -123,14 +138,14 @@ jobs:
           fi
 
       - name: Upload visual regression artifacts
-        if: always() && steps.visual-regression.outputs.HAS_CHANGES == 'true'
+        if: always() && steps.changed-files.outputs.any_changed == 'true' && steps.visual-regression.outputs.HAS_CHANGES == 'true'
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: visual-regression-screenshots
           path: visual-regression-output/
 
       - name: Generate visual regression report
-        if: always()
+        if: always() && steps.changed-files.outputs.any_changed == 'true'
         env:
           REPOSITORY: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
@@ -192,7 +207,7 @@ jobs:
           fi
 
       - name: Update PR comment
-        if: always()
+        if: always() && steps.changed-files.outputs.any_changed == 'true'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           HAS_CHANGES: ${{ steps.visual-regression.outputs.HAS_CHANGES }}
@@ -237,6 +252,7 @@ jobs:
             }
 
       - name: Summary
+        if: steps.changed-files.outputs.any_changed == 'true'
         env:
           HAS_CHANGES: ${{ steps.visual-regression.outputs.HAS_CHANGES }}
         run: |

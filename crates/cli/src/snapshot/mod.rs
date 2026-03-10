@@ -4,16 +4,19 @@
 
 mod compare;
 
-use compare::prompt_user_approval;
-use holt_regression::{Comparison, StoryVariant, VariantOutcome};
-
 use std::path::Path;
+use std::process::Command;
+
+use compare::prompt_user_approval;
+use doco::Mount;
+use holt_regression::{Comparison, VariantOutcome};
 
 const BASELINE_DIR: &str = "tests/visual-baselines";
 
 /// Configuration for running visual regression tests.
 pub struct SnapshotConfig<'a> {
     pub book_path: &'a Path,
+    pub stories_path: &'a Path,
     /// Run the browser headless (no visible window).
     pub headless: bool,
     /// Save new and mismatched screenshots to the baseline directory.
@@ -22,19 +25,37 @@ pub struct SnapshotConfig<'a> {
     pub check: bool,
 }
 
-/// Build the list of story variants from the static story registry.
-fn discover_variants() -> Vec<StoryVariant> {
-    let mut variants = Vec::new();
-    for story in inventory::iter::<&'static holt_book::Story> {
-        for (idx, variant) in story.variants.iter().enumerate() {
-            variants.push(StoryVariant {
-                story_id: story.id.to_string(),
-                variant_index: idx,
-                name: variant.name.to_lowercase().replace(' ', "_"),
-            });
-        }
+/// Run `trunk build` in the book path to produce `dist/`.
+fn trunk_build(book_path: &Path) -> Result<std::path::PathBuf, String> {
+    println!("Running trunk build...");
+
+    let status = Command::new("trunk")
+        .args(["build", "--release"])
+        .current_dir(book_path)
+        .status()
+        .map_err(|e| format!("Failed to run trunk: {}. Is trunk installed?", e))?;
+
+    if !status.success() {
+        return Err(format!(
+            "trunk build failed with exit code {:?}",
+            status.code()
+        ));
     }
-    variants
+
+    let dist_path = book_path.join("dist");
+    if !dist_path.exists() {
+        return Err(format!(
+            "trunk build did not produce {}",
+            dist_path.display()
+        ));
+    }
+
+    let dist_path = dist_path
+        .canonicalize()
+        .map_err(|e| format!("Failed to resolve dist path: {}", e))?;
+
+    println!("Build complete: {}\n", dist_path.display());
+    Ok(dist_path)
 }
 
 /// Run visual regression tests.
@@ -44,12 +65,28 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
     println!("Holt Visual Regression Testing");
     println!("================================\n");
 
+    let dist_path = trunk_build(config.book_path)?;
+
+    let dist_str = dist_path
+        .to_str()
+        .ok_or_else(|| "dist path is not valid UTF-8".to_string())?;
+
     let doco = doco::Doco::builder()
         .server(
             doco::Server::builder()
-                .image("holt-kit-docs")
-                .tag("latest")
+                .image("caddy")
+                .tag("alpine")
                 .port(80)
+                .mount(Mount::bind_mount(dist_str, "/srv"))
+                .cmd_arg("caddy")
+                .cmd_arg("file-server")
+                .cmd_arg("--root")
+                .cmd_arg("/srv")
+                .cmd_arg("--listen")
+                .cmd_arg(":80")
+                .cmd_arg("--try-files")
+                .cmd_arg("{path}")
+                .cmd_arg("/index.html")
                 .build(),
         )
         .headless(config.headless)
@@ -59,7 +96,8 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
     println!("Starting doco session...");
     let session = doco.connect().await.map_err(|e| e.to_string())?;
 
-    let variants = discover_variants();
+    let variants = holt_regression::discover_variants(config.stories_path)
+        .map_err(|e| format!("Failed to discover stories: {}", e))?;
     println!("Found {} story variants\n", variants.len());
 
     let regression_config = holt_regression::Config {
@@ -149,7 +187,6 @@ fn handle_outcome(
                 return Ok(false);
             }
 
-            // Headless: save screenshot, no prompt
             if config.headless {
                 holt_regression::save(baseline_dir, variant, screenshot)
                     .map_err(|e| e.to_string())?;
@@ -157,7 +194,6 @@ fn handle_outcome(
                 return Ok(false);
             }
 
-            // Interactive: prompt for approval
             let baseline_path = baseline_dir
                 .join(&variant.story_id)
                 .join(format!("{}.png", variant.name));

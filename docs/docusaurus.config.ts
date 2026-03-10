@@ -10,7 +10,7 @@ const config: Config = {
   url: "https://holt.rs",
   baseUrl: "/",
 
-  organizationName: "aonyx",
+  organizationName: "aonyx-ai",
   projectName: "holt",
 
   onBrokenLinks: "throw",
@@ -33,7 +33,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          editUrl: "https://github.com/aonyx-labs/holt/tree/main/docs/",
+          editUrl: "https://github.com/aonyx-ai/holt/tree/main/docs/",
         },
         blog: false,
         theme: {
@@ -63,7 +63,7 @@ const config: Config = {
           value: '<a href="/kit/" class="navbar__item navbar__link">Kit</a>',
         },
         {
-          href: "https://github.com/aonyx-labs/holt",
+          href: "https://github.com/aonyx-ai/holt",
           label: "GitHub",
           position: "right",
         },
@@ -103,7 +103,7 @@ const config: Config = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/aonyx-labs/holt",
+              href: "https://github.com/aonyx-ai/holt",
             },
           ],
         },

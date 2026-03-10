@@ -5,10 +5,12 @@ behavior/presentation separation.
 
 ## Workspace Structure
 
-- **`holt-kit`** (`crates/ui/`) - Core UI library
-- **`holt-kit-docs`** (`crates/ui-book/`) - Storybook app
+- **`holt-kit`** (`crates/kit/`) - Core UI library
+- **`holt-kit-docs`** (`crates/kit-docs/`) - Storybook app
 - **`holt-book`** (`crates/book/`) - Storybook framework
 - **`holt-macros`** (`crates/story-macro/`) - Story macros
+- **`holt-cli`** (`crates/cli/`) - CLI tool
+- **`holt-regression`** (`crates/regression/`) - Visual regression testing
 
 ## Development
 

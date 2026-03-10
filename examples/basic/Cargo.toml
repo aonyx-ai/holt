@@ -14,6 +14,17 @@ inventory = "0.3.20"
 wasm-bindgen = "0.2"
 console_error_panic_hook = "0.1.7"
 
+[dev-dependencies]
+doco = "0.2.3"
+futures = "0.3"
+thirtyfour = "0.36"
+tokio = { version = "1", features = ["rt", "time"] }
+
+[[test]]
+name = "e2e"
+path = "tests/e2e.rs"
+harness = false
+
 [features]
 default = ["csr"]
 csr = ["holt-book/csr", "leptos/csr"]

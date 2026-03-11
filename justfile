@@ -119,6 +119,10 @@ generate-book-css:
     if [[ "$(uname)" == "Darwin" ]]; then SED=(sed -i ''); else SED=(sed -i); fi
     "${SED[@]}" '/^@layer properties;$/d; /^:root {$/,$d' assets/holt-book.css
     "${SED[@]}" -e :a -e '/^[[:space:]]*$/{' -e '$d' -e N -e ba -e '}' assets/holt-book.css
+    # Trigger build.rs to copy the CSS to target/css/ so trunk builds
+    # can resolve the import before cargo compiles the full dependency tree.
+    cd ../..
+    cargo check -p holt-book
 
 # Publish crates to crates.io
 publish: generate-book-css

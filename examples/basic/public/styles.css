@@ -1,4 +1,7 @@
 @import "tailwindcss" source(none);
+/* This intentionally imports from target/css/ to test the documented
+   pre-compiled CSS flow that downstream consumers use. See docs/guides/shipping-css.md.
+   The `generate-book-css` just recipe must populate this path before trunk build. */
 @import "../../../target/css/holt-book/holt-book.css";
 @source "../src/**/*.rs";
 

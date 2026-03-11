@@ -12,7 +12,7 @@ approaches, from quick overrides to full component modifications.
 Every Holt component accepts a `class` prop for adding or overriding styles:
 
 ```rust
-use holt_kit::visual::*;
+use crate::components::*;
 
 view! {
     // Add rounded corners
@@ -66,7 +66,6 @@ let base_classes = "inline-flex items-center justify-center rounded-xl text-base
 Import your modified component instead of Holt's:
 
 ```rust
-// Instead of: use holt_kit::visual::*;
 use crate::components::button::Button;
 ```
 

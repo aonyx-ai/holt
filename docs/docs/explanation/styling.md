@@ -20,7 +20,7 @@ Holt uses Tailwind CSS via `tailwind_fuse` for type-safe, composable styling.
 Components use a variant system for consistent styling:
 
 ```rust
-use holt_kit::visual::*;
+use crate::components::*;
 
 // Different visual variants
 view! {
@@ -85,16 +85,10 @@ Components automatically support dark mode via Tailwind's `dark:` variant:
 
 ## Tailwind Configuration
 
-Add Holt to your Tailwind content paths:
+Since your components live in your own crate, Tailwind just needs to scan your
+source files. With Tailwind v4 and Trunk, use `rel="tailwind-css"` in your
+`index.html` and Tailwind will auto-detect classes from your Rust sources:
 
-```js
-// tailwind.config.js
-module.exports = {
-  content: [
-    "./src/**/*.rs",
-    // Include Holt's component styles
-    "./node_modules/holt-kit/**/*.rs",
-  ],
-  // ...
-};
+```html
+<link data-trunk rel="tailwind-css" href="public/styles.css" />
 ```

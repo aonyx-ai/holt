@@ -1,5 +1,6 @@
-/* https://tailwindcss.com/docs/detecting-classes-in-source-files#setting-your-base-path */
-@import "tailwindcss" source("../../../");
+@import "tailwindcss" source(none);
+@import "../../../target/css/holt-book/holt-book.css";
+@source "../src/**/*.rs";
 
 @custom-variant dark (&:is(.dark *));
 

@@ -45,7 +45,7 @@ jobs:
         uses: flox/install-flox-action@9428713e8d3883274c334b4b95b8830beebd24d2 # 2.3.0
         with:
           # renovate: datasource=github-releases depName=flox/flox
-          version: 1.9.1
+          version: 1.10.0
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # 2.8.2

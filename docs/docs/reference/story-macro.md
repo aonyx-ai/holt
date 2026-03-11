@@ -15,24 +15,31 @@ A story consists of one or more **variant functions** annotated with
 
 ```rust
 use holt_book::{story, variant};
-use holt_kit::visual::Button;
 use leptos::prelude::*;
+use crate::components::{Card, CardHeader, CardTitle, CardContent};
 
 #[variant]
 fn default() -> AnyView {
-    view! { <Button>"Click me!"</Button> }.into_any()
-}
-
-#[variant]
-fn secondary() -> AnyView {
     view! {
-        <Button variant=ButtonVariant::Secondary>"Click me!"</Button>
+        <Card>
+            <CardHeader><CardTitle>"Hello"</CardTitle></CardHeader>
+            <CardContent><p>"Card content goes here."</p></CardContent>
+        </Card>
     }.into_any()
 }
 
-/// Buttons are for clicking and doing button things
-#[story(id = "button", name = "Button")]
-const BUTTON_STORY: () = &[default, secondary];
+#[variant]
+fn compact() -> AnyView {
+    view! {
+        <Card class="w-64">
+            <CardContent><p>"A compact card."</p></CardContent>
+        </Card>
+    }.into_any()
+}
+
+/// A container for grouping related content
+#[story(id = "card", name = "Card")]
+const CARD_STORY: () = &[default, compact];
 ```
 
 ## `#[variant]`
@@ -42,9 +49,11 @@ one visual state of the component.
 
 ```rust
 #[variant]
-fn outline() -> AnyView {
+fn minimal() -> AnyView {
     view! {
-        <Button variant=ButtonVariant::Outline>"Click me!"</Button>
+        <Card>
+            <CardContent><p>"Just content, no header."</p></CardContent>
+        </Card>
     }.into_any()
 }
 ```
@@ -57,70 +66,87 @@ on the `view!` result).
 Applied to a `const` that references an array of variant functions. The macro
 accepts these attributes:
 
-| Attribute    | Required | Description                                      |
-| ------------ | -------- | ------------------------------------------------ |
-| `id`         | yes      | Unique identifier used in URLs and snapshots     |
-| `name`       | yes      | Display name shown in the storybook sidebar      |
-| `extra_docs` | no       | Additional documentation (typically source code) |
+| Attribute    | Required | Description                                                 |
+| ------------ | -------- | ----------------------------------------------------------- |
+| `id`         | yes      | Unique identifier used in URLs and snapshots                |
+| `name`       | yes      | Display name shown in the storybook sidebar                 |
+| `extra_docs` | no       | Additional Markdown documentation (`&'static str` constant) |
 
 ```rust
-#[story(id = "button", name = "Button")]
-const BUTTON_STORY: () = &[default, outline, destructive];
+#[story(id = "card", name = "Card")]
+const CARD_STORY: () = &[default, compact, minimal];
 ```
 
 The const's **doc comment** becomes the story description displayed in the UI:
 
 ```rust
-/// Buttons are for clicking and doing button things
-#[story(id = "button", name = "Button")]
-const BUTTON_STORY: () = &[default, outline];
+/// A container for grouping related content
+#[story(id = "card", name = "Card")]
+const CARD_STORY: () = &[default, compact];
 ```
 
-## Source Code Display
+## Extra Documentation
 
-Stories can optionally include their own source code in the UI. This uses a
-build-time `include!` macro that pulls in a generated file:
+Stories can include additional documentation displayed in the UI via the
+`extra_docs` attribute. This accepts a reference to a `&'static str` constant
+containing any Markdown content — usage notes, design rationale, API details, or
+anything else you want to show alongside the component.
 
 ```rust
-include!(concat!(env!("OUT_DIR"), "/stories/button_source.rs"));
+const CARD_DOCS: &str = "
+## Design Notes
 
-#[story(id = "button", name = "Button", extra_docs = BUTTON_SOURCE)]
-const BUTTON_STORY: () = &[default, outline];
+Cards should always have a minimum width of 200px.
+Use `CardHeader` for titles and `CardContent` for body text.
+";
+
+#[story(id = "card", name = "Card", extra_docs = CARD_DOCS)]
+const CARD_STORY: () = &[default, compact];
 ```
 
-The `extra_docs` attribute references a constant produced by the build script.
-This is an advanced feature used in the Holt Kit storybook itself — most stories
-don't need it.
+The constant can come from anywhere — a literal in your source, an
+`include_str!` of a Markdown file, or a build-script-generated value. Holt Kit's
+own storybook uses this to embed source code, but the feature is
+general-purpose.
 
 ## Complete Example
 
-From the Holt Kit storybook (`crates/kit-docs/src/stories/button.rs`):
+A complete story file for a Card component:
 
 ```rust
 use holt_book::{story, variant};
-use holt_kit::visual::{Button, ButtonVariant};
 use leptos::prelude::*;
+use crate::components::{Card, CardHeader, CardTitle, CardContent};
 
 #[variant]
 fn default() -> AnyView {
-    view! { <Button>"Click me!"</Button> }.into_any()
-}
-
-#[variant]
-fn outline() -> AnyView {
     view! {
-        <Button variant=ButtonVariant::Outline>"Click me!"</Button>
+        <Card>
+            <CardHeader><CardTitle>"Hello"</CardTitle></CardHeader>
+            <CardContent><p>"Card content goes here."</p></CardContent>
+        </Card>
     }.into_any()
 }
 
 #[variant]
-fn destructive() -> AnyView {
+fn compact() -> AnyView {
     view! {
-        <Button variant=ButtonVariant::Destructive>"Click me!"</Button>
+        <Card class="w-64">
+            <CardContent><p>"A compact card."</p></CardContent>
+        </Card>
     }.into_any()
 }
 
-/// Buttons are for clicking and doing button things
-#[story(id = "button", name = "Button")]
-const BUTTON_STORY: () = &[default, outline, destructive];
+#[variant]
+fn minimal() -> AnyView {
+    view! {
+        <Card>
+            <CardContent><p>"Just content, no header."</p></CardContent>
+        </Card>
+    }.into_any()
+}
+
+/// A container for grouping related content
+#[story(id = "card", name = "Card")]
+const CARD_STORY: () = &[default, compact, minimal];
 ```

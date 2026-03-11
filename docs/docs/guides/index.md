@@ -34,3 +34,11 @@ Catch unintended visual changes with screenshot testing:
 - Review and accept/reject changes
 - Update baselines from CI artifacts
 - Handle flaky tests
+
+### [Ship Pre-compiled CSS](/docs/guides/shipping-css)
+
+Distribute Tailwind CSS from component libraries:
+
+- Generate and check in pre-compiled CSS
+- Copy CSS to `target/css/` via build.rs
+- Import library CSS in consumer projects

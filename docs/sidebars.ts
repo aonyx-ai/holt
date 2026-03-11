@@ -22,6 +22,7 @@ const sidebars: SidebarsConfig = {
         "guides/customize-styling",
         "guides/dark-mode",
         "guides/snapshot-testing",
+        "guides/shipping-css",
       ],
     },
     {

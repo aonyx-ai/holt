@@ -35,7 +35,20 @@ jobs:
 
       - name: Export targets
         id: export-targets
-        run: echo "targets=$(just --list | awk '/build-|check-|format-|lint-|test-/{print $1}' | jq -cnR '[inputs]')" >> "$GITHUB_OUTPUT"
+        run: |
+          targets=$(just --dump --dump-format json | jq -c '[
+            .recipes | to_entries[] |
+            select(.key | test("^(build-|check-|format-|lint-|test-)")) |
+            .key as $name |
+            (.value.doc // "") as $doc |
+            if ($doc | test("\\[ci-partitions: (?<n>[0-9]+)\\]")) then
+              ($doc | capture("\\[ci-partitions: (?<n>[0-9]+)\\]").n | tonumber) as $n |
+              range(1; $n + 1) | "\($name) \(.)/\($n)"
+            else
+              $name
+            end
+          ]')
+          echo "targets=$targets" >> "$GITHUB_OUTPUT"
 
   checks:
     name: ${{ matrix.target }}

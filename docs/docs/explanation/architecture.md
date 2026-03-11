@@ -68,9 +68,9 @@ with your other dependencies.
 **Incremental adoption**: Copy the components you need. Skip the ones you don't.
 Mix Holt components with your own.
 
-The `holt-kit` crate provides ready-to-use components if you prefer a
-traditional library approach, but the source is always available for
-customization.
+The `holt-kit` crate is the component library used by Holt's own storybook, but
+it isn't published — it's meant as a reference implementation. Copy the
+components you need into your own project and customize them.
 
 ## Why a Storybook Framework?
 

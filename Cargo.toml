@@ -1,8 +1,6 @@
 [workspace]
 members = ["crates/*", "examples/*"]
 
-# Opt-in to the new feature resolver introduced in Rust 1.51 and Edition 2021.
-# https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
 resolver = "2"
 
 [workspace.package]
@@ -11,7 +9,7 @@ edition = "2024"
 
 description = "A UI toolkit for Leptos"
 license = "Apache-2.0 OR MIT"
-repository = "https://github.com/aonyx-rs/holt.git"
+repository = "https://github.com/aonyx-ai/holt.git"
 
 # Leptos 0.8.5 requires Rust 1.88 or later
 rust-version = "1.88"

@@ -48,7 +48,7 @@ fn KitNavbar() -> impl IntoView {
                 </div>
                 <div class="kit-navbar-items kit-navbar-right">
                     <a
-                        href="https://github.com/aonyx-labs/holt"
+                        href="https://github.com/aonyx-ai/holt"
                         class="kit-navbar-link"
                         target="_blank"
                         rel="noopener noreferrer"

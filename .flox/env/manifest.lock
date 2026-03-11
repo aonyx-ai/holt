@@ -78,6 +78,9 @@
         "pkg-path": "rustfmt",
         "pkg-group": "rust-toolchain"
       },
+      "tailwindcss_4": {
+        "pkg-path": "tailwindcss_4"
+      },
       "taplo": {
         "pkg-path": "taplo"
       },
@@ -1267,6 +1270,7 @@
       "unfree": false,
       "version": "2.53.0",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
@@ -2179,6 +2183,122 @@
       ],
       "outputs": {
         "out": "/nix/store/8skdr5xqspbgwfvhj9hq91jnk6ir13kg-prettier-3.6.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tailwindcss_4",
+      "broken": false,
+      "derivation": "/nix/store/r8qg8x9sw8w9dy401mg9hs0r76lmhxfq-tailwindcss_4-4.2.1.drv",
+      "description": "Command-line tool for the CSS framework with composable CSS classes, standalone v4 CLI",
+      "install_id": "tailwindcss_4",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "tailwindcss_4-4.2.1",
+      "pname": "tailwindcss_4",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T04:48:30.750507Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "4.2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8wshvmj8vhp1crwkblabrgm82gznzypr-tailwindcss_4-4.2.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tailwindcss_4",
+      "broken": false,
+      "derivation": "/nix/store/4hf0jij74as9nj91pxn2psqw52qnk4lc-tailwindcss_4-4.2.1.drv",
+      "description": "Command-line tool for the CSS framework with composable CSS classes, standalone v4 CLI",
+      "install_id": "tailwindcss_4",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "tailwindcss_4-4.2.1",
+      "pname": "tailwindcss_4",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T05:25:51.633909Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "4.2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/zgj10plkfm79n9brspcd91vbzmps90kl-tailwindcss_4-4.2.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tailwindcss_4",
+      "broken": false,
+      "derivation": "/nix/store/118lzlbganywcm0gxbv3p1plkl48al32-tailwindcss_4-4.2.1.drv",
+      "description": "Command-line tool for the CSS framework with composable CSS classes, standalone v4 CLI",
+      "install_id": "tailwindcss_4",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "tailwindcss_4-4.2.1",
+      "pname": "tailwindcss_4",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T06:05:33.893747Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "4.2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/m7vnr1ivlyh2ky5m67mg4vaz775q5068-tailwindcss_4-4.2.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tailwindcss_4",
+      "broken": false,
+      "derivation": "/nix/store/cv75mm9xr11q0b1rcbff0yvkad1z3vlf-tailwindcss_4-4.2.1.drv",
+      "description": "Command-line tool for the CSS framework with composable CSS classes, standalone v4 CLI",
+      "install_id": "tailwindcss_4",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "tailwindcss_4-4.2.1",
+      "pname": "tailwindcss_4",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T06:49:17.177172Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "4.2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ca1qddz6pnnrj76qrz6gv4gsh5cpabbq-tailwindcss_4-4.2.1"
       },
       "system": "x86_64-linux",
       "group": "toplevel",

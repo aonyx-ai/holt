@@ -1,7 +1,10 @@
 # CLAUDE.md
 
-Holt is a UI toolkit for Leptos implementing Shadcn/Radix-style components with
-behavior/presentation separation.
+Holt is a UI toolkit for Leptos following the Shadcn model: users copy component
+source code into their own crate and own it. `holt-kit` is an internal reference
+implementation (`publish = false`) — it should never appear in docs, examples,
+or user-facing code. Users depend on `holt-book` (the storybook framework) and
+`holt-cli` (the CLI, which installs a binary called `holt`).
 
 ## Workspace Structure
 

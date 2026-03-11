@@ -24,7 +24,7 @@ tailwind_fuse = { version = "0.3.0", features = ["variant"] }
 thiserror = ">=1.0.37, <2"
 markdown = "1.0.0"
 const_format = "0.2.34"
-holt-macros = { path = "../story-macro", version = "0.2.0" }
+holt-macros = { path = "../story-macro", version = "0.2.1" }
 
 [dev-dependencies]
 holt-kit = { path = "../kit" }

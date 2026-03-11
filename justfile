@@ -128,6 +128,7 @@ generate-book-css:
 publish: generate-book-css
     cargo publish -p holt-macros -v --all-features
     cargo publish -p holt-book -v --all-features
+    cargo publish -p holt-regression -v --all-features
     cargo publish -p holt-cli -v --all-features
 
 # Run the tests

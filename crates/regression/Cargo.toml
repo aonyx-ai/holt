@@ -3,7 +3,9 @@ name = "holt-regression"
 
 version.workspace = true
 edition.workspace = true
-publish = false
+description.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
 anyhow = "1"

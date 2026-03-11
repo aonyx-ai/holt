@@ -1,4 +1,7 @@
 // @component Badge
+#[cfg(feature = "e2e")]
+mod e2e;
+
 use holt_book::{story, variant};
 use holt_kit::visual::{Badge, BadgeVariant};
 use leptos::prelude::*;

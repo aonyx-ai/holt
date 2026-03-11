@@ -30,7 +30,7 @@ check-docs:
 
 # Check features with cargo-hack
 check-features:
-    cargo hack --workspace --feature-powerset --mutually-exclusive-features csr,ssr,hydrate check --tests
+    cargo hack --workspace --feature-powerset --mutually-exclusive-features csr,ssr,hydrate --exclude-features e2e check --tests
 
 # Check latest dependencies with cargo-update
 check-deps-latest:
@@ -138,3 +138,7 @@ test-example: generate-book-css
 # Run browser integration tests for the example crate
 test-example-e2e: generate-book-css
     cd examples/basic && trunk build --release && cargo test --test e2e
+
+# Run browser integration tests for the kit-docs storybook
+test-kit-docs-e2e: generate-book-css
+    cd crates/kit-docs && trunk build --release && cargo test --test e2e --features e2e

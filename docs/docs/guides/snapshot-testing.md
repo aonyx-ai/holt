@@ -4,8 +4,11 @@ sidebar_position: 3
 
 # Snapshot Testing
 
-This guide covers common tasks when working with snapshot tests in your
-day-to-day development workflow.
+Snapshot testing catches unintended visual changes by comparing screenshots of
+your component stories against committed baselines. Holt uses
+[doco](https://crates.io/crates/doco) under the hood, which spins up a Docker
+container to serve your storybook and a headless Chrome instance to capture
+screenshots. The only prerequisite is a running Docker daemon.
 
 ## Run Snapshot Tests
 
@@ -15,73 +18,75 @@ From your project root:
 holt snapshot
 ```
 
-This starts a server, launches Firefox, captures screenshots of every story
-variant, and compares them against baselines.
+This builds your storybook with `trunk build --release`, starts a Caddy server
+in a Docker container, launches a browser, captures a screenshot of every story
+variant, and compares each against its baseline in `tests/visual-baselines/`.
 
-To use a different port:
+### CLI Flags
 
-```bash
-holt snapshot --port 4000
-```
+| Flag            | Description                                                     |
+| --------------- | --------------------------------------------------------------- |
+| `--check`       | CI mode: pass/fail only, no saving, no prompts. Exits non-zero. |
+| `--headless`    | Run the browser without a visible window.                       |
+| `--no-headless` | Force a visible browser even in non-interactive shells.         |
+| `--save`        | Save new/changed screenshots (default: true).                   |
+| `--no-save`     | Don't save screenshots.                                         |
+
+Headless mode is auto-detected: if stdout is not a terminal, the browser runs
+headless.
 
 ## Review and Accept Changes
 
-When a screenshot differs from its baseline, a comparison window opens (locally)
-or the test fails (in CI).
+When a screenshot differs from its baseline, the behavior depends on whether
+you're running locally or in CI.
 
 ### Local Review
 
-The comparison window shows two tabs:
+A comparison window opens showing two tabs:
 
 - **Baseline**: The expected appearance
 - **New Screenshot**: The current appearance
 
 Toggle between them to spot differences, then:
 
-- **Accept New**: Update the baseline with the new screenshot
+- **Accept**: Update the baseline with the new screenshot
 - **Reject**: Keep the old baseline
 
-### Terminal Mode
+On systems without a display server, Holt falls back to terminal mode — it opens
+both images in your default viewer and prompts you to accept or reject.
 
-On headless systems, Holt falls back to terminal mode. It opens both images in
-your default viewer and prompts:
+### CI Mode
 
-```
-Screenshot differs for card/default. Accept new baseline? [y/N]:
-```
+In CI, run with `--check`. Any mismatch or new variant fails the build. The
+visual regression workflow posts a comment on the PR with a summary of changes
+and instructions for accepting them.
 
-## Update Baselines from CI Artifacts
+## Update Baselines from CI
 
-When tests fail in CI, the new screenshots are saved as artifacts. To update
-baselines:
-
-1. Download the CI artifacts (usually a zip of `tests/visual-baselines/`)
-2. Extract and replace your local baselines:
+When the visual regression workflow detects changes, it uploads the new
+screenshots as an artifact and posts a PR comment with a one-liner to accept
+them:
 
 ```bash
-# Example for GitHub Actions
-unzip visual-baselines.zip -d tests/
+just kit-docs load-baselines-from-gh-artifact <run-id>
 ```
 
-3. Review the changes:
-
-```bash
-git diff tests/visual-baselines/
-# Or use a visual diff tool
-```
-
-4. Commit the updated baselines:
+This downloads the artifact, replaces your local baselines, and shows you the
+git diff. Review the changes, then commit:
 
 ```bash
 git add tests/visual-baselines/
-git commit -m "Update baselines"
+git commit -m "Accept new visual baselines"
 ```
 
 ## Add Snapshot Tests to CI
 
 ### GitHub Actions
 
-Add a job that runs after your storybook builds:
+The only infrastructure requirement is Docker. No need to install Firefox,
+geckodriver, or any browser — doco handles all of that inside containers.
+
+A minimal job:
 
 ```yaml
 snapshot-testing:
@@ -92,49 +97,29 @@ snapshot-testing:
     - name: Install Rust
       uses: dtolnay/rust-action@stable
 
-    - name: Install geckodriver
-      run: |
-        wget -q https://github.com/mozilla/geckodriver/releases/download/v0.35.0/geckodriver-v0.35.0-linux64.tar.gz
-        tar -xzf geckodriver-v0.35.0-linux64.tar.gz
-        sudo mv geckodriver /usr/local/bin/
-
-    - name: Install Firefox
-      uses: browser-actions/setup-firefox@latest
-
     - name: Run snapshot tests
-      run: holt snapshot
+      run: cargo run -p holt-cli -- snapshot --check
 
-    - name: Upload baselines on failure
+    - name: Upload screenshots on failure
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: visual-baselines
+        name: visual-regression-screenshots
         path: tests/visual-baselines/
 ```
 
-The `CI` environment variable triggers headless mode automatically.
-
-### Other CI Systems
-
-Set the `CI` environment variable to enable headless mode:
-
-```bash
-CI=true holt snapshot
-```
+See `.github/workflows/visual-regression.yml` in the Holt repo for the full
+workflow, which also compares against main-branch baselines and posts PR
+comments.
 
 ## Handle Flaky Tests
 
-Snapshot tests can be sensitive to:
+Snapshot tests can be sensitive to rendering differences. Tips for stability:
 
-- **Font rendering**: Different OS versions render fonts slightly differently
-- **Timing**: Animations or async content may not be ready when captured
-- **Viewport size**: Ensure consistent browser dimensions
-
-Tips for stable tests:
-
-1. **Pin browser versions** in CI to avoid rendering differences
-2. **Disable animations** in your storybook's test mode
-3. **Use static data** in stories instead of async fetches
+- **Use Docker for consistency.** Since doco runs the browser inside a
+  container, font rendering and viewport size are identical across machines.
+- **Disable animations** in your storybook's test mode.
+- **Use static data** in stories instead of async fetches.
 
 ## Reset All Baselines
 

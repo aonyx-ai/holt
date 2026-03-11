@@ -108,8 +108,20 @@ lint-yaml:
 prettier fix="false" extension="*":
     prettier {{ if fix == "true" { "--write" } else { "--list-different" } }} --ignore-unknown "**/*.{{ extension }}"
 
+# Generate pre-compiled CSS for holt-book
+generate-book-css:
+    #!/usr/bin/env -S flox activate -- bash
+    set -euo pipefail
+    cd crates/book
+    tailwindcss -i tailwind-input.css -o assets/holt-book.css
+    # Strip theme variables, @property declarations, and @layer properties
+    # fallback — consumers already have these from their own @import "tailwindcss".
+    if [[ "$(uname)" == "Darwin" ]]; then SED=(sed -i ''); else SED=(sed -i); fi
+    "${SED[@]}" '/^@layer properties;$/d; /^:root {$/,$d' assets/holt-book.css
+    "${SED[@]}" -e :a -e '/^[[:space:]]*$/{' -e '$d' -e N -e ba -e '}' assets/holt-book.css
+
 # Publish crates to crates.io
-publish:
+publish: generate-book-css
     cargo publish -p holt-macros -v --all-features
     cargo publish -p holt-book -v --all-features
     cargo publish -p holt-cli -v --all-features
@@ -120,9 +132,9 @@ test-rust:
     cargo test --all-targets -p holt-book -p holt-kit-docs --features ssr --no-default-features
 
 # Run integration test with the example crate
-test-example:
+test-example: generate-book-css
     cd examples/basic && cargo run -p holt-cli -- snapshot --check
 
 # Run browser integration tests for the example crate
-test-example-e2e:
+test-example-e2e: generate-book-css
     cd examples/basic && trunk build --release && cargo test --test e2e

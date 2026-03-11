@@ -30,7 +30,7 @@ check-docs:
 
 # Check features with cargo-hack
 check-features:
-    cargo hack --workspace --feature-powerset --mutually-exclusive-features csr,ssr,hydrate check --tests
+    cargo hack --workspace --feature-powerset --mutually-exclusive-features csr,ssr,hydrate --exclude-features e2e check --tests
 
 # Check latest dependencies with cargo-update
 check-deps-latest:
@@ -119,6 +119,10 @@ generate-book-css:
     if [[ "$(uname)" == "Darwin" ]]; then SED=(sed -i ''); else SED=(sed -i); fi
     "${SED[@]}" '/^@layer properties;$/d; /^:root {$/,$d' assets/holt-book.css
     "${SED[@]}" -e :a -e '/^[[:space:]]*$/{' -e '$d' -e N -e ba -e '}' assets/holt-book.css
+    # Trigger build.rs to copy the CSS to target/css/ so trunk builds
+    # can resolve the import before cargo compiles the full dependency tree.
+    cd ../..
+    cargo check -p holt-book
 
 # Publish crates to crates.io
 publish: generate-book-css
@@ -138,3 +142,7 @@ test-example: generate-book-css
 # Run browser integration tests for the example crate
 test-example-e2e: generate-book-css
     cd examples/basic && trunk build --release && cargo test --test e2e
+
+# Run browser integration tests for the kit-docs storybook
+test-kit-docs-e2e: generate-book-css
+    cd crates/kit-docs && trunk build --release && cargo test --test e2e --features e2e

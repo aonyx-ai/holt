@@ -1,3 +1,6 @@
+#[cfg(feature = "e2e")]
+mod e2e;
+
 pub mod stories;
 
 #[cfg(feature = "csr")]

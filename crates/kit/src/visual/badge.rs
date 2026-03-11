@@ -48,33 +48,4 @@ mod tests {
     fn class_prop_accepts_str_and_string() {
         assert_class_prop!(BadgeProps);
     }
-
-    // TODO: migrate to doco E2E test
-    #[test]
-    #[ignore]
-    fn badge_renders_as_span() {
-        let document = web_sys::window().unwrap().document().unwrap();
-        let container = document.create_element("div").unwrap();
-        document.body().unwrap().append_child(&container).unwrap();
-
-        let _owner = Owner::new();
-        _owner.with(|| {
-            let view = view! { <Badge>"Test"</Badge> };
-            let mut mounted = view.build();
-            use leptos::tachys::view::Mountable;
-            mounted.mount(&container, None);
-        });
-
-        let first_child = container
-            .first_element_child()
-            .expect("Badge should render an element");
-
-        assert_eq!(
-            first_child.tag_name().to_lowercase(),
-            "span",
-            "Badge root element should be a <span>"
-        );
-
-        document.body().unwrap().remove_child(&container).unwrap();
-    }
 }

@@ -20,6 +20,7 @@ icondata = { version = "0.7.0", default-features = false, features = [
 leptos_icons = "0.7.0"
 inventory = "0.3.20"
 console_error_panic_hook = { version = "0.1.7", optional = true }
+doco = { version = "0.2.3", optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
 any_spawner = { version = "0.3.0", features = ["tokio"], optional = true }
 futures = { version = "0.3", optional = true }
@@ -53,6 +54,7 @@ hydrate = [
   "console_error_panic_hook",
 ]
 visual-regression = ["thirtyfour", "tokio", "ureq", "eframe", "image"]
+e2e = ["doco", "thirtyfour", "tokio", "futures"]
 
 [build-dependencies]
 thiserror = ">=1.0.37, <2"
@@ -62,3 +64,9 @@ itertools = "0.14.0"
 name = "ssg"
 path = "src/bin/ssg.rs"
 required-features = ["ssr"]
+
+[[test]]
+name = "e2e"
+path = "tests/e2e.rs"
+harness = false
+required-features = ["e2e"]

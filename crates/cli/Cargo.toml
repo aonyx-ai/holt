@@ -14,7 +14,7 @@ path = "src/main.rs"
 clawless = "0.5"
 doco = "0.2.3"
 eframe = "0.33"
-holt-regression = { path = "../regression", version = "0.2.0" }
+holt-regression = { path = "../regression", version = "0.2.1" }
 image = { version = "0.25", features = ["png"] }
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["process", "rt-multi-thread", "macros"] }

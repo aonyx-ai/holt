@@ -6,6 +6,7 @@ edition.workspace = true
 description.workspace = true
 license.workspace = true
 repository.workspace = true
+include = ["src/", "build.rs", "assets/holt-book.css"]
 
 [[bin]]
 name = "holt-book"

@@ -28,9 +28,13 @@ Add dependencies to your `Cargo.toml`:
 ```toml
 [dependencies]
 leptos = "0.8"
-holt-kit = "0.1"
 holt-book = "0.1"
+tailwind_fuse = "0.3"
 ```
+
+Holt doesn't ship a pre-built component library — you create your own components
+and use Holt Book to showcase them. This is the Shadcn model: you own and
+customize every component.
 
 ## Step 2: Set Up the Storybook Structure
 
@@ -48,8 +52,7 @@ my-components/
 
 ## Step 3: Create a Component
 
-Let's build a simple Card component following Holt's behavior/presentation
-pattern.
+Let's build a simple Card component using Tailwind CSS via `tailwind_fuse`.
 
 Create `src/components/card.rs`:
 

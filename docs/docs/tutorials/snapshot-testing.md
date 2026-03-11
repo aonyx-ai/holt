@@ -12,17 +12,11 @@ components and know how to catch unintended visual changes.
 
 - A working Holt storybook (see
   [Your First Storybook](/docs/tutorials/first-storybook))
-- Firefox installed
-- geckodriver installed and in your PATH
+- Docker running
 
-To check if geckodriver is available:
-
-```bash
-geckodriver --version
-```
-
-If not installed, get it from
-[Mozilla's geckodriver releases](https://github.com/mozilla/geckodriver/releases).
+That's it — Holt uses [doco](https://crates.io/crates/doco) to run a Caddy
+server and headless Chrome inside Docker containers, so there's nothing else to
+install.
 
 ## Step 1: Run Your First Snapshot Test
 
@@ -35,27 +29,24 @@ holt snapshot
 You'll see output like:
 
 ```
-Holt Snapshot Testing
+Holt Visual Regression Testing
 ================================
 
-Starting geckodriver...
-Starting Trunk server...
-Connecting to WebDriver...
+Running trunk build...
+Build complete: /path/to/dist
 
 Processing 12 story variants...
 
   [new] card/default (new baseline)
-  -> Baseline created (test will fail until committed)
-  [new] card/with-custom-class (new baseline)
-  -> Baseline created (test will fail until committed)
+  [new] card/fixed_width (new baseline)
   ...
 
 ================================
-Results: 0 passed, 12 failed
+Results: 0 passed, 12 new
 ```
 
-The "failures" are expected—there were no baselines to compare against. Holt
-created them for you.
+The first run creates baselines for every variant — there's nothing to compare
+against yet.
 
 ## Step 2: Explore the Baseline Directory
 
@@ -71,10 +62,10 @@ You'll see a directory structure like:
 tests/visual-baselines/
 ├── card/
 │   ├── default.png
-│   ├── with-custom-class.png
+│   ├── fixed_width.png
 │   └── minimal.png
 └── button/
-    ├── primary.png
+    ├── default.png
     └── secondary.png
 ```
 
@@ -94,7 +85,7 @@ Now you should see:
 Processing 12 story variants...
 
   [ok] card/default matches baseline
-  [ok] card/with-custom-class matches baseline
+  [ok] card/fixed_width matches baseline
   ...
 
 ================================
@@ -106,7 +97,7 @@ All tests pass because the screenshots match the baselines.
 ## Step 4: Make a Visual Change
 
 Let's see what happens when a component changes. Open one of your components and
-make a visible change—perhaps change a padding value, border color, or font
+make a visible change — perhaps change a padding value, border color, or font
 size.
 
 For example, if you have a Card component:
@@ -137,10 +128,14 @@ You can toggle between views to spot the differences.
 
 In the comparison window:
 
-- Click **Accept New** to update the baseline with the new screenshot
+- Click **Accept** to update the baseline with the new screenshot
 - Click **Reject** to keep the old baseline (test stays failed)
 
 If you accept, the baseline file is updated immediately.
+
+On headless systems (SSH sessions, containers), Holt falls back to terminal mode
+— it opens both images in your default viewer and prompts you to accept or
+reject.
 
 ## Step 7: Commit Your Baselines
 
@@ -154,22 +149,14 @@ git commit -m "Update baselines for card component"
 
 ## Troubleshooting
 
-### geckodriver not found
+### Docker not running
 
-Make sure geckodriver is in your PATH:
+Holt needs Docker to run the Caddy server and browser. Make sure the Docker
+daemon is running:
 
 ```bash
-# macOS with Homebrew
-brew install geckodriver
-
-# Or download from GitHub and add to PATH
-export PATH="$PATH:/path/to/geckodriver"
+docker info
 ```
-
-### Firefox crashes or times out
-
-Ensure Firefox is installed and up to date. The WebDriver needs a compatible
-Firefox version.
 
 ### Comparison window doesn't open
 

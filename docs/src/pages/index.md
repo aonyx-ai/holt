@@ -23,33 +23,28 @@ Holt provides two things:
 
 ```bash
 # Install the CLI
-cargo install holt
-
-# Initialize in your Leptos project
-holt init
+cargo install holt-cli
 
 # Start the dev server
 holt serve
 ```
 
-### Use Components
+### Showcase Your Components
 
-```bash
-cargo add holt-kit
-```
+Copy component source code into your own crate, then use `holt-book` to build an
+interactive storybook:
 
 ```rust
-use holt_kit::prelude::*;
+use holt_book::{story, variant};
 use leptos::prelude::*;
 
-#[component]
-fn App() -> impl IntoView {
-    view! {
-        <Button variant=ButtonVariant::Primary>
-            "Click me"
-        </Button>
-    }
+#[variant]
+fn default() -> AnyView {
+    view! { <Button>"Click me"</Button> }.into_any()
 }
+
+#[story(id = "button", name = "Button")]
+const BUTTON_STORY: () = &[default];
 ```
 
 ## Features

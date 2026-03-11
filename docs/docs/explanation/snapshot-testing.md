@@ -15,13 +15,29 @@ update subtly shifts your layout.
 
 Snapshot testing fills this gap by comparing screenshots of your components
 against known-good baselines. If anything looks different, you find out
-immediately—before users do.
+immediately — before users do.
 
-For a component library like Holt, snapshot testing is essential because:
+For a component library, snapshot testing is essential because:
 
 1. **Styling is the product**: Components exist to look right
 2. **CSS is global and fragile**: One change can cascade unexpectedly
-3. **Cross-browser rendering varies**: What works in Chrome may shift in Firefox
+3. **Rendering varies**: Font hinting, subpixel rendering, and layout engines
+   differ across environments
+
+## How It Works
+
+Holt uses [doco](https://crates.io/crates/doco) to run screenshots in Docker
+containers. When you run `holt snapshot`:
+
+1. `trunk build --release` compiles your storybook to static files
+2. A Caddy server starts in a Docker container, serving the built storybook
+3. A headless Chrome instance (also in Docker) navigates to each story variant
+4. Screenshots are captured at a fixed viewport (1280x720)
+5. Each screenshot is compared byte-for-byte against its baseline PNG
+
+Because both the server and browser run inside containers, results are
+consistent across machines — no need to worry about local browser versions or OS
+font rendering.
 
 ## How Screenshot Comparison Works
 
@@ -33,14 +49,8 @@ the test passes. This approach is:
 - **Sensitive**: Any change, even a single pixel, triggers a diff
 
 The tradeoff is sensitivity. Identical visual output can produce different bytes
-due to:
-
-- PNG encoder differences
-- Font rendering variations between OS versions
-- Timing differences in animations
-
-That's why Holt captures all baselines with the same browser (Firefox) and
-recommends pinning browser versions in CI.
+due to PNG encoder differences or timing issues with animations. Running
+everything in Docker mitigates most of these problems.
 
 ## Local vs CI Workflows
 
@@ -50,36 +60,30 @@ Snapshot testing behaves differently depending on context.
 
 When you run `holt snapshot` locally:
 
-1. Firefox opens visibly (not headless)
-2. Screenshots are captured at 1280x720
-3. Differences trigger a GUI comparison window
-4. You decide whether to accept or reject each change
-5. Orphaned baselines (from deleted stories) are cleaned up
+1. Screenshots are captured at 1280x720
+2. Differences trigger a GUI comparison window
+3. You decide whether to accept or reject each change
+4. Orphaned baselines (from deleted stories) are cleaned up
 
 The GUI makes it easy to review changes interactively. Toggle between baseline
 and new screenshot to spot differences, then accept or reject with a click.
 
 ### CI Environment
 
-When the `CI` environment variable is set:
+When you run `holt snapshot --check`:
 
-1. Firefox runs headless (no display needed)
+1. The browser runs headless
 2. Screenshots are captured at the same resolution
-3. Differences cause the test to fail
-4. New screenshots are saved for artifact upload
-5. Orphan cleanup is skipped (baselines shouldn't change in CI)
+3. Any difference causes the test to fail immediately
+4. No screenshots are saved, no prompts are shown
 
-This workflow lets you:
-
-1. Run tests to detect regressions
-2. Download artifacts when tests fail
-3. Review the new screenshots locally
-4. Update baselines and commit if the changes are intentional
+The visual regression CI workflow compares against main-branch baselines and
+posts a PR comment summarizing changes with instructions for accepting them.
 
 ## GUI vs Terminal Approval
 
 The comparison GUI requires a display. On systems without one (SSH sessions,
-some CI environments, Linux without X11), Holt falls back to terminal mode:
+containers), Holt falls back to terminal mode:
 
 1. Both images are saved to temp files
 2. Your OS's default image viewer opens them (if available)
@@ -90,9 +94,9 @@ available.
 
 ## Orphan Cleanup
 
-When you delete a story or rename a variant, its baseline becomes orphaned—it no
-longer corresponds to anything in your storybook. Holt detects and removes these
-automatically during local runs.
+When you delete a story or rename a variant, its baseline becomes orphaned — it
+no longer corresponds to anything in your storybook. Holt detects and removes
+these automatically during local runs.
 
 Orphan cleanup only runs locally (not in CI) because:
 
@@ -108,19 +112,14 @@ deleted. Review the list to make sure they're actually obsolete.
 ### Byte Comparison is Strict
 
 Any rendering difference fails the test. This catches real regressions but can
-cause false positives from:
+cause false positives from timing issues with async content or animations.
 
-- OS font rendering changes
-- Browser updates
-- Timing issues with async content
+Mitigation: Use static data in stories and disable animations in test mode.
 
-Mitigation: Pin browser versions in CI and ensure components are fully rendered
-before capture.
+### Chrome Only
 
-### Firefox Only
-
-Holt uses Firefox via geckodriver. This simplifies setup (one browser to
-install) but means you're not testing Chrome or Safari rendering.
+Holt uses Chrome via doco's Docker-based browser. This means you're not testing
+Firefox or Safari rendering.
 
 For cross-browser snapshot testing, consider additional tooling or a service
 like Percy or Chromatic that tests multiple browsers.
@@ -128,20 +127,22 @@ like Percy or Chromatic that tests multiple browsers.
 ### No Pixel Tolerance
 
 Some snapshot testing tools allow "fuzzy" matching that ignores small
-differences. Holt's byte comparison doesn't. This is intentional—if pixels
+differences. Holt's byte comparison doesn't. This is intentional — if pixels
 changed, you should know.
 
-If you need tolerance, you could implement perceptual hashing or diff
-percentages, but that adds complexity and can mask real issues.
+The comparison trait (`ImageComparator`) is pluggable, so tolerance-based
+comparators could be added without changing the rest of the system.
 
 ## Design Decisions
 
-### Why geckodriver/Firefox?
+### Why Docker?
 
-- Open source with stable WebDriver support
-- Consistent rendering across platforms
-- Headless mode works reliably
-- No licensing concerns
+Running the server and browser inside Docker containers means:
+
+- No local browser or driver installation required
+- Consistent rendering across developer machines and CI
+- No version skew between local and CI environments
+- Single prerequisite: a running Docker daemon
 
 ### Why Store Baselines in the Repo?
 

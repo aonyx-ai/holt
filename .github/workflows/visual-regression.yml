@@ -53,7 +53,7 @@ jobs:
 
       - name: Cache Rust artifacts
         if: steps.changed-files.outputs.any_changed == 'true'
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # 2.8.2
+        uses: Swatinem/rust-cache@c676846f29d98ff6b0106d3608c7ffd4048af17b # 2.9.0
         with:
           prefix-key: "v0-visual-regression"
           cache-on-failure: true

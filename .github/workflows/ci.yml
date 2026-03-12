@@ -68,7 +68,7 @@ jobs:
         run: rm -f flox.x86_64-linux.deb
 
       - name: Cache Rust artifacts
-        uses: Swatinem/rust-cache@c676846f29d98ff6b0106d3608c7ffd4048af17b # 2.9.0
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # 2.9.1
         with:
           prefix-key: "v0-${{ matrix.target }}"
           cache-on-failure: true

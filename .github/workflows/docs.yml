@@ -48,7 +48,7 @@ jobs:
           version: 1.10.0
 
       - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@c676846f29d98ff6b0106d3608c7ffd4048af17b # 2.9.0
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # 2.9.1
 
       - name: Build Kit WASM + CSS with Trunk
         uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0

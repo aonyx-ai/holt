@@ -1,5 +1,24 @@
+use clawless::clap;
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
+
+/// Whether to automatically open the browser
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, clap::ValueEnum)]
+pub enum OpenBrowser {
+    #[default]
+    No,
+    Yes,
+}
+
+impl<'de> Deserialize<'de> for OpenBrowser {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let value = <bool as Deserialize>::deserialize(deserializer)?;
+        match value {
+            true => Ok(Self::Yes),
+            false => Ok(Self::No),
+        }
+    }
+}
 
 #[derive(Debug, Default, Deserialize)]
 pub struct Config {
@@ -22,7 +41,7 @@ pub struct ServeConfig {
     #[serde(default = "default_port")]
     pub port: u16,
     #[serde(default)]
-    pub open: bool,
+    pub open: OpenBrowser,
 }
 
 fn default_book_path() -> PathBuf {
@@ -50,7 +69,7 @@ impl Default for ServeConfig {
     fn default() -> Self {
         Self {
             port: default_port(),
-            open: false,
+            open: OpenBrowser::No,
         }
     }
 }

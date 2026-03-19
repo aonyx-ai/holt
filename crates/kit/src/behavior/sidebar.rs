@@ -17,14 +17,22 @@ impl SidebarContext {
     }
 }
 
+/// Initial open/closed state for the sidebar
+#[derive(Copy, Clone, PartialEq, Default)]
+pub enum SidebarInitialState {
+    #[default]
+    Open,
+    Closed,
+}
+
 #[component]
 pub fn SidebarProvider(
-    #[prop(optional)] initial_state: Option<bool>,
+    #[prop(optional)] initial_state: SidebarInitialState,
     #[prop(optional)] open: Option<ReadSignal<bool>>,
     #[prop(optional)] set_open_prop: Option<WriteSignal<bool>>,
     children: Children,
 ) -> impl IntoView {
-    let initial_state = initial_state.unwrap_or(true);
+    let initial_state = initial_state == SidebarInitialState::Open;
 
     let (is_open_local, set_open_local) = signal(initial_state);
     let is_open = open.unwrap_or(is_open_local);

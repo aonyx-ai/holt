@@ -10,7 +10,7 @@ use doco::Client;
 ///
 /// Callers construct these from their own story registry (e.g. `inventory::iter`).
 /// The regression crate uses them to capture screenshots and locate baselines.
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub struct StoryVariant {
     /// The story identifier (e.g. "button", "checkbox")
     pub story_id: String,

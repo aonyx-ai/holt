@@ -1,5 +1,5 @@
 # Flox manifest version managed by Flox CLI
-version = 1
+schema-version = "1.10.0"
 
 [install]
 # The Rust toolchain with cargo, clippy, rustc, and rustfmt.
@@ -9,12 +9,14 @@ clippy.pkg-group = "rust-toolchain"
 clippy.pkg-path = "clippy"
 rustc.pkg-group = "rust-toolchain"
 rustc.pkg-path = "rustc"
+rustc.outputs = "all"
 rustfmt.pkg-group = "rust-toolchain"
 rustfmt.pkg-path = "rustfmt"
 
 # The standard library links against this package on macOS.
 libiconv.pkg-path = "libiconv"
 libiconv.systems = ["aarch64-darwin", "x86_64-darwin"]
+libiconv.outputs = "all"
 
 # This package provides the source code for the standard library, which is used
 # by rust-analyzer below to provide diagnostics and documentation.
@@ -31,24 +33,60 @@ clang.pkg-path = "clang"
 clang.systems = ["aarch64-darwin", "x86_64-darwin"]
 gcc.pkg-path = "gcc"
 gcc.systems = ["aarch64-linux", "x86_64-linux"]
+gcc.outputs = "all"
 
 # Local development tools
 cargo-hack.pkg-path = "cargo-hack"
 git.pkg-path = "git"
+git.outputs = "all"
 gum.pkg-path = "gum"
 just.pkg-path = "just"
+just.outputs = "all"
 leptosfmt.pkg-path = "leptosfmt"
 markdownlint-cli.pkg-path = "markdownlint-cli"
 parallel.pkg-path = "parallel"
+parallel.outputs = "all"
 prettier.pkg-path = "prettier"
 taplo.pkg-path = "taplo"
 wasm-pack.pkg-path = "wasm-pack"
 yamllint.pkg-path = "yamllint"
+yamllint.outputs = "all"
 zizmor.pkg-path = "zizmor"
 lld.pkg-path = "lld"
+lld.outputs = "all"
 geckodriver.pkg-path = "geckodriver"
 tailwindcss_4.pkg-path = "tailwindcss_4"
 trunk.pkg-path = "trunk"
+
+# Required by cargo-dylint (via git2 -> openssl-sys) when building from source,
+# and zlib for linking the nightly-compiled lint libraries.
+openssl.pkg-path = "openssl"
+openssl.outputs = "all"
+pkg-config.pkg-path = "pkg-config"
+zlib.pkg-path = "zlib"
+zlib.outputs = "all"
+
+[hook]
+on-activate = """
+  # Install the nightly toolchain and dylint for whisker lints
+  rustup toolchain install nightly-2026-03-05 -c rustc-dev -c llvm-tools-preview --no-self-update
+  command -v cargo-dylint || cargo install cargo-dylint dylint-link --git https://github.com/trailofbits/dylint
+
+  # Wrap dylint-link so RUSTUP_TOOLCHAIN is always set. Dylint strips this
+  # var when building lint libraries, but dylint-link requires it to find the
+  # linker (defaulting to cc on non-Windows). We move the real binary aside
+  # and replace it with a wrapper that provides the fallback.
+  real="$HOME/.cargo/bin/dylint-link"
+  if [ -f "$real" ] && [ ! -f "$real.real" ]; then
+    mv "$real" "$real.real"
+    cat > "$real" << 'WRAPPER'
+#!/bin/sh
+export RUSTUP_TOOLCHAIN="${RUSTUP_TOOLCHAIN:-nightly-2026-03-05}"
+exec "$HOME/.cargo/bin/dylint-link.real" "$@"
+WRAPPER
+    chmod +x "$real"
+  fi
+"""
 
 [profile]
 

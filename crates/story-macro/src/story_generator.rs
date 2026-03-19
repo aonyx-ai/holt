@@ -87,18 +87,17 @@ impl StoryGenerator {
 /// Takes a const expression representing a (reference to an) array of variant
 /// names, and returns a vector of Idents of the variant names.
 fn parse_variant_names(body: &ItemConst) -> Vec<Ident> {
-    let mut variant_names = Vec::new();
-
-    // Extract the array expression from the const
-    if let Expr::Array(array) = &*body.expr {
-        variant_names = extract_variant_names_from_array(array);
-    } else if let Expr::Reference(ref_expr) = &*body.expr
-        && let Expr::Array(array) = &*ref_expr.expr
-    {
-        variant_names = extract_variant_names_from_array(array);
-    }
-
-    variant_names
+    let array = match &*body.expr {
+        Expr::Array(array) => array,
+        Expr::Reference(ref_expr) => {
+            let Expr::Array(array) = &*ref_expr.expr else {
+                return Vec::new();
+            };
+            array
+        }
+        _ => return Vec::new(),
+    };
+    extract_variant_names_from_array(array)
 }
 
 fn extract_variant_names_from_array(array: &ExprArray) -> Vec<Ident> {

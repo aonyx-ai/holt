@@ -18,7 +18,7 @@ use crate::story::StoryVariant;
 /// Returns an error if the directory cannot be read or a file cannot be parsed.
 pub fn discover_variants(dir: &Path) -> Result<Vec<StoryVariant>> {
     let mut variants = Vec::new();
-    scan_directory(dir, &mut variants)?;
+    scan_directory(dir, &mut variants).with_context(|| format!("scan {}", dir.display()))?;
     variants.sort_by(|a, b| {
         a.story_id
             .cmp(&b.story_id)
@@ -35,7 +35,7 @@ fn scan_directory(dir: &Path, variants: &mut Vec<StoryVariant>) -> Result<()> {
         let path = entry.path();
 
         if path.is_dir() {
-            scan_directory(&path, variants)?;
+            scan_directory(&path, variants).with_context(|| format!("scan {}", path.display()))?;
         } else if path.extension().is_some_and(|ext| ext == "rs") {
             let source =
                 fs::read_to_string(&path).with_context(|| format!("read {}", path.display()))?;

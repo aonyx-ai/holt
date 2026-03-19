@@ -1,7 +1,7 @@
 //! CLI command for visual regression testing.
 
 use crate::config::Config;
-use crate::snapshot::{self, SnapshotConfig};
+use crate::snapshot::{self, HeadlessMode, SaveMode, SnapshotConfig, SnapshotMode};
 use clawless::prelude::*;
 use std::io::IsTerminal;
 
@@ -9,43 +9,56 @@ use std::io::IsTerminal;
 pub struct SnapshotArgs {
     /// Run in check mode: purely pass/fail, no saving, no prompts.
     /// Exits non-zero on any failure. Implies --headless --no-save.
-    #[arg(long)]
-    check: bool,
+    #[arg(
+        long,
+        num_args = 0,
+        default_missing_value = "check",
+        default_value = "interactive"
+    )]
+    check: SnapshotMode,
 
     /// Run the browser in headless mode (no visible window).
     /// Default: headless when stdout is not a terminal.
-    #[arg(long)]
-    headless: bool,
-
-    /// Force a visible browser window even in non-interactive shells.
-    #[arg(long = "no-headless", conflicts_with = "headless")]
-    no_headless: bool,
-
-    /// Save new and mismatched screenshots to the baseline directory [default: true].
-    #[arg(long)]
-    save: bool,
+    #[arg(
+        long,
+        num_args = 0,
+        default_missing_value = "headless",
+        default_value = "auto"
+    )]
+    headless: HeadlessMode,
 
     /// Do not save screenshots.
-    #[arg(long = "no-save", conflicts_with = "save")]
-    no_save: bool,
+    #[arg(
+        long = "no-save",
+        num_args = 0,
+        default_missing_value = "no-save",
+        default_value = "save"
+    )]
+    save: SaveMode,
 }
 
 impl SnapshotArgs {
-    fn headless(&self) -> bool {
-        if self.check || self.headless {
-            return true;
+    fn resolve_headless(&self) -> HeadlessMode {
+        match self.check {
+            SnapshotMode::Check => HeadlessMode::Headless,
+            SnapshotMode::Interactive => match self.headless {
+                HeadlessMode::Auto => {
+                    if std::io::stdout().is_terminal() {
+                        HeadlessMode::Visible
+                    } else {
+                        HeadlessMode::Headless
+                    }
+                }
+                other => other,
+            },
         }
-        if self.no_headless {
-            return false;
-        }
-        !std::io::stdout().is_terminal()
     }
 
-    fn save(&self) -> bool {
-        if self.check || self.no_save {
-            return false;
+    fn resolve_save(&self) -> SaveMode {
+        match self.check {
+            SnapshotMode::Check => SaveMode::NoSave,
+            SnapshotMode::Interactive => self.save,
         }
-        true
     }
 }
 
@@ -58,9 +71,9 @@ pub async fn snapshot(args: SnapshotArgs, _ctx: Context) -> CommandResult {
     snapshot::run(SnapshotConfig {
         book_path: &config.book.path,
         stories_path: &stories_path,
-        headless: args.headless(),
-        save: args.save(),
-        check: args.check,
+        headless: args.resolve_headless(),
+        save: args.resolve_save(),
+        mode: args.check,
     })
     .await
     .map_err(Error::msg)

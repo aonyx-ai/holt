@@ -6,7 +6,7 @@ use leptos::web_sys::KeyboardEvent;
 use leptos_floating::{Align, FloatingOptions, Side, use_floating};
 
 /// Select behavior context that manages state and interactions
-#[derive(Clone, Copy)]
+#[derive(Copy, Clone)]
 pub struct SelectContext {
     pub value: RwSignal<Option<String>>,
     pub open: RwSignal<bool>,
@@ -109,7 +109,12 @@ pub fn SelectTrigger(
     let context = use_select();
 
     let on_keydown = move |ev: KeyboardEvent| {
-        let action = handle_trigger_keydown(&ev.key(), context.is_open());
+        let state = if context.is_open() {
+            SelectOpenState::Open
+        } else {
+            SelectOpenState::Closed
+        };
+        let action = handle_trigger_keydown(&ev.key(), state);
         match action {
             KeyAction::None => {}
             KeyAction::Toggle => {
@@ -293,7 +298,7 @@ pub fn SelectValue(
 }
 
 /// Actions that can result from a keydown on the select trigger
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 enum KeyAction {
     None,
     Toggle,
@@ -302,7 +307,7 @@ enum KeyAction {
 }
 
 /// Actions that can result from a keydown within the select content/listbox
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 enum ContentKeyAction {
     None,
     FocusNext,
@@ -311,9 +316,16 @@ enum ContentKeyAction {
     CloseAndFocusTrigger,
 }
 
-fn handle_trigger_keydown(key: &str, is_open: bool) -> KeyAction {
+/// Whether the select dropdown is currently open
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+enum SelectOpenState {
+    Open,
+    Closed,
+}
+
+fn handle_trigger_keydown(key: &str, state: SelectOpenState) -> KeyAction {
     match key {
-        "Escape" if is_open => KeyAction::Close,
+        "Escape" if state == SelectOpenState::Open => KeyAction::Close,
         "ArrowDown" => KeyAction::OpenAndFocusFirst,
         "Enter" | " " => KeyAction::Toggle,
         _ => KeyAction::None,
@@ -330,12 +342,19 @@ fn handle_content_keydown(key: &str) -> ContentKeyAction {
     }
 }
 
+/// Direction to move focus within the select list
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+enum FocusDirection {
+    Forward,
+    Backward,
+}
+
 fn focus_next_item(container: &web_sys::Element) -> bool {
-    focus_sibling_item(container, true)
+    focus_sibling_item(container, FocusDirection::Forward)
 }
 
 fn focus_previous_item(container: &web_sys::Element) -> bool {
-    focus_sibling_item(container, false)
+    focus_sibling_item(container, FocusDirection::Backward)
 }
 
 fn focus_first_item(container: &web_sys::Element) -> bool {
@@ -353,7 +372,7 @@ fn focus_first_item(container: &web_sys::Element) -> bool {
     false
 }
 
-fn focus_sibling_item(container: &web_sys::Element, forward: bool) -> bool {
+fn focus_sibling_item(container: &web_sys::Element, direction: FocusDirection) -> bool {
     let items = container.query_selector_all("[role='option']");
     let Ok(items) = items else { return false };
 
@@ -382,15 +401,22 @@ fn focus_sibling_item(container: &web_sys::Element, forward: bool) -> bool {
     }
 
     let next_index = match current_index {
-        Some(idx) => {
-            if forward {
-                if idx + 1 < count { idx + 1 } else { 0 }
-            } else if idx > 0 {
-                idx - 1
-            } else {
-                count - 1
+        Some(idx) => match direction {
+            FocusDirection::Forward => {
+                if idx + 1 < count {
+                    idx + 1
+                } else {
+                    0
+                }
             }
-        }
+            FocusDirection::Backward => {
+                if idx > 0 {
+                    idx - 1
+                } else {
+                    count - 1
+                }
+            }
+        },
         None => 0,
     };
 
@@ -467,18 +493,24 @@ mod tests {
 
     #[test]
     fn escape_closes_open_select() {
-        assert_eq!(handle_trigger_keydown("Escape", true), KeyAction::Close);
+        assert_eq!(
+            handle_trigger_keydown("Escape", SelectOpenState::Open),
+            KeyAction::Close
+        );
     }
 
     #[test]
     fn escape_on_closed_select_is_noop() {
-        assert_eq!(handle_trigger_keydown("Escape", false), KeyAction::None);
+        assert_eq!(
+            handle_trigger_keydown("Escape", SelectOpenState::Closed),
+            KeyAction::None
+        );
     }
 
     #[test]
     fn arrow_down_opens_select() {
         assert_eq!(
-            handle_trigger_keydown("ArrowDown", false),
+            handle_trigger_keydown("ArrowDown", SelectOpenState::Closed),
             KeyAction::OpenAndFocusFirst
         );
     }
@@ -486,15 +518,21 @@ mod tests {
     #[test]
     fn arrow_down_on_open_trigger_focuses_first() {
         assert_eq!(
-            handle_trigger_keydown("ArrowDown", true),
+            handle_trigger_keydown("ArrowDown", SelectOpenState::Open),
             KeyAction::OpenAndFocusFirst
         );
     }
 
     #[test]
     fn enter_and_space_toggle_trigger() {
-        assert_eq!(handle_trigger_keydown("Enter", false), KeyAction::Toggle);
-        assert_eq!(handle_trigger_keydown(" ", false), KeyAction::Toggle);
+        assert_eq!(
+            handle_trigger_keydown("Enter", SelectOpenState::Closed),
+            KeyAction::Toggle
+        );
+        assert_eq!(
+            handle_trigger_keydown(" ", SelectOpenState::Closed),
+            KeyAction::Toggle
+        );
     }
 
     #[test]
@@ -532,8 +570,14 @@ mod tests {
 
     #[test]
     fn unhandled_keys_are_noop() {
-        assert_eq!(handle_trigger_keydown("Tab", false), KeyAction::None);
-        assert_eq!(handle_trigger_keydown("a", false), KeyAction::None);
+        assert_eq!(
+            handle_trigger_keydown("Tab", SelectOpenState::Closed),
+            KeyAction::None
+        );
+        assert_eq!(
+            handle_trigger_keydown("a", SelectOpenState::Closed),
+            KeyAction::None
+        );
         assert_eq!(handle_content_keydown("Tab"), ContentKeyAction::None);
         assert_eq!(handle_content_keydown("a"), ContentKeyAction::None);
     }

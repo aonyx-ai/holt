@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::config::{Config, OpenBrowser};
 use clawless::prelude::*;
 use tokio::process::Command;
 
@@ -9,8 +9,14 @@ pub struct ServeArgs {
     port: Option<u16>,
 
     /// Open browser automatically (default from config)
-    #[arg(short, long)]
-    open: bool,
+    #[arg(
+        short,
+        long,
+        num_args = 0,
+        default_missing_value = "yes",
+        default_value = "no"
+    )]
+    open: OpenBrowser,
 }
 
 /// Start the development server
@@ -19,7 +25,7 @@ pub async fn serve(args: ServeArgs, _ctx: Context) -> CommandResult {
     let config = Config::load().map_err(|e| Error::msg(format!("Failed to load config: {e}")))?;
 
     let port = args.port.unwrap_or(config.serve.port);
-    let open = args.open || config.serve.open;
+    let open = args.open == OpenBrowser::Yes || config.serve.open == OpenBrowser::Yes;
 
     let mut cmd = Command::new("trunk");
     cmd.arg("serve");

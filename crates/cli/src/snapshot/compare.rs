@@ -8,6 +8,20 @@ use std::path::Path;
 use std::process::Command;
 use std::sync::{Arc, Mutex, mpsc};
 
+/// Which image to display in the comparison view
+#[derive(Copy, Clone, Eq, PartialEq)]
+enum CompareView {
+    Baseline,
+    Screenshot,
+}
+
+/// Whether the user's verdict has been sent
+#[derive(Copy, Clone, Eq, PartialEq)]
+enum VerdictState {
+    Pending,
+    Sent,
+}
+
 /// egui app for comparing images.
 struct ImageCompareApp {
     title: String,
@@ -15,9 +29,16 @@ struct ImageCompareApp {
     screenshot_image: egui::ColorImage,
     baseline_texture: Option<egui::TextureHandle>,
     screenshot_texture: Option<egui::TextureHandle>,
-    show_baseline: bool,
-    result_tx: mpsc::Sender<bool>,
-    sent_result: bool,
+    active_view: CompareView,
+    result_tx: mpsc::Sender<Verdict>,
+    verdict_state: VerdictState,
+}
+
+/// User's decision on a visual diff
+#[derive(Copy, Clone, Eq, PartialEq)]
+enum Verdict {
+    Accept,
+    Reject,
 }
 
 impl ImageCompareApp {
@@ -26,7 +47,7 @@ impl ImageCompareApp {
         variant: &StoryVariant,
         baseline: &[u8],
         screenshot: &[u8],
-        result_tx: mpsc::Sender<bool>,
+        result_tx: mpsc::Sender<Verdict>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         use image::ImageReader;
         use std::io::Cursor;
@@ -65,9 +86,9 @@ impl ImageCompareApp {
             screenshot_image,
             baseline_texture: None,
             screenshot_texture: None,
-            show_baseline: true,
+            active_view: CompareView::Baseline,
             result_tx,
-            sent_result: false,
+            verdict_state: VerdictState::Pending,
         })
     }
 }
@@ -78,28 +99,34 @@ impl eframe::App for ImageCompareApp {
             ui.horizontal(|ui| {
                 ui.heading(&self.title);
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if ui.button("Reject").clicked() && !self.sent_result {
-                        let _ = self.result_tx.send(false);
-                        self.sent_result = true;
+                    if ui.button("Reject").clicked() && self.verdict_state == VerdictState::Pending
+                    {
+                        let _ = self.result_tx.send(Verdict::Reject);
+                        self.verdict_state = VerdictState::Sent;
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
-                    if ui.button("Accept New").clicked() && !self.sent_result {
-                        let _ = self.result_tx.send(true);
-                        self.sent_result = true;
+                    if ui.button("Accept New").clicked()
+                        && self.verdict_state == VerdictState::Pending
+                    {
+                        let _ = self.result_tx.send(Verdict::Accept);
+                        self.verdict_state = VerdictState::Sent;
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                     ui.separator();
                     if ui
-                        .selectable_label(!self.show_baseline, "New Screenshot")
+                        .selectable_label(
+                            self.active_view == CompareView::Screenshot,
+                            "New Screenshot",
+                        )
                         .clicked()
                     {
-                        self.show_baseline = false;
+                        self.active_view = CompareView::Screenshot;
                     }
                     if ui
-                        .selectable_label(self.show_baseline, "Baseline")
+                        .selectable_label(self.active_view == CompareView::Baseline, "Baseline")
                         .clicked()
                     {
-                        self.show_baseline = true;
+                        self.active_view = CompareView::Baseline;
                     }
                     ui.label("View:");
                 });
@@ -112,14 +139,15 @@ impl eframe::App for ImageCompareApp {
             egui::ScrollArea::both()
                 .auto_shrink([false, false])
                 .show(ui, |ui| {
-                    let (image, texture_slot, name) = if self.show_baseline {
-                        (&self.baseline_image, &mut self.baseline_texture, "baseline")
-                    } else {
-                        (
+                    let (image, texture_slot, name) = match self.active_view {
+                        CompareView::Baseline => {
+                            (&self.baseline_image, &mut self.baseline_texture, "baseline")
+                        }
+                        CompareView::Screenshot => (
                             &self.screenshot_image,
                             &mut self.screenshot_texture,
                             "screenshot",
-                        )
+                        ),
                     };
 
                     let texture = texture_slot.get_or_insert_with(|| {
@@ -233,13 +261,13 @@ pub fn prompt_user_approval(
         ..Default::default()
     };
 
-    let result_shared = Arc::new(Mutex::new(None));
+    let result_shared: Arc<Mutex<Option<Verdict>>> = Arc::new(Mutex::new(None));
     let result_clone = Arc::clone(&result_shared);
 
     let result = std::thread::scope(|s| {
         let handle = s.spawn(move || {
-            if let Ok(decision) = rx.recv() {
-                *result_clone.lock().unwrap() = Some(decision);
+            if let Ok(verdict) = rx.recv() {
+                *result_clone.lock().unwrap() = Some(verdict);
             }
         });
 
@@ -273,9 +301,9 @@ pub fn prompt_user_approval(
     });
 
     match result {
-        Some(decision) => {
+        Some(verdict) => {
             println!("  -> Comparison window closed");
-            Ok(decision)
+            Ok(verdict == Verdict::Accept)
         }
         None => {
             eprintln!("  GUI failed, falling back to terminal mode");

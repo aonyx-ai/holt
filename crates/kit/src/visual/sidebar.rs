@@ -32,7 +32,7 @@ pub enum SidebarSide {
     Right,
 }
 
-#[derive(TwVariant, PartialEq)]
+#[derive(PartialEq, TwVariant)]
 pub enum SidebarCollapsible {
     #[tw(class = "")]
     OffCanvas,
@@ -159,7 +159,7 @@ pub fn Sidebar(
             SidebarVariant::Floating | SidebarVariant::Inset => {
                 classes.push("group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+_theme(spacing.4))]".to_string());
             }
-            _ => {
+            SidebarVariant::Sidebar => {
                 classes.push(
                     "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]".to_string(),
                 );
@@ -188,7 +188,7 @@ pub fn Sidebar(
             SidebarVariant::Floating | SidebarVariant::Inset => {
                 classes.push("p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+theme(spacing.4)+2px)]".to_string());
             }
-            _ => {
+            SidebarVariant::Sidebar => {
                 classes.push("group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l".to_string());
             }
         }
@@ -374,13 +374,28 @@ pub fn SidebarMenuItem(#[prop(optional, into)] class: String, children: Children
     view! { <div class=classes>{children()}</div> }
 }
 
+/// Whether a sidebar menu button is active
+#[derive(Copy, Clone, PartialEq, Default)]
+pub enum MenuButtonState {
+    #[default]
+    Inactive,
+    Active,
+}
+
+impl MenuButtonState {
+    fn is_active(self) -> bool {
+        self == Self::Active
+    }
+}
+
 /// A button within a sidebar menu item
 #[component]
 pub fn SidebarMenuButton(
     #[prop(optional, into)] class: String,
-    #[prop(optional)] is_active: bool,
+    #[prop(optional)] state: MenuButtonState,
     children: Children,
 ) -> impl IntoView {
+    let is_active = state.is_active();
     let classes = {
         let mut classes = "group flex items-center w-full rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer transition-colors peer/menu-button".to_string();
 

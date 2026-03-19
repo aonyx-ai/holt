@@ -2,7 +2,7 @@ use leptos::children::Children;
 use leptos::prelude::*;
 use leptos::web_sys::window;
 
-#[derive(Clone, Copy)]
+#[derive(Copy, Clone)]
 pub struct SidebarContext {
     pub is_open: ReadSignal<bool>,
     pub set_open: WriteSignal<bool>,
@@ -19,9 +19,18 @@ impl SidebarContext {
     }
 }
 
+/// Initial open/closed state for the sidebar
+#[derive(Copy, Clone, PartialEq)]
+#[allow(dead_code)]
+pub enum SidebarInitialState {
+    Open,
+    Closed,
+    Auto,
+}
+
 #[component]
 pub fn SidebarProvider(
-    #[prop(optional)] initial_state: Option<bool>,
+    #[prop(optional)] initial_state: Option<SidebarInitialState>,
     #[prop(optional)] open: Option<ReadSignal<bool>>,
     #[prop(optional)] set_open_prop: Option<WriteSignal<bool>>,
     children: Children,
@@ -39,8 +48,11 @@ pub fn SidebarProvider(
         }
     };
 
-    // Default: open on desktop, closed on mobile (like Shadcn)
-    let initial_state = initial_state.unwrap_or(!initial_mobile);
+    let initial_state = match initial_state {
+        Some(SidebarInitialState::Open) => true,
+        Some(SidebarInitialState::Closed) => false,
+        Some(SidebarInitialState::Auto) | None => !initial_mobile,
+    };
 
     let (is_open_local, set_open_local) = signal(initial_state);
     let is_open = open.unwrap_or(is_open_local);

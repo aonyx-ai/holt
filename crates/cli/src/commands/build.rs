@@ -1,12 +1,21 @@
 use crate::config::Config;
+use clawless::clap;
 use clawless::prelude::*;
 use tokio::process::Command;
 
+/// Build profile selection
+#[derive(Copy, Clone, Debug, Default, clap::ValueEnum)]
+pub enum BuildProfile {
+    #[default]
+    Debug,
+    Release,
+}
+
 #[derive(Debug, Args)]
 pub struct BuildArgs {
-    /// Build in release mode
-    #[arg(short, long)]
-    release: bool,
+    /// Build profile
+    #[arg(short, long, default_value = "debug")]
+    profile: BuildProfile,
 }
 
 /// Build for production
@@ -18,8 +27,11 @@ pub async fn build(args: BuildArgs, _ctx: Context) -> CommandResult {
     cmd.arg("build");
     cmd.current_dir(&config.book.path);
 
-    if args.release {
-        cmd.arg("--release");
+    match args.profile {
+        BuildProfile::Debug => {}
+        BuildProfile::Release => {
+            cmd.arg("--release");
+        }
     }
 
     let status = cmd.status().await?;

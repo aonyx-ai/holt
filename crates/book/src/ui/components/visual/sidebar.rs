@@ -3,7 +3,7 @@ use leptos::prelude::*;
 
 use super::super::behavior::SidebarContext;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 #[allow(dead_code)]
 pub enum SidebarVariant {
     Sidebar,
@@ -11,14 +11,14 @@ pub enum SidebarVariant {
     Inset,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Copy, Clone)]
 #[allow(dead_code)]
 pub enum SidebarSide {
     Left,
     Right,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 #[allow(dead_code)]
 pub enum SidebarCollapsible {
     OffCanvas,

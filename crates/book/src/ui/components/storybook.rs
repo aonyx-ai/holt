@@ -9,12 +9,12 @@ use crate::ui::app::BasePath;
 use crate::ui::components::markdown::Markdown;
 use crate::ui::story::Story;
 
-#[derive(Params, PartialEq)]
+#[derive(PartialEq, Params)]
 struct StoryParams {
     story_id: Option<String>,
 }
 
-#[derive(Params, PartialEq)]
+#[derive(PartialEq, Params)]
 struct VisualTestParams {
     story_id: Option<String>,
     variant_index: Option<String>,
@@ -95,8 +95,8 @@ pub fn StorybookStory() -> impl IntoView {
             .ok()
             .and_then(|params| params.story_id.clone());
 
-        if let Some(id) = id {
-            inventory::iter::<&'static Story>
+        match id {
+            Some(id) => inventory::iter::<&'static Story>
                 .into_iter()
                 .find(|story| story.id == id)
                 .map_or_else(
@@ -118,15 +118,14 @@ pub fn StorybookStory() -> impl IntoView {
                         }
                         .into_any()
                     },
-                )
-        } else {
-            view! {
+                ),
+            None => view! {
                 <MobileHeader />
                 <div class="flex flex-col items-center justify-center h-full">
                     <p class="text-center">No story selected</p>
                 </div>
             }
-            .into_any()
+            .into_any(),
         }
     }
 }
@@ -209,26 +208,27 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                 <div class="p-6">
                     {move || {
                         let index = selected_variant.get();
-                        if let Some(variant) = variants.get(index) {
-                            if active_tab.get() == "preview" {
-                                view! {
-                                    <div class="flex items-center justify-center min-h-[200px] bg-muted/20 rounded-lg">
-                                        {(variant.render)()}
-                                    </div>
+                        match variants.get(index) {
+                            Some(variant) => {
+                                if active_tab.get() == "preview" {
+                                    view! {
+                                        <div class="flex items-center justify-center min-h-[200px] bg-muted/20 rounded-lg">
+                                            {(variant.render)()}
+                                        </div>
+                                    }
+                                        .into_any()
+                                } else {
+                                    view! {
+                                        <div class="bg-muted/30 rounded-lg p-4">
+                                            <pre class="text-sm overflow-x-auto">
+                                                <code>{variant.source}</code>
+                                            </pre>
+                                        </div>
+                                    }
+                                        .into_any()
                                 }
-                                    .into_any()
-                            } else {
-                                view! {
-                                    <div class="bg-muted/30 rounded-lg p-4">
-                                        <pre class="text-sm overflow-x-auto">
-                                            <code>{variant.source}</code>
-                                        </pre>
-                                    </div>
-                                }
-                                    .into_any()
                             }
-                        } else {
-                            view! { <div>"No variant selected"</div> }.into_any()
+                            None => view! { <div>"No variant selected"</div> }.into_any(),
                         }
                     }}
                 </div>

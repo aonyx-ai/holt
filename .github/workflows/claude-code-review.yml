@@ -14,7 +14,7 @@ jobs:
       github.event.issue.pull_request &&
       contains(github.event.comment.body, '@claude review')
 
-    runs-on: warp-ubuntu-latest-x64-2x
+    runs-on: ubuntu-latest
     concurrency:
       group: "claude-review-${{ github.event.issue.number }}"
       cancel-in-progress: true

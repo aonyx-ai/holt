@@ -13,7 +13,7 @@ static KIT_DIR: &str = "../kit/";
 type BuildResult<T> = Result<T, BuildError>;
 
 /// Errors that can occur during the build process.
-#[derive(Error, Debug)]
+#[derive(Debug, Error)]
 pub enum BuildError {
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
@@ -78,7 +78,7 @@ mod config {
 
 mod data {
     /// Information about a UI component extracted from story files.
-    #[derive(Debug, Clone)]
+    #[derive(Clone, Debug)]
     pub struct ComponentInfo {
         pub source: String,
     }

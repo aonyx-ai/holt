@@ -1,6 +1,6 @@
 use syn::{Expr, ItemConst, Lit, Meta};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub(crate) enum DocComments {
     Some(String),
     None,

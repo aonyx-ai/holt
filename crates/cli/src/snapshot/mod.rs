@@ -7,6 +7,7 @@ mod compare;
 use std::path::Path;
 use std::process::Command;
 
+use clawless::clap;
 use compare::prompt_user_approval;
 use doco::Mount;
 use holt_regression::{Comparison, VariantOutcome};
@@ -15,16 +16,38 @@ static CADDYFILE: &str = include_str!("Caddyfile");
 
 const BASELINE_DIR: &str = "tests/visual-baselines";
 
+/// Whether to run in check mode (CI) or interactive mode (local dev).
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, clap::ValueEnum)]
+pub enum SnapshotMode {
+    #[default]
+    Interactive,
+    Check,
+}
+
+/// Whether to run the browser headless.
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, clap::ValueEnum)]
+pub enum HeadlessMode {
+    #[default]
+    Auto,
+    Headless,
+    Visible,
+}
+
+/// Whether to save screenshots to the baseline directory.
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, clap::ValueEnum)]
+pub enum SaveMode {
+    #[default]
+    Save,
+    NoSave,
+}
+
 /// Configuration for running visual regression tests.
 pub struct SnapshotConfig<'a> {
     pub book_path: &'a Path,
     pub stories_path: &'a Path,
-    /// Run the browser headless (no visible window).
-    pub headless: bool,
-    /// Save new and mismatched screenshots to the baseline directory.
-    pub save: bool,
-    /// Check mode: purely pass/fail, no saving, no prompts.
-    pub check: bool,
+    pub headless: HeadlessMode,
+    pub save: SaveMode,
+    pub mode: SnapshotMode,
 }
 
 /// Run `trunk build` in the book path to produce `dist/`.
@@ -92,7 +115,7 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
                 .mount(Mount::bind_mount(caddyfile_str, "/etc/caddy/Caddyfile"))
                 .build(),
         )
-        .headless(config.headless)
+        .headless(config.headless == HeadlessMode::Headless)
         .viewport(doco::Viewport::new(1280, 720))
         .build();
 
@@ -132,7 +155,7 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
     println!("\n================================");
     println!("Results: {} passed, {} failed", passed, failed);
 
-    if !config.check && !config.headless {
+    if config.mode == SnapshotMode::Interactive && config.headless != HeadlessMode::Headless {
         let orphaned = holt_regression::cleanup_orphaned(&baseline_dir, &variants)
             .map_err(|e| e.to_string())?;
         if !orphaned.is_empty() {
@@ -170,13 +193,16 @@ fn handle_outcome(
             Ok(true)
         }
         Ok(Comparison::New { screenshot }) => {
-            if config.save {
-                println!("  [new] {} (new baseline)", label);
-                holt_regression::save(baseline_dir, variant, screenshot)
-                    .map_err(|e| e.to_string())?;
-                println!("  -> Baseline created");
-            } else {
-                println!("  [FAIL] {} no baseline", label);
+            match config.save {
+                SaveMode::Save => {
+                    println!("  [new] {} (new baseline)", label);
+                    holt_regression::save(baseline_dir, variant, screenshot)
+                        .map_err(|e| e.to_string())?;
+                    println!("  -> Baseline created");
+                }
+                SaveMode::NoSave => {
+                    println!("  [FAIL] {} no baseline", label);
+                }
             }
             Ok(false)
         }
@@ -186,12 +212,11 @@ fn handle_outcome(
         }) => {
             println!("  [FAIL] {} differs from baseline", label);
 
-            if !config.save {
+            if config.save == SaveMode::NoSave {
                 return Ok(false);
             }
 
-            // Headless: save screenshot, no prompt
-            if config.headless {
+            if config.headless == HeadlessMode::Headless {
                 holt_regression::save(baseline_dir, variant, screenshot)
                     .map_err(|e| e.to_string())?;
                 println!("  -> New screenshot saved");

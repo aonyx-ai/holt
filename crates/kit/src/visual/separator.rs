@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 
 /// Orientation options for the separator
-#[derive(Clone, Copy, Default, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Default)]
 pub enum Orientation {
     #[default]
     Horizontal,

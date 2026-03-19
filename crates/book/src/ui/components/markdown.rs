@@ -135,7 +135,32 @@ fn render_node(node: markdown::mdast::Node) -> impl IntoView {
             </strong>
         }.into_any(),
         markdown::mdast::Node::Text(text) => view! { {text.value} }.into_any(),
-        _ => view! { <span /> }.into_any()
+        markdown::mdast::Node::ThematicBreak(_) => view! { <hr class="my-6 border-t" /> }.into_any(),
+        markdown::mdast::Node::Table(table) => view! {
+            <table class="border-collapse border mb-4 w-full">
+                {table.children.iter().map(|child| render_node(child.clone())).collect_view()}
+            </table>
+        }.into_any(),
+        markdown::mdast::Node::TableRow(row) => view! {
+            <tr class="border-b">
+                {row.children.iter().map(|child| render_node(child.clone())).collect_view()}
+            </tr>
+        }.into_any(),
+        markdown::mdast::Node::TableCell(cell) => view! {
+            <td class="border px-3 py-1">
+                {cell.children.iter().map(|child| render_node(child.clone())).collect_view()}
+            </td>
+        }.into_any(),
+        markdown::mdast::Node::Html(html) => view! { <span inner_html=html.value /> }.into_any(),
+        markdown::mdast::Node::FootnoteDefinition(_)
+        | markdown::mdast::Node::FootnoteReference(_) => view! { <span /> }.into_any(),
+        markdown::mdast::Node::Toml(_)
+        | markdown::mdast::Node::Yaml(_) => view! { <span /> }.into_any(),
+        markdown::mdast::Node::MdxJsxFlowElement(_)
+        | markdown::mdast::Node::MdxJsxTextElement(_)
+        | markdown::mdast::Node::MdxjsEsm(_)
+        | markdown::mdast::Node::MdxTextExpression(_)
+        | markdown::mdast::Node::MdxFlowExpression(_) => view! { <span /> }.into_any(),
     }
 }
 

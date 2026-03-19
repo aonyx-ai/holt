@@ -45,7 +45,7 @@ fn build_help_shows_options() {
 
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("--release"));
+        .stdout(predicate::str::contains("--profile"));
 }
 
 #[test]
@@ -59,10 +59,10 @@ fn serve_accepts_port() {
 }
 
 #[test]
-fn build_accepts_release() {
+fn build_accepts_profile() {
     let mut cmd = cargo_bin_cmd!("holt");
 
-    cmd.args(["build", "--release"]);
+    cmd.args(["build", "--profile", "release"]);
 
     // Fails because trunk command not found, but args were parsed
     cmd.assert().failure();

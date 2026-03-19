@@ -1,7 +1,7 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "version": 1,
+    "schema-version": "1.10.0",
     "install": {
       "cargo": {
         "pkg-path": "cargo",
@@ -26,19 +26,22 @@
         "systems": [
           "aarch64-linux",
           "x86_64-linux"
-        ]
+        ],
+        "outputs": "all"
       },
       "geckodriver": {
         "pkg-path": "geckodriver"
       },
       "git": {
-        "pkg-path": "git"
+        "pkg-path": "git",
+        "outputs": "all"
       },
       "gum": {
         "pkg-path": "gum"
       },
       "just": {
-        "pkg-path": "just"
+        "pkg-path": "just",
+        "outputs": "all"
       },
       "leptosfmt": {
         "pkg-path": "leptosfmt"
@@ -48,16 +51,26 @@
         "systems": [
           "aarch64-darwin",
           "x86_64-darwin"
-        ]
+        ],
+        "outputs": "all"
       },
       "lld": {
-        "pkg-path": "lld"
+        "pkg-path": "lld",
+        "outputs": "all"
       },
       "markdownlint-cli": {
         "pkg-path": "markdownlint-cli"
       },
+      "openssl": {
+        "pkg-path": "openssl",
+        "outputs": "all"
+      },
       "parallel": {
-        "pkg-path": "parallel"
+        "pkg-path": "parallel",
+        "outputs": "all"
+      },
+      "pkg-config": {
+        "pkg-path": "pkg-config"
       },
       "prettier": {
         "pkg-path": "prettier"
@@ -72,7 +85,8 @@
       },
       "rustc": {
         "pkg-path": "rustc",
-        "pkg-group": "rust-toolchain"
+        "pkg-group": "rust-toolchain",
+        "outputs": "all"
       },
       "rustfmt": {
         "pkg-path": "rustfmt",
@@ -91,11 +105,19 @@
         "pkg-path": "wasm-pack"
       },
       "yamllint": {
-        "pkg-path": "yamllint"
+        "pkg-path": "yamllint",
+        "outputs": "all"
       },
       "zizmor": {
         "pkg-path": "zizmor"
+      },
+      "zlib": {
+        "pkg-path": "zlib",
+        "outputs": "all"
       }
+    },
+    "hook": {
+      "on-activate": "  # Install the nightly toolchain and dylint for whisker lints\n  rustup toolchain install nightly-2026-03-05 -c rustc-dev -c llvm-tools-preview --no-self-update\n  command -v cargo-dylint || cargo install cargo-dylint dylint-link --git https://github.com/trailofbits/dylint\n\n  # Wrap dylint-link so RUSTUP_TOOLCHAIN is always set. Dylint strips this\n  # var when building lint libraries, but dylint-link requires it to find the\n  # linker (defaulting to cc on non-Windows). We move the real binary aside\n  # and replace it with a wrapper that provides the fallback.\n  real=\"$HOME/.cargo/bin/dylint-link\"\n  if [ -f \"$real\" ] && [ ! -f \"$real.real\" ]; then\n    mv \"$real\" \"$real.real\"\n    cat > \"$real\" << 'WRAPPER'\n#!/bin/sh\nexport RUSTUP_TOOLCHAIN=\"${RUSTUP_TOOLCHAIN:-nightly-2026-03-05}\"\nexec \"$HOME/.cargo/bin/dylint-link.real\" \"$@\"\nWRAPPER\n    chmod +x \"$real\"\n  fi\n"
     },
     "profile": {},
     "options": {}
@@ -939,6 +961,9 @@
       "unfree": false,
       "version": "21.1.8",
       "outputs_to_install": [
+        "out",
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
@@ -968,6 +993,7 @@
       "unfree": false,
       "version": "21.1.8",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
@@ -998,6 +1024,7 @@
       "version": "15.2.0",
       "outputs_to_install": [
         "man",
+        "out",
         "out",
         "out"
       ],
@@ -1031,6 +1058,7 @@
       "version": "15.2.0",
       "outputs_to_install": [
         "man",
+        "out",
         "out",
         "out"
       ],
@@ -1664,6 +1692,13 @@
       "outputs_to_install": [
         "out",
         "out",
+        "out",
+        "out",
+        "out",
+        "out",
+        "out",
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
@@ -1694,6 +1729,8 @@
       "unfree": false,
       "version": "109.100.2",
       "outputs_to_install": [
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
@@ -1945,6 +1982,153 @@
       "priority": 5
     },
     {
+      "attr_path": "openssl",
+      "broken": false,
+      "derivation": "/nix/store/pcv77r7f3kfxx2vgmj89ai64ch1ilzcj-openssl-3.6.1.drv",
+      "description": "Cryptographic library that implements the SSL and TLS protocols",
+      "install_id": "openssl",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "openssl-3.6.1",
+      "pname": "openssl",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T04:47:12.133646Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.6.1",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/az9imgxrs6prk3kngg1r6nmjr1v2j61p-openssl-3.6.1-bin",
+        "dev": "/nix/store/1178sl0xnnjkjs9663gavn0cck4rx6pr-openssl-3.6.1-dev",
+        "doc": "/nix/store/w3w3dqckywglcz5w94f150z1dc6ahrp4-openssl-3.6.1-doc",
+        "man": "/nix/store/aw91hny2f4kvxmhxr5ln91w0y53cbv6l-openssl-3.6.1-man",
+        "out": "/nix/store/ar3higrpqx1sbx9m28i5crsgmaffki49-openssl-3.6.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "openssl",
+      "broken": false,
+      "derivation": "/nix/store/zrzdx5ga7njvqpb4sd0xn7xjcq87di4f-openssl-3.6.1.drv",
+      "description": "Cryptographic library that implements the SSL and TLS protocols",
+      "install_id": "openssl",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "openssl-3.6.1",
+      "pname": "openssl",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T05:24:09.551008Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.6.1",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "bin",
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/qg9is7wkbb6yp394pcj3hy5kiv66dl7v-openssl-3.6.1-bin",
+        "debug": "/nix/store/z5404xlmxks5gz56wv8k4ynd9jnf2ihc-openssl-3.6.1-debug",
+        "dev": "/nix/store/1z9xdmlb0phqvr5x7wp2qgic61w3r5my-openssl-3.6.1-dev",
+        "doc": "/nix/store/gn3vq7i7332gb3nl0v1kp718487difad-openssl-3.6.1-doc",
+        "man": "/nix/store/sdxxhb1m6d4as2nsaqgx4v5jnnhnriz0-openssl-3.6.1-man",
+        "out": "/nix/store/5zl8qqll2yv6v9k7k3h1c131x8xw6pvk-openssl-3.6.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "openssl",
+      "broken": false,
+      "derivation": "/nix/store/5yfqars706ka7ip0mj2zljdxw1rhdscm-openssl-3.6.1.drv",
+      "description": "Cryptographic library that implements the SSL and TLS protocols",
+      "install_id": "openssl",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "openssl-3.6.1",
+      "pname": "openssl",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T06:04:17.510537Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.6.1",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/zaz6np1c8xqlnkj2vf7j4djp3bd1g4wv-openssl-3.6.1-bin",
+        "dev": "/nix/store/dp3zxgxamqcsg3m15z989niaw6dmmmc8-openssl-3.6.1-dev",
+        "doc": "/nix/store/1imldik8ljswxlplc73hzd47wgbcvjvc-openssl-3.6.1-doc",
+        "man": "/nix/store/n1kwnkngk6vyrvcvcf4z9qwij18rr7s1-openssl-3.6.1-man",
+        "out": "/nix/store/lcm93hfhp6gwb5ilrrbllkbvchxxj4vl-openssl-3.6.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "openssl",
+      "broken": false,
+      "derivation": "/nix/store/vmyc45g3rr38wpjsvzax2i489dvihc89-openssl-3.6.1.drv",
+      "description": "Cryptographic library that implements the SSL and TLS protocols",
+      "install_id": "openssl",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "openssl-3.6.1",
+      "pname": "openssl",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T06:47:27.420362Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.6.1",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "bin",
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/9nww32bprhg1rr1qj423xdr5mwnqk93z-openssl-3.6.1-bin",
+        "debug": "/nix/store/drl891bkkxavilqvcxa8pj0rgg6klmjq-openssl-3.6.1-debug",
+        "dev": "/nix/store/1p14m1hrdkykyxs0l6wg7y29ahppcnsr-openssl-3.6.1-dev",
+        "doc": "/nix/store/xb0i5l883qwms52wxhm0krygfqllxxil-openssl-3.6.1-doc",
+        "man": "/nix/store/7bvx99sfzk9iw2pa4131a4qaqmifwl05-openssl-3.6.1-man",
+        "out": "/nix/store/p96a7p297gmia8zcy4i72qd45wzw8lh6-openssl-3.6.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
       "attr_path": "parallel",
       "broken": false,
       "derivation": "/nix/store/gxiwf98mn5jz1fq4b24g7mp4kpq2b2x5-parallel-20260122.drv",
@@ -2067,6 +2251,138 @@
         "doc": "/nix/store/bqai14k0f9v5l6nc3m7aqhqp0q1lczkv-parallel-20260122-doc",
         "man": "/nix/store/asigykjz744x4rnsryy12555mx7kcmym-parallel-20260122-man",
         "out": "/nix/store/ddi33l75b1xxlymvipkabqhi7hjava6k-parallel-20260122"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/1rnsk5iqycd87lrqqp9ixbkpafd574r2-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T04:47:20.548983Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/cqnljpwngva1kkx5b19b71j291j3wfmv-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/aw3iz07i5svbh9vagw9wf6skdblbj2bi-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/s854fasrcpcj8x7bc0hnh9wpjgfcbwvh-pkg-config-wrapper-0.29.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/2cakm17wnm5jl1d5n85r897jhmpkaavm-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T05:24:21.218304Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/bi8d3bzdnq0p3vfrvhl58h931rxpfc9f-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/73whcmcjw6qlxswb47lf4ykr80jla8wn-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/kd1m81w8pak48m7qkydafp1xq3blzbgz-pkg-config-wrapper-0.29.2"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/ijc7yih6094kj4h2sbk88x1s5y3qhhv2-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T06:04:25.750754Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/i6dayp8k249nxsx08asabpl6zamixkl2-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/4szfswmsvsbj95q1j3cwyk1z69arbw8j-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/pnsvg8avfh2nym8zg4h72qp31a710jaw-pkg-config-wrapper-0.29.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/4sflgpi32p1q6znl8c320hncgs1sp9d5-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T06:47:39.707929Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/zh2c9sb41q4c62xwfgkk4bspgkas2qjw-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/f69zkr603mis7hkjpbladwhs1s2mz0ch-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/1nv3i8mpypy3d516f4pd95m0w72r73jy-pkg-config-wrapper-0.29.2"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -2883,6 +3199,143 @@
       ],
       "outputs": {
         "out": "/nix/store/1vsvi6yi3w1g479dxjv7pw5mb60qh96g-zizmor-1.22.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "zlib",
+      "broken": false,
+      "derivation": "/nix/store/jsxbqfiycbxsyc83nw95bd50vhwf2q52-zlib-1.3.1.drv",
+      "description": "Lossless data-compression library",
+      "install_id": "zlib",
+      "license": "Zlib",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "zlib-1.3.1",
+      "pname": "zlib",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T04:49:23.370494Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.3.1",
+      "outputs_to_install": [
+        "out",
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/5knzc9w31z2yd666mnzv4sh67f1vhlka-zlib-1.3.1-dev",
+        "out": "/nix/store/zrcjwa4f88lphgsrvjfb6alxvhyyvgkj-zlib-1.3.1",
+        "static": "/nix/store/m1i3gmkmsdrcbm9m2axajj604rsfdna6-zlib-1.3.1-static"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "zlib",
+      "broken": false,
+      "derivation": "/nix/store/hrh0zndpzcl6xb5qfvbbk1ggk6hp756i-zlib-1.3.1.drv",
+      "description": "Lossless data-compression library",
+      "install_id": "zlib",
+      "license": "Zlib",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "zlib-1.3.1",
+      "pname": "zlib",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T05:27:03.765283Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.3.1",
+      "outputs_to_install": [
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/cibwfc96l4adq8wf7nbm966nwxcpzkw9-zlib-1.3.1-dev",
+        "out": "/nix/store/wv20ws4j6hcxkvsja8y675v99ljrj9sg-zlib-1.3.1",
+        "static": "/nix/store/wxgmp0n4b0093ynyy22400adc8v7nhz1-zlib-1.3.1-static"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "zlib",
+      "broken": false,
+      "derivation": "/nix/store/f7kj6f047hbbvs0bq5allcfyg3rylyfx-zlib-1.3.1.drv",
+      "description": "Lossless data-compression library",
+      "install_id": "zlib",
+      "license": "Zlib",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "zlib-1.3.1",
+      "pname": "zlib",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T06:06:25.154882Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.3.1",
+      "outputs_to_install": [
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/c87061qbpv6fxfqzhhva94854wwv3ryn-zlib-1.3.1-dev",
+        "out": "/nix/store/sr4c535qpc4hbiqwwn7kdq7k4b9nxg8l-zlib-1.3.1",
+        "static": "/nix/store/vipcgi5bznjjf4i0jahiagj7wnbgc8h9-zlib-1.3.1-static"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "zlib",
+      "broken": false,
+      "derivation": "/nix/store/070x6gfk1058zai25jmbrjbhf2y395j5-zlib-1.3.1.drv",
+      "description": "Lossless data-compression library",
+      "install_id": "zlib",
+      "license": "Zlib",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=aca4d95fce4914b3892661bcb80b8087293536c6",
+      "name": "zlib-1.3.1",
+      "pname": "zlib",
+      "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+      "rev_count": 958961,
+      "rev_date": "2026-03-06T04:56:59Z",
+      "scrape_date": "2026-03-08T06:50:29.892881Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.3.1",
+      "outputs_to_install": [
+        "out",
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/87y9237m9c9m9mxk9ajwdfmn78vz6w2y-zlib-1.3.1-dev",
+        "out": "/nix/store/vl8jkqpr0l3fac3cxiy4nwc5paiww1lv-zlib-1.3.1",
+        "static": "/nix/store/njwanmygmqc5vdhx22mnipiihqp39ysr-zlib-1.3.1-static"
       },
       "system": "x86_64-linux",
       "group": "toplevel",

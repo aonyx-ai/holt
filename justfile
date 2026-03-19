@@ -95,6 +95,7 @@ lint-markdown:
 # Lint Rust files
 lint-rust:
     cargo clippy --all-targets --all-features -- -D warnings
+    PATH="$HOME/.cargo/bin:$PATH" DYLINT_RUSTFLAGS="-D warnings" RUSTUP_TOOLCHAIN=nightly-2026-03-05 cargo dylint --all --workspace --no-deps
 
 # Lint TOML files
 lint-toml:

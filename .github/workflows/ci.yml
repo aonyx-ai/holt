@@ -14,7 +14,7 @@ concurrency:
 jobs:
   targets:
     name: Enumerate Just recipes
-    runs-on: warp-ubuntu-latest-x64-2x
+    runs-on: ubuntu-latest
 
     permissions:
       contents: read # Checkout code
@@ -39,7 +39,7 @@ jobs:
 
   checks:
     name: ${{ matrix.target }}
-    runs-on: warp-ubuntu-latest-x64-2x
+    runs-on: ubuntu-latest
 
     permissions:
       packages: write # Push Docker images for visual regression
@@ -72,7 +72,6 @@ jobs:
         with:
           prefix-key: "v0-${{ matrix.target }}"
           cache-on-failure: true
-          cache-provider: "warpbuild"
 
       - name: Run check with Just
         uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0
@@ -81,7 +80,7 @@ jobs:
 
   success:
     name: All checks succeeded
-    runs-on: warp-ubuntu-latest-x64-2x
+    runs-on: ubuntu-latest
 
     permissions: {}
 

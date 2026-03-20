@@ -114,7 +114,12 @@ pub fn CarouselPrevious(
     let ctx = use_carousel();
 
     view! {
-        <button type="button" class=class on:click=move |_| ctx.scroll_prev() aria-label="Previous slide">
+        <button
+            type="button"
+            class=class
+            on:click=move |_| ctx.scroll_prev()
+            aria-label="Previous slide"
+        >
             {children()}
         </button>
     }
@@ -126,7 +131,12 @@ pub fn CarouselNext(#[prop(optional, into)] class: String, children: Children) -
     let ctx = use_carousel();
 
     view! {
-        <button type="button" class=class on:click=move |_| ctx.scroll_next() aria-label="Next slide">
+        <button
+            type="button"
+            class=class
+            on:click=move |_| ctx.scroll_next()
+            aria-label="Next slide"
+        >
             {children()}
         </button>
     }

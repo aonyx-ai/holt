@@ -72,11 +72,7 @@ pub fn CarouselContent(#[prop(optional, into)] class: String, children: Children
         CarouselOrientation::Horizontal => CarouselContentHorizontalStyle {}.with_class(&class),
         CarouselOrientation::Vertical => CarouselContentVerticalStyle {}.with_class(&class),
     };
-    view! {
-        <CarouselContentPrimitive class=class>
-            {children()}
-        </CarouselContentPrimitive>
-    }
+    view! { <CarouselContentPrimitive class=class>{children()}</CarouselContentPrimitive> }
 }
 
 /// Styled individual slide.
@@ -87,11 +83,7 @@ pub fn CarouselItem(#[prop(optional, into)] class: String, children: Children) -
         CarouselOrientation::Horizontal => CarouselItemHorizontalStyle {}.with_class(&class),
         CarouselOrientation::Vertical => CarouselItemVerticalStyle {}.with_class(&class),
     };
-    view! {
-        <CarouselItemPrimitive class=class>
-            {children()}
-        </CarouselItemPrimitive>
-    }
+    view! { <CarouselItemPrimitive class=class>{children()}</CarouselItemPrimitive> }
 }
 
 /// Styled previous-slide button with a left-arrow icon.
@@ -102,9 +94,7 @@ pub fn CarouselPrevious(#[prop(optional, into)] class: String) -> impl IntoView 
         CarouselOrientation::Horizontal => CarouselPrevHorizontalPos {}.to_class(),
         CarouselOrientation::Vertical => CarouselPrevVerticalPos {}.to_class(),
     };
-    let class = CarouselNavStyle {}
-        .with_class(&pos_class)
-        .with_class(&class);
+    let class = tw_merge!(CarouselNavStyle {}.with_class(&pos_class), &class);
     view! {
         <CarouselPreviousPrimitive class=class>
             <leptos_icons::Icon icon=icondata::LuArrowLeft attr:class="h-4 w-4" />
@@ -121,9 +111,7 @@ pub fn CarouselNext(#[prop(optional, into)] class: String) -> impl IntoView {
         CarouselOrientation::Horizontal => CarouselNextHorizontalPos {}.to_class(),
         CarouselOrientation::Vertical => CarouselNextVerticalPos {}.to_class(),
     };
-    let class = CarouselNavStyle {}
-        .with_class(&pos_class)
-        .with_class(&class);
+    let class = tw_merge!(CarouselNavStyle {}.with_class(&pos_class), &class);
     view! {
         <CarouselNextPrimitive class=class>
             <leptos_icons::Icon icon=icondata::LuArrowRight attr:class="h-4 w-4" />

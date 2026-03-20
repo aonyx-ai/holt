@@ -1,3 +1,4 @@
+mod aspect_ratio;
 mod badge;
 mod breadcrumb;
 mod button;

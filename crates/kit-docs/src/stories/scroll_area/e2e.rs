@@ -14,10 +14,7 @@ async fn scroll_area_renders_with_content(client: Client) -> Result<()> {
     );
 
     let tags = scroll_area.find_all(By::Css("div.text-sm")).await?;
-    assert!(
-        !tags.is_empty(),
-        "scroll area should contain tag items"
-    );
+    assert!(!tags.is_empty(), "scroll area should contain tag items");
     Ok(())
 }
 

@@ -40,11 +40,7 @@ pub fn ScrollArea(
         format!("{base_class} {class}")
     };
 
-    view! {
-        <div class=classes>
-            {children()}
-        </div>
-    }
+    view! { <div class=classes>{children()}</div> }
 }
 
 #[cfg(test)]

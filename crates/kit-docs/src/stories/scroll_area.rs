@@ -1,4 +1,4 @@
-// @component ScrollArea
+// @component scroll_area
 #[cfg(feature = "e2e")]
 mod e2e;
 
@@ -48,7 +48,10 @@ fn default() -> AnyView {
 #[variant]
 fn horizontal() -> AnyView {
     view! {
-        <ScrollArea orientation=ScrollOrientation::Horizontal class="w-96 whitespace-nowrap rounded-md border">
+        <ScrollArea
+            orientation=ScrollOrientation::Horizontal
+            class="w-96 whitespace-nowrap rounded-md border"
+        >
             <div class="flex w-max space-x-4 p-4">
                 <div class="w-48 shrink-0 rounded-md border p-4">
                     <h4 class="text-sm font-medium">"Item 1"</h4>

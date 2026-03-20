@@ -138,7 +138,7 @@ jobs:
           fi
 
       - name: Report results
-        if: always() && steps.changed-files.outputs.any_changed == 'true'
+        if: "!cancelled() && steps.changed-files.outputs.any_changed == 'true'"
         uses: ./.github/actions/visual-regression-report
         with:
           has-changes: ${{ steps.visual-regression.outputs.HAS_CHANGES }}

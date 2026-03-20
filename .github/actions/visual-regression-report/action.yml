@@ -78,11 +78,7 @@ runs:
 
         ---
 
-        ### 📥 Review
-
-        {{REPORT_LINK}}
-
-        Or run `holt snapshot` locally to review and accept changes interactively.
+        {{REPORT_LINK}} | `holt snapshot` locally
 
         EOF
         else
@@ -108,9 +104,9 @@ runs:
           let reportLink;
           if (hasChanges && artifactId) {
             const reportUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${artifactId}`;
-            reportLink = `**[View comparison report](${reportUrl})** — interactive slider, side-by-side, and toggle modes (no download needed).`;
+            reportLink = `[View comparison report](${reportUrl})`;
           } else {
-            reportLink = `Go to the [workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) to download artifacts.`;
+            reportLink = `[View workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
           }
           comment = comment.replace('{{REPORT_LINK}}', reportLink);
 

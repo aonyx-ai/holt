@@ -28,6 +28,11 @@ fn outline() -> AnyView {
 }
 
 #[variant]
+fn success() -> AnyView {
+    view! { <Badge variant=BadgeVariant::Success>Success</Badge> }.into_any()
+}
+
+#[variant]
 fn verified() -> AnyView {
     view! {
         <Badge variant=BadgeVariant::Secondary class="bg-blue-500 text-white dark:bg-blue-600">
@@ -79,6 +84,7 @@ const BADGE_STORY: () = &[
     secondary,
     destructive,
     outline,
+    success,
     verified,
     number_8,
     number_99,

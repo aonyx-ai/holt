@@ -10,9 +10,7 @@ async fn menubar_renders_triggers(client: Client) -> Result<()> {
     let menubar = client.find(By::Css("main [role='menubar']")).await?;
     assert!(menubar.is_displayed().await?, "menubar should be visible");
 
-    let triggers = menubar
-        .find_all(By::Css("button[role='menuitem']"))
-        .await?;
+    let triggers = menubar.find_all(By::Css("button[role='menuitem']")).await?;
     assert_eq!(triggers.len(), 3, "should have three menu triggers");
     Ok(())
 }
@@ -33,10 +31,7 @@ async fn menubar_opens_on_click(client: Client) -> Result<()> {
     assert!(menu.is_displayed().await?, "menu should be visible");
 
     let items = menu.find_all(By::Css("[role='menuitem']")).await?;
-    assert!(
-        !items.is_empty(),
-        "menu should contain at least one item"
-    );
+    assert!(!items.is_empty(), "menu should contain at least one item");
     Ok(())
 }
 

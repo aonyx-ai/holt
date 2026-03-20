@@ -26,10 +26,6 @@ pub enum BadgeVariant {
     Destructive,
     #[tw(class = "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground")]
     Outline,
-    #[tw(
-        class = "border-transparent bg-emerald-600 text-white [a&]:hover:bg-emerald-600/90 dark:bg-emerald-500"
-    )]
-    Success,
 }
 
 #[component]

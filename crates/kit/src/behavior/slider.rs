@@ -158,10 +158,10 @@ pub fn SliderRoot(
         // We need to share the move closure ref to remove it later
         let move_fn = on_pointermove
             .as_ref()
-            .unchecked_ref::<js_sys::Function>()
+            .unchecked_ref::<web_sys::js_sys::Function>()
             .clone();
 
-        let on_pointerup: Closure<dyn Fn(web_sys::PointerEvent)> =
+        let on_pointerup: Closure<dyn FnMut(web_sys::PointerEvent)> =
             Closure::once(move |_ev: web_sys::PointerEvent| {
                 ctx_up.dragging.set(false);
                 if let Some(win) = web_sys::window() {
@@ -223,12 +223,7 @@ pub fn SliderTrack(#[prop(optional, into)] class: String, children: Children) ->
 pub fn SliderRange(#[prop(optional, into)] class: String) -> impl IntoView {
     let context = use_slider();
 
-    view! {
-        <span
-            class=class
-            style:width=move || format!("{}%", context.percentage())
-        />
-    }
+    view! { <span class=class style:width=move || format!("{}%", context.percentage()) /> }
 }
 
 /// The draggable thumb

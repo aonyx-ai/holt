@@ -1,9 +1,11 @@
 //! CLI command for visual regression testing.
 
+use std::io::IsTerminal;
+use std::path::PathBuf;
+
 use crate::config::Config;
 use crate::snapshot::{self, HeadlessMode, SaveMode, SnapshotConfig, SnapshotMode};
 use clawless::prelude::*;
-use std::io::IsTerminal;
 
 #[derive(Debug, Args)]
 pub struct SnapshotArgs {
@@ -35,6 +37,10 @@ pub struct SnapshotArgs {
         default_value = "save"
     )]
     save: SaveMode,
+
+    /// Generate a self-contained HTML comparison report at the given path.
+    #[arg(long, value_name = "PATH")]
+    report: Option<PathBuf>,
 }
 
 impl SnapshotArgs {
@@ -74,6 +80,7 @@ pub async fn snapshot(args: SnapshotArgs, _ctx: Context) -> CommandResult {
         headless: args.resolve_headless(),
         save: args.resolve_save(),
         mode: args.check,
+        report: args.report.as_deref(),
     })
     .await
     .map_err(Error::msg)

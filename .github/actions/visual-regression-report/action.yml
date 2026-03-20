@@ -22,6 +22,7 @@ runs:
         path: visual-regression-output/
 
     - name: Upload visual regression report
+      id: upload-report
       if: inputs.has-changes == 'true'
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
       with:
@@ -96,29 +97,20 @@ runs:
       uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
       env:
         HAS_CHANGES: ${{ inputs.has-changes }}
+        REPORT_ARTIFACT_ID: ${{ steps.upload-report.outputs.artifact-id }}
       with:
         script: |
           const fs = require('fs');
           let comment = fs.readFileSync('comment.md', 'utf8');
           const hasChanges = process.env.HAS_CHANGES === 'true';
+          const artifactId = process.env.REPORT_ARTIFACT_ID;
 
-          // Look up the report artifact URL
-          let reportLink = `Go to the [workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) and download the **visual-regression-screenshots** artifact to compare images locally.`;
-          if (hasChanges) {
-            try {
-              const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                run_id: context.runId,
-              });
-              const report = artifacts.find(a => a.name === 'visual-regression-report');
-              if (report) {
-                const reportUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${report.id}`;
-                reportLink = `**[View comparison report](${reportUrl})** — interactive slider, side-by-side, and toggle modes (no download needed).\n\nOr download the **visual-regression-screenshots** artifact to compare images locally.`;
-              }
-            } catch (e) {
-              console.log('Could not look up report artifact:', e.message);
-            }
+          let reportLink;
+          if (hasChanges && artifactId) {
+            const reportUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${artifactId}`;
+            reportLink = `**[View comparison report](${reportUrl})** — interactive slider, side-by-side, and toggle modes (no download needed).`;
+          } else {
+            reportLink = `Go to the [workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) to download artifacts.`;
           }
           comment = comment.replace('{{REPORT_LINK}}', reportLink);
 

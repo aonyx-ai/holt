@@ -77,6 +77,11 @@ When you run `holt snapshot --check`:
 3. Any difference causes the test to fail immediately
 4. No screenshots are saved, no prompts are shown
 
+Adding `--report report.html` generates an interactive HTML comparison report
+with slider, side-by-side, and toggle modes for reviewing differences. The CI
+workflow uploads this as a clickable artifact, so reviewers can inspect changes
+directly in their browser without downloading anything.
+
 The visual regression CI workflow compares against main-branch baselines and
 posts a PR comment summarizing changes with instructions for accepting them.
 

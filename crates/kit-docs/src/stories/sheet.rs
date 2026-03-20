@@ -68,9 +68,15 @@ fn left_side() -> AnyView {
                     <a href="#" class="rounded-md px-3 py-2 text-sm hover:bg-accent">
                         "Dashboard"
                     </a>
-                    <a href="#" class="rounded-md px-3 py-2 text-sm hover:bg-accent">"Settings"</a>
-                    <a href="#" class="rounded-md px-3 py-2 text-sm hover:bg-accent">"Profile"</a>
-                    <a href="#" class="rounded-md px-3 py-2 text-sm hover:bg-accent">"Help"</a>
+                    <a href="#" class="rounded-md px-3 py-2 text-sm hover:bg-accent">
+                        "Settings"
+                    </a>
+                    <a href="#" class="rounded-md px-3 py-2 text-sm hover:bg-accent">
+                        "Profile"
+                    </a>
+                    <a href="#" class="rounded-md px-3 py-2 text-sm hover:bg-accent">
+                        "Help"
+                    </a>
                 </nav>
             </SheetContent>
         </Sheet>

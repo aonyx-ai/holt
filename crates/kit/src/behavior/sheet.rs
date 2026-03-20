@@ -72,8 +72,8 @@ pub fn SheetContent(#[prop(optional, into)] class: String, children: ChildrenFn)
     };
 
     view! {
-        <Show when=move || ctx.is_open()>
-            <Portal>
+        <Show when=move || ctx.is_open() clone:class>
+            <Portal clone:class>
                 <div
                     class="sheet-overlay"
                     on:click=on_overlay_click

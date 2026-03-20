@@ -8,29 +8,25 @@ use crate::behavior::{
 };
 
 /// Which edge of the screen the sheet slides out from.
-#[derive(TwVariant)]
+#[derive(Default)]
 pub enum SheetSide {
     Top,
     Bottom,
     Left,
-    #[tw(default)]
+    #[default]
     Right,
 }
 
 /// The main Sheet component
 #[component]
 pub fn Sheet(#[prop(optional)] open: RwSignal<bool>, children: Children) -> impl IntoView {
-    view! {
-        <SheetRootPrimitive open=open>{children()}</SheetRootPrimitive>
-    }
+    view! { <SheetRootPrimitive open=open>{children()}</SheetRootPrimitive> }
 }
 
 /// Sheet trigger with no default styling (user styles via class prop)
 #[component]
 pub fn SheetTrigger(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
-    view! {
-        <SheetTriggerPrimitive class=class>{children()}</SheetTriggerPrimitive>
-    }
+    view! { <SheetTriggerPrimitive class=class>{children()}</SheetTriggerPrimitive> }
 }
 
 /// Sheet content panel that slides in from the specified side
@@ -65,10 +61,13 @@ pub fn SheetContent(
         &class
     );
 
+    let children = StoredValue::new(children);
+
     view! {
         <SheetContentPrimitive class=overlay_classes>
-            <div class=content_classes>
-                {children()}
+            <div class=content_classes
+                .clone()>
+                {children.read_value()()}
                 <SheetClosePrimitive class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
                     <Icon icon=icondata::LuX attr:class="h-4 w-4" />
                     <span class="sr-only">"Close"</span>
@@ -115,9 +114,7 @@ pub fn SheetDescription(
 /// Close button (re-export of behavior primitive with optional styling)
 #[component]
 pub fn SheetClose(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
-    view! {
-        <SheetClosePrimitive class=class>{children()}</SheetClosePrimitive>
-    }
+    view! { <SheetClosePrimitive class=class>{children()}</SheetClosePrimitive> }
 }
 
 #[cfg(test)]

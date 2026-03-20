@@ -54,7 +54,9 @@ async fn dropdown_menu_items_have_menuitem_role(client: Client) -> Result<()> {
     trigger.click().await?;
     tokio::time::sleep(std::time::Duration::from_millis(300)).await;
 
-    let items = client.find_all(By::Css("[role='menu'] [role='menuitem']")).await?;
+    let items = client
+        .find_all(By::Css("[role='menu'] [role='menuitem']"))
+        .await?;
     assert!(
         items.len() >= 4,
         "default variant should have at least 4 menu items, found {}",

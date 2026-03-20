@@ -13,9 +13,7 @@ use leptos_floating::{Align, Side};
 /// The main DropdownMenu component
 #[component]
 pub fn DropdownMenu(children: Children) -> impl IntoView {
-    view! {
-        <DropdownMenuRootPrimitive>{children()}</DropdownMenuRootPrimitive>
-    }
+    view! { <DropdownMenuRootPrimitive>{children()}</DropdownMenuRootPrimitive> }
 }
 
 /// Dropdown menu trigger with styling
@@ -29,11 +27,7 @@ pub fn DropdownMenuTrigger(
         &class
     );
 
-    view! {
-        <DropdownMenuTriggerPrimitive class=classes>
-            {children()}
-        </DropdownMenuTriggerPrimitive>
-    }
+    view! { <DropdownMenuTriggerPrimitive class=classes>{children()}</DropdownMenuTriggerPrimitive> }
 }
 
 /// Dropdown menu content with positioning and styling
@@ -85,11 +79,7 @@ pub fn DropdownMenuLabel(
 ) -> impl IntoView {
     let classes = tw_merge!("px-2 py-1.5 text-sm font-semibold", &class);
 
-    view! {
-        <DropdownMenuLabelPrimitive class=classes>
-            {children()}
-        </DropdownMenuLabelPrimitive>
-    }
+    view! { <DropdownMenuLabelPrimitive class=classes>{children()}</DropdownMenuLabelPrimitive> }
 }
 
 /// Separator between menu items

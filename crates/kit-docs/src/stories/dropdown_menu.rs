@@ -1,4 +1,4 @@
-// @component DropdownMenu
+// @component dropdown_menu
 #[cfg(feature = "e2e")]
 mod e2e;
 

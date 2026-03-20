@@ -2,3 +2,8 @@ rules:
   cache-poisoning:
     ignore:
       - visual-regression.yml
+      - visual-regression-reusable.yml
+  # Caller controls concurrency for reusable workflows
+  concurrency-limits:
+    ignore:
+      - visual-regression-reusable.yml

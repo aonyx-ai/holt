@@ -48,6 +48,7 @@ pub struct SnapshotConfig<'a> {
     pub headless: HeadlessMode,
     pub save: SaveMode,
     pub mode: SnapshotMode,
+    pub report: Option<&'a Path>,
 }
 
 /// Run `trunk build` in the book path to produce `dist/`.
@@ -132,6 +133,16 @@ pub async fn run(config: SnapshotConfig<'_>) -> Result<(), String> {
     };
 
     let result = holt_regression::run(session.client(), &variants, &regression_config).await;
+
+    if let Some(report_path) = config.report {
+        let html = holt_regression::generate_html_report(&result);
+        if let Some(parent) = report_path.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|e| format!("Failed to create report directory: {e}"))?;
+        }
+        std::fs::write(report_path, html).map_err(|e| format!("Failed to write report: {e}"))?;
+        println!("Report written to {}", report_path.display());
+    }
 
     let mut passed = 0;
     let mut failed = 0;

@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visual Regression Report</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: #111;
+        color: #e0e0e0;
+        padding: 2rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .summary {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #1a1a1a;
+        border-radius: 8px;
+      }
+      .summary .stat {
+        font-size: 1.1rem;
+      }
+      .stat-passed {
+        color: #4ade80;
+      }
+      .stat-mismatch {
+        color: #f87171;
+      }
+      .stat-new {
+        color: #60a5fa;
+      }
+      .stat-error {
+        color: #fbbf24;
+      }
+
+      .entry {
+        margin-bottom: 1.5rem;
+        background: #1a1a1a;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .entry-header {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        user-select: none;
+      }
+      .entry-header:hover {
+        background: #222;
+      }
+      .entry-header .arrow {
+        transition: transform 0.2s;
+        font-size: 0.75rem;
+      }
+      .entry-header.open .arrow {
+        transform: rotate(90deg);
+      }
+      .entry-header .label {
+        font-weight: 600;
+        flex: 1;
+      }
+      .entry-header .badge {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+      .badge-mismatch {
+        background: #991b1b;
+        color: #fca5a5;
+      }
+      .badge-new {
+        background: #1e3a5f;
+        color: #93c5fd;
+      }
+      .badge-error {
+        background: #713f12;
+        color: #fde68a;
+      }
+      .entry-body {
+        display: none;
+        padding: 1rem;
+        border-top: 1px solid #333;
+      }
+      .entry-body.open {
+        display: block;
+      }
+
+      .mode-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .mode-tab {
+        padding: 0.4rem 0.8rem;
+        background: #333;
+        border: none;
+        color: #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+      .mode-tab.active {
+        background: #555;
+        color: #fff;
+      }
+
+      .comparison {
+        position: relative;
+        background: repeating-conic-gradient(#222 0% 25%, #2a2a2a 0% 50%) 0 0 /
+          20px 20px;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .comparison img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Side by side */
+      .side-by-side {
+        display: flex;
+        gap: 1rem;
+      }
+      .side-by-side .panel {
+        flex: 1;
+        min-width: 0;
+      }
+      .side-by-side .panel-label {
+        font-size: 0.75rem;
+        color: #999;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* Slider */
+      .slider-wrap {
+        position: relative;
+        overflow: hidden;
+      }
+      .slider-wrap img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .slider-new {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      .slider-new img {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+      .slider-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: ew-resize;
+        z-index: 2;
+      }
+      .slider-line {
+        position: absolute;
+        top: 0;
+        width: 2px;
+        height: 100%;
+        background: #fff;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* Toggle */
+      .toggle-wrap {
+        cursor: pointer;
+      }
+      .toggle-wrap img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .toggle-hint {
+        font-size: 0.75rem;
+        color: #888;
+        margin-top: 0.25rem;
+      }
+
+      /* New screenshot (single image) */
+      .new-screenshot img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Error */
+      .error-message {
+        padding: 1rem;
+        background: #2a1a00;
+        border-radius: 4px;
+        color: #fde68a;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Visual Regression Report</h1>
+    <div class="summary">
+      <span class="stat stat-passed">{{PASSED_COUNT}} passed</span>
+      <span class="stat stat-mismatch">{{MISMATCH_COUNT}} changed</span>
+      <span class="stat stat-new">{{NEW_COUNT}} new</span>
+      <span class="stat stat-error">{{ERROR_COUNT}} errors</span>
+    </div>
+
+    {{ENTRIES}}
+
+    <script>
+      // Toggle entry collapse
+      document.querySelectorAll(".entry-header").forEach((header) => {
+        header.addEventListener("click", () => {
+          header.classList.toggle("open");
+          header.nextElementSibling.classList.toggle("open");
+        });
+      });
+
+      // Comparison mode tabs
+      document.querySelectorAll(".mode-tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const entry = tab.closest(".entry-body");
+          entry
+            .querySelectorAll(".mode-tab")
+            .forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          const mode = tab.dataset.mode;
+          entry.querySelectorAll(".comparison-mode").forEach((m) => {
+            m.style.display = m.dataset.mode === mode ? "" : "none";
+          });
+        });
+      });
+
+      // Slider logic
+      document.querySelectorAll(".slider-input").forEach((input) => {
+        const wrap = input.closest(".slider-wrap");
+        const newImg = wrap.querySelector(".slider-new");
+        const line = wrap.querySelector(".slider-line");
+
+        function update(pct) {
+          newImg.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+          line.style.left = pct + "%";
+        }
+
+        input.addEventListener("input", () => update(input.value));
+        update(input.value);
+      });
+
+      // Toggle logic
+      document.querySelectorAll(".toggle-wrap").forEach((wrap) => {
+        const baseline = wrap.querySelector(".toggle-baseline");
+        const screenshot = wrap.querySelector(".toggle-screenshot");
+        let showing = "baseline";
+
+        function toggle() {
+          if (showing === "baseline") {
+            baseline.style.display = "none";
+            screenshot.style.display = "";
+            showing = "screenshot";
+          } else {
+            screenshot.style.display = "none";
+            baseline.style.display = "";
+            showing = "baseline";
+          }
+        }
+
+        wrap.addEventListener("click", toggle);
+        screenshot.style.display = "none";
+      });
+
+      // Expand all entries with changes by default
+      document.querySelectorAll(".entry-header").forEach((header) => {
+        if (!header.querySelector(".badge")) return; // skip passed entries if any
+        header.classList.add("open");
+        header.nextElementSibling.classList.add("open");
+      });
+    </script>
+  </body>
+</html>

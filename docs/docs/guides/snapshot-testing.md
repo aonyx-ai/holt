@@ -24,13 +24,14 @@ variant, and compares each against its baseline in `tests/visual-baselines/`.
 
 ### CLI Flags
 
-| Flag            | Description                                                     |
-| --------------- | --------------------------------------------------------------- |
-| `--check`       | CI mode: pass/fail only, no saving, no prompts. Exits non-zero. |
-| `--headless`    | Run the browser without a visible window.                       |
-| `--no-headless` | Force a visible browser even in non-interactive shells.         |
-| `--save`        | Save new/changed screenshots (default: true).                   |
-| `--no-save`     | Don't save screenshots.                                         |
+| Flag              | Description                                                         |
+| ----------------- | ------------------------------------------------------------------- |
+| `--check`         | CI mode: pass/fail only, no saving, no prompts. Exits non-zero.     |
+| `--headless`      | Run the browser without a visible window.                           |
+| `--no-headless`   | Force a visible browser even in non-interactive shells.             |
+| `--save`          | Save new/changed screenshots (default: true).                       |
+| `--no-save`       | Don't save screenshots.                                             |
+| `--report <PATH>` | Generate a self-contained HTML comparison report at the given path. |
 
 Headless mode is auto-detected: if stdout is not a terminal, the browser runs
 headless.
@@ -86,7 +87,29 @@ git commit -m "Accept new visual baselines"
 The only infrastructure requirement is Docker. No need to install Firefox,
 geckodriver, or any browser — doco handles all of that inside containers.
 
-A minimal job:
+The recommended approach is Holt's reusable workflow, which handles checkout,
+change detection, baseline comparison, artifact uploads (including an
+interactive HTML report), and PR comments:
+
+```yaml
+snapshot-testing:
+  uses: aonyx-ai/holt/.github/workflows/visual-regression-reusable.yml@main
+  with:
+    watch-paths: |
+      crates/my-lib/**
+      crates/kit-docs/**
+```
+
+The reusable workflow accepts these inputs:
+
+| Input            | Default                  | Description                                  |
+| ---------------- | ------------------------ | -------------------------------------------- |
+| `baseline-dir`   | `tests/visual-baselines` | Baseline directory relative to book path     |
+| `watch-paths`    | _(required)_             | Newline-separated globs for change detection |
+| `holt-version`   | `latest`                 | Version of holt-cli to install               |
+| `rust-toolchain` | `stable`                 | Rust toolchain for cargo install             |
+
+If you need more control, here's a minimal manual job:
 
 ```yaml
 snapshot-testing:
@@ -98,19 +121,46 @@ snapshot-testing:
       uses: dtolnay/rust-action@stable
 
     - name: Run snapshot tests
-      run: cargo run -p holt-cli -- snapshot --check
+      run: cargo run -p holt-cli -- snapshot --check --report report.html
 
-    - name: Upload screenshots on failure
+    - name: Upload report
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: visual-regression-screenshots
-        path: tests/visual-baselines/
+        name: visual-regression-report
+        path: report.html
+        archive: false
 ```
 
 See `.github/workflows/visual-regression.yml` in the Holt repo for the full
-workflow, which also compares against main-branch baselines and posts PR
-comments.
+workflow used by Holt itself.
+
+## HTML Comparison Report
+
+`holt snapshot --report report.html` generates a self-contained HTML file that
+you can open directly in a browser. The report embeds baseline and new images as
+base64 data URIs — no server or external dependencies needed.
+
+For each changed or new component, the report provides three comparison modes:
+
+- **Slider overlay**: Drag a divider across stacked images to reveal differences
+- **Side by side**: Baseline and new screenshot next to each other
+- **Toggle**: Click to swap between baseline and new
+
+The reusable workflow uploads this report as a clickable artifact using
+`archive: false`, so reviewers can view it directly from the GitHub Actions UI
+without downloading anything.
+
+For custom workflows, upload the report with `archive: false` to get the same
+behavior:
+
+```yaml
+- uses: actions/upload-artifact@v4
+  with:
+    name: visual-regression-report
+    path: report.html
+    archive: false
+```
 
 ## Handle Flaky Tests
 

@@ -1,14 +1,27 @@
 ---
-name: Visual Regression
+name: Visual Regression (Reusable)
 
 permissions: {}
 
 "on":
-  pull_request:
-
-concurrency:
-  group: "visual-regression-${{ github.ref }}"
-  cancel-in-progress: true
+  workflow_call:
+    inputs:
+      baseline-dir:
+        description: "Baseline directory relative to book path"
+        type: string
+        default: "tests/visual-baselines"
+      watch-paths:
+        description: "Newline-separated globs for change detection"
+        type: string
+        required: true
+      holt-version:
+        description: "Version of holt-cli to install"
+        type: string
+        default: "latest"
+      rust-toolchain:
+        description: "Rust toolchain for cargo install"
+        type: string
+        default: "stable"
 
 jobs:
   visual-regression:
@@ -23,84 +36,90 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           persist-credentials: true
-          fetch-depth: 0 # Fetch full history to allow checking out PR commits
+          fetch-depth: 0
 
       - name: Check for relevant changes
         id: changed-files
         uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
         with:
-          files: |
-            crates/book/**
-            crates/cli/**
-            crates/kit/**
-            crates/kit-docs/**
-            crates/regression/**
+          files: ${{ inputs.watch-paths }}
 
       - name: Skip if no relevant changes
         if: steps.changed-files.outputs.any_changed != 'true'
         run: echo "No visual-regression-relevant files changed — skipping."
 
-      - name: Install Flox
+      - name: Install Rust
         if: steps.changed-files.outputs.any_changed == 'true'
-        uses: flox/install-flox-action@9428713e8d3883274c334b4b95b8830beebd24d2 # 2.3.0
+        uses: dtolnay/rust-toolchain@efa25f7f19611383d5b0ccf2d1c8914531636bf9 # master
         with:
-          # renovate: datasource=github-releases depName=flox/flox
-          version: 1.10.0
+          toolchain: ${{ inputs.rust-toolchain }}
 
-      - name: Remove Flox installer (if it exists)
-        if: steps.changed-files.outputs.any_changed == 'true'
-        run: rm -f flox.x86_64-linux.deb
-
-      - name: Cache Rust artifacts
+      - name: Cache cargo install
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # 2.9.1
         with:
           prefix-key: "v0-visual-regression"
           cache-on-failure: true
 
-      - name: Prepare baselines for comparison
+      - name: Install holt-cli
         if: steps.changed-files.outputs.any_changed == 'true'
+        env:
+          HOLT_VERSION: ${{ inputs.holt-version }}
         run: |
-          # Save PR branch baselines (if they exist)
-          if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
-            echo "Saving PR branch baselines for later comparison..."
-            cp -r crates/kit-docs/tests/visual-baselines crates/kit-docs/tests/pr-baselines
+          if [ "$HOLT_VERSION" = "latest" ]; then
+            cargo install holt-cli
+          else
+            cargo install "holt-cli@${HOLT_VERSION}"
           fi
 
-          # Fetch baselines from main branch - these will be used for visual regression test
+      - name: Prepare baselines for comparison
+        if: steps.changed-files.outputs.any_changed == 'true'
+        env:
+          INPUT_BASELINE_DIR: ${{ inputs.baseline-dir }}
+        run: |
+          BOOK_PATH=$(grep -A5 '^\[book\]' holt.toml | grep 'path' | sed 's/.*= *"\(.*\)"/\1/' || echo ".")
+          BASELINE_DIR="${BOOK_PATH}/${INPUT_BASELINE_DIR}"
+
+          # Save PR branch baselines (if they exist)
+          if [ -d "$BASELINE_DIR" ]; then
+            echo "Saving PR branch baselines for later comparison..."
+            cp -r "$BASELINE_DIR" "${BASELINE_DIR}-pr-copy"
+          fi
+
+          # Fetch baselines from main branch
           git fetch origin main
-          rm -rf crates/kit-docs/tests/visual-baselines
-          git checkout origin/main -- crates/kit-docs/tests/visual-baselines || echo "No baselines in main"
+          rm -rf "$BASELINE_DIR"
+          git checkout origin/main -- "$BASELINE_DIR" || echo "No baselines in main"
 
           echo "Baselines from main:"
-          tree crates/kit-docs/tests/visual-baselines/ || echo "No baselines in main"
-
-      - name: Build holt CLI
-        if: steps.changed-files.outputs.any_changed == 'true'
-        run: |
-          flox activate -- cargo build -p holt-cli --release
+          tree "$BASELINE_DIR" || echo "No baselines in main"
 
       - name: Run visual regression tests
         if: steps.changed-files.outputs.any_changed == 'true'
         id: visual-regression
         timeout-minutes: 20
+        env:
+          INPUT_BASELINE_DIR: ${{ inputs.baseline-dir }}
         run: |
+          BOOK_PATH=$(grep -A5 '^\[book\]' holt.toml | grep 'path' | sed 's/.*= *"\(.*\)"/\1/' || echo ".")
+          BASELINE_DIR="${BOOK_PATH}/${INPUT_BASELINE_DIR}"
+
           # Create output directories for artifacts
           mkdir -p visual-regression-output/baseline
           mkdir -p visual-regression-output/new
 
           # Save main baselines for artifact upload
-          if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
-            cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/baseline/ 2>/dev/null || true
+          if [ -d "$BASELINE_DIR" ]; then
+            cp -r "$BASELINE_DIR"/* visual-regression-output/baseline/ 2>/dev/null || true
           fi
 
-          # Run visual regression (saves new screenshots for artifact upload)
+          # Run visual regression
           set +e
-          flox activate -- cargo run -p holt-cli --release -- snapshot --report visual-regression-output/report.html 2>&1 | tee visual-regression.log
+          holt snapshot --report visual-regression-output/report.html 2>&1 | tee visual-regression.log
           REGRESSION_EXIT_CODE=${PIPESTATUS[0]}
           set -e
 
-          # Fail fast if the snapshot command itself crashed (not a visual diff)
+          # Fail fast if the snapshot command itself crashed
           if [ $REGRESSION_EXIT_CODE -ne 0 ] && ! grep -q "\[ok\]\|\[FAIL\]\|\[new\]" visual-regression.log; then
             echo "Snapshot command failed before producing any results"
             cat visual-regression.log
@@ -108,17 +127,17 @@ jobs:
           fi
 
           # Save new screenshots for artifact upload
-          if [ -d "crates/kit-docs/tests/visual-baselines" ]; then
-            cp -r crates/kit-docs/tests/visual-baselines/* visual-regression-output/new/ 2>/dev/null || true
+          if [ -d "$BASELINE_DIR" ]; then
+            cp -r "$BASELINE_DIR"/* visual-regression-output/new/ 2>/dev/null || true
           fi
 
           if [ $REGRESSION_EXIT_CODE -ne 0 ]; then
             echo "Visual differences detected compared to main"
 
             # Check if PR branch already committed these baselines
-            if [ -d "crates/kit-docs/tests/pr-baselines" ]; then
+            if [ -d "${BASELINE_DIR}-pr-copy" ]; then
               echo "Checking if changes are already committed in PR branch..."
-              if diff -r visual-regression-output/new crates/kit-docs/tests/pr-baselines > /dev/null 2>&1; then
+              if diff -r visual-regression-output/new "${BASELINE_DIR}-pr-copy" > /dev/null 2>&1; then
                 echo "New screenshots match PR's committed baselines - changes already accepted"
                 echo "HAS_CHANGES=false" >> "$GITHUB_OUTPUT"
                 exit 0
@@ -152,7 +171,7 @@ jobs:
           path: visual-regression-output/report.html
           archive: false
 
-      - name: Generate visual regression report
+      - name: Generate PR comment
         if: always() && steps.changed-files.outputs.any_changed == 'true'
         env:
           REPOSITORY: ${{ github.repository }}
@@ -180,18 +199,6 @@ jobs:
             done
 
             cat >> comment.md << EOF
-
-          ---
-
-          ### ✅ Quick Accept
-
-          To accept these visual changes, run:
-
-          \`\`\`bash
-          just kit-docs load-baselines-from-gh-artifact ${RUN_ID}
-          \`\`\`
-
-          This will download the new baselines, copy them to your local repository, and prepare them for commit.
 
           ---
 
@@ -236,7 +243,6 @@ jobs:
             );
 
             if (botComment) {
-              // Update existing comment
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -245,7 +251,6 @@ jobs:
               });
               console.log('Updated existing comment');
             } else if (hasChanges) {
-              // Only create new comment if there are changes
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,

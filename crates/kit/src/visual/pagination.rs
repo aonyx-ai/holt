@@ -128,7 +128,7 @@ pub fn PaginationEllipsis(#[prop(optional, into)] class: String) -> impl IntoVie
 
     view! {
         <span class=classes aria-hidden="true">
-            <Icon icon=icondata::LuMoreHorizontal attr:class="h-4 w-4" />
+            <Icon icon=icondata::LuEllipsis attr:class="h-4 w-4" />
             <span class="sr-only">More pages</span>
         </span>
     }

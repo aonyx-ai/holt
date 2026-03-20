@@ -4,6 +4,7 @@ mod button;
 mod card;
 mod checkbox;
 mod collapsible;
+mod dropdown_menu;
 mod input;
 mod label;
 mod select;

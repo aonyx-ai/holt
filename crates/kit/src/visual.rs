@@ -14,6 +14,7 @@ pub use self::sidebar::*;
 pub use self::switch::*;
 pub use self::textarea::*;
 pub use self::toggle::*;
+pub use self::tooltip::*;
 pub use self::typography::*;
 
 mod badge;
@@ -30,4 +31,5 @@ mod sidebar;
 mod switch;
 mod textarea;
 mod toggle;
+mod tooltip;
 mod typography;

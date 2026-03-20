@@ -204,9 +204,7 @@ jobs:
 
           ### 📥 Review
 
-          1. Go to the [workflow run](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})
-          2. Click the **visual-regression-report** artifact to open the interactive HTML comparison report (slider, side-by-side, and toggle modes)
-          3. Or download the **visual-regression-screenshots** artifact to compare images locally
+          {{REPORT_LINK}}
 
           Or run \`holt snapshot\` locally to review and accept changes interactively.
 
@@ -227,8 +225,28 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const comment = fs.readFileSync('comment.md', 'utf8');
+            let comment = fs.readFileSync('comment.md', 'utf8');
             const hasChanges = process.env.HAS_CHANGES === 'true';
+
+            // Look up the report artifact URL
+            let reportLink = `Go to the [workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) and download the **visual-regression-screenshots** artifact to compare images locally.`;
+            if (hasChanges) {
+              try {
+                const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: context.runId,
+                });
+                const report = artifacts.find(a => a.name === 'visual-regression-report');
+                if (report) {
+                  const reportUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${report.id}`;
+                  reportLink = `**[View comparison report](${reportUrl})** — interactive slider, side-by-side, and toggle modes (no download needed).\n\nOr download the **visual-regression-screenshots** artifact to compare images locally.`;
+                }
+              } catch (e) {
+                console.log('Could not look up report artifact:', e.message);
+              }
+            }
+            comment = comment.replace('{{REPORT_LINK}}', reportLink);
 
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({

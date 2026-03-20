@@ -78,12 +78,13 @@ pub fn TabsContent(
     children: ChildrenFn,
 ) -> impl IntoView {
     let ctx = use_tabs();
+    let value_hidden = value.clone();
 
     view! {
         <div
             role="tabpanel"
             class=class
-            hidden=move || ctx.active_value.get() != value
+            hidden=move || ctx.active_value.get() != value_hidden
             data-state=move || {
                 if ctx.active_value.get() == value { "active" } else { "inactive" }
             }

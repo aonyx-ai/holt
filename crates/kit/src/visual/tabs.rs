@@ -45,9 +45,7 @@ pub fn Tabs(
 #[component]
 pub fn TabsList(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let class = TabsListStyle {}.with_class(&class);
-    view! {
-        <TabsListPrimitive class=class>{children()}</TabsListPrimitive>
-    }
+    view! { <TabsListPrimitive class=class>{children()}</TabsListPrimitive> }
 }
 
 #[component]
@@ -72,7 +70,11 @@ pub fn TabsContent(
     children: ChildrenFn,
 ) -> impl IntoView {
     let class = TabsContentStyle {}.with_class(&class);
-    view! { <TabsContentPrimitive class=class value=value>{children()}</TabsContentPrimitive> }
+    view! {
+        <TabsContentPrimitive class=class value=value>
+            {children()}
+        </TabsContentPrimitive>
+    }
 }
 
 #[cfg(test)]

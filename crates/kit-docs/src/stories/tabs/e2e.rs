@@ -32,9 +32,7 @@ async fn tabs_switch_content_on_click(client: Client) -> Result<()> {
     tokio::time::sleep(std::time::Duration::from_millis(500)).await;
 
     // Click the Password tab
-    let triggers = client
-        .find_all(By::Css("main button[role='tab']"))
-        .await?;
+    let triggers = client.find_all(By::Css("main button[role='tab']")).await?;
     assert!(triggers.len() >= 2, "should have at least two tab triggers");
 
     triggers[1].click().await?;

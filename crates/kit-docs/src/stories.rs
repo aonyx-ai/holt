@@ -1,3 +1,4 @@
+mod accordion;
 mod badge;
 mod breadcrumb;
 mod button;

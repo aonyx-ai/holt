@@ -62,7 +62,7 @@ jobs:
         uses: flox/install-flox-action@9428713e8d3883274c334b4b95b8830beebd24d2 # 2.3.0
         with:
           # renovate: datasource=github-releases depName=flox/flox
-          version: 1.10.0
+          version: 1.11.0
 
       - name: Remove Flox installer (if it exists)
         run: rm -f flox.x86_64-linux.deb

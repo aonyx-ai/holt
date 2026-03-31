@@ -13,7 +13,7 @@ path = "src/main.rs"
 [dependencies]
 clawless = "0.5"
 doco = "0.2.3"
-eframe = "0.33"
+eframe = "0.34"
 holt-regression = { path = "../regression", version = "0.2.1" }
 image = { version = "0.25", features = ["png"] }
 serde = { version = "1", features = ["derive"] }

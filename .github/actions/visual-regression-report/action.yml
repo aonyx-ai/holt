@@ -1,0 +1,154 @@
+---
+name: Visual Regression Report
+description: Upload artifacts, generate PR comment, and post it for visual regression results.
+
+inputs:
+  has-changes:
+    description: "Whether visual changes were detected ('true' or 'false')"
+    required: true
+  quick-accept-command:
+    description: "Optional shell command for quick-accept section in PR comment"
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Upload visual regression artifacts
+      if: inputs.has-changes == 'true'
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+      with:
+        name: visual-regression-screenshots
+        path: visual-regression-output/
+
+    - name: Upload visual regression report
+      id: upload-report
+      if: inputs.has-changes == 'true'
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+      with:
+        name: visual-regression-report
+        path: visual-regression-output/report.html
+        archive: false
+
+    - name: Generate PR comment
+      shell: bash
+      env:
+        HAS_CHANGES: ${{ inputs.has-changes }}
+        QUICK_ACCEPT_COMMAND: ${{ inputs.quick-accept-command }}
+      run: |
+        if [ "$HAS_CHANGES" == "true" ]; then
+          cat > comment.md << 'EOF'
+        ## 📸 Visual Regression Report
+
+        This PR includes visual changes to the following components:
+
+        EOF
+
+          # Parse the log file for changes and list them
+          grep -E "(\[FAIL\]|\[new\])" visual-regression.log | while read -r line; do
+            if echo "$line" | grep -q "\[FAIL\]"; then
+              story=$(echo "$line" | sed -n 's/.*\[FAIL\] \([^/]*\/[^ ]*\) differs.*/\1/p')
+              echo "- 🔄 **Modified:** \`$story\`" >> comment.md
+
+            elif echo "$line" | grep -q "\[new\]"; then
+              story=$(echo "$line" | sed -n 's/.*\[new\] \([^/]*\/[^ ]*\) (new.*/\1/p')
+              echo "- ✨ **New Component:** \`$story\`" >> comment.md
+            fi
+          done
+
+          if [ -n "$QUICK_ACCEPT_COMMAND" ]; then
+            cat >> comment.md << EOF
+
+        ---
+
+        ### ✅ Quick Accept
+
+        To accept these visual changes, run:
+
+        \`\`\`bash
+        ${QUICK_ACCEPT_COMMAND}
+        \`\`\`
+
+        This will download the new baselines, copy them to your local repository, and prepare them for commit.
+
+        EOF
+          fi
+
+          cat >> comment.md << 'EOF'
+
+        ---
+
+        {{REPORT_LINK}} | `holt snapshot` locally
+
+        EOF
+        else
+          cat > comment.md << 'EOF'
+        ## 📸 Visual Regression Report
+
+        ✅ All component screenshots match their baselines. No visual changes detected.
+        EOF
+        fi
+
+    - name: Update PR comment
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+      env:
+        HAS_CHANGES: ${{ inputs.has-changes }}
+        REPORT_ARTIFACT_ID: ${{ steps.upload-report.outputs.artifact-id }}
+      with:
+        script: |
+          const fs = require('fs');
+          let comment = fs.readFileSync('comment.md', 'utf8');
+          const hasChanges = process.env.HAS_CHANGES === 'true';
+          const artifactId = process.env.REPORT_ARTIFACT_ID;
+
+          let reportLink;
+          if (hasChanges && artifactId) {
+            const reportUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${artifactId}`;
+            reportLink = `[View comparison report](${reportUrl})`;
+          } else {
+            reportLink = `[View workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+          }
+          comment = comment.replace('{{REPORT_LINK}}', reportLink);
+
+          // Find existing comment
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const botComment = comments.find(comment =>
+            comment.user.type === 'Bot' &&
+            comment.body.includes('📸 Visual Regression Report')
+          );
+
+          if (botComment) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: comment
+            });
+            console.log('Updated existing comment');
+          } else if (hasChanges) {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+            console.log('Created new comment');
+          } else {
+            console.log('No changes and no existing comment - skipping');
+          }
+
+    - name: Summary
+      shell: bash
+      env:
+        HAS_CHANGES: ${{ inputs.has-changes }}
+      run: |
+        if [ "${HAS_CHANGES}" == "true" ]; then
+          echo "📸 Visual changes detected - see PR comment for details"
+        else
+          echo "✅ No visual changes detected"
+        fi

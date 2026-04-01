@@ -105,13 +105,14 @@ holt snapshot [OPTIONS]
 
 **Options:**
 
-| Option          | Description                                                       |
-| --------------- | ----------------------------------------------------------------- |
-| `--check`       | CI mode: pass/fail only, no saving, no prompts. Exits non-zero.   |
-| `--headless`    | Run the browser without a visible window.                         |
-| `--no-headless` | Force a visible browser even in non-interactive shells.           |
-| `--save`        | Save new/changed screenshots to the baseline directory (default). |
-| `--no-save`     | Don't save screenshots.                                           |
+| Option            | Description                                                         |
+| ----------------- | ------------------------------------------------------------------- |
+| `--check`         | CI mode: pass/fail only, no saving, no prompts. Exits non-zero.     |
+| `--headless`      | Run the browser without a visible window.                           |
+| `--no-headless`   | Force a visible browser even in non-interactive shells.             |
+| `--save`          | Save new/changed screenshots to the baseline directory (default).   |
+| `--no-save`       | Don't save screenshots.                                             |
+| `--report <PATH>` | Generate a self-contained HTML comparison report at the given path. |
 
 Headless mode is auto-detected: if stdout is not a terminal, the browser runs
 headless.

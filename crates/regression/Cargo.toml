@@ -9,6 +9,7 @@ repository.workspace = true
 
 [dependencies]
 anyhow = "1"
+base64 = "0.22"
 doco = "0.2.3"
 regex = "1"
 thiserror = "2"

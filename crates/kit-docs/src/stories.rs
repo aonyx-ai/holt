@@ -11,4 +11,5 @@ mod separator;
 mod switch;
 mod textarea;
 mod toggle;
+mod toggle_group;
 mod typography;

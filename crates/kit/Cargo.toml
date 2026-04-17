@@ -18,7 +18,9 @@ web-sys = { version = "0.3.80", features = [
   "Element",
   "HtmlElement",
   "KeyboardEvent",
+  "MouseEvent",
   "NodeList",
+  "PointerEvent",
 ] }
 
 [dev-dependencies]

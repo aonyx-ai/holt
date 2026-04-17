@@ -6,6 +6,7 @@ mod select;
 mod sidebar;
 mod switch;
 mod toggle;
+mod tooltip;
 
 pub use checkbox::*;
 pub use collapsible::*;
@@ -13,3 +14,4 @@ pub use select::*;
 pub use sidebar::*;
 pub use switch::*;
 pub use toggle::*;
+pub use tooltip::*;

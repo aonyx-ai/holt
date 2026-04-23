@@ -9,6 +9,7 @@ mod label;
 mod select;
 mod separator;
 mod switch;
+mod table;
 mod textarea;
 mod toggle;
 mod typography;

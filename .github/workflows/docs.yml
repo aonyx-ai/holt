@@ -51,12 +51,12 @@ jobs:
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # 2.9.1
 
       - name: Build Kit WASM + CSS with Trunk
-        uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0
+        uses: flox/activate-action@7065dcbe5583b7b015f07a8ebd49d7266e3053e8 # v1.1.1
         with:
           command: bash -c 'cd crates/kit-docs && trunk build --release --filehash false --no-default-features --features hydrate'
 
       - name: Generate Kit Storybook static files
-        uses: flox/activate-action@410568008895a0f2e09a34bbd9523f8ef1f2d292 # 1.1.0
+        uses: flox/activate-action@7065dcbe5583b7b015f07a8ebd49d7266e3053e8 # v1.1.1
         with:
           command: cargo run -p holt-kit-docs --bin ssg --features ssr --no-default-features
 

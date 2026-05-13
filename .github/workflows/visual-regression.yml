@@ -42,7 +42,7 @@ jobs:
 
       - name: Install Flox
         if: steps.changed-files.outputs.any_changed == 'true'
-        uses: flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a # 2.4.0
+        uses: flox/install-flox-action@6e70b2624cea62b0f11ea4a28e719fe1c86c028b # v2.4.1
         with:
           # renovate: datasource=github-releases depName=flox/flox
           version: 1.12.0

@@ -8,6 +8,7 @@ mod input;
 mod label;
 mod select;
 mod separator;
+mod skeleton;
 mod switch;
 mod textarea;
 mod toggle;

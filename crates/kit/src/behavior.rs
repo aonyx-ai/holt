@@ -2,6 +2,7 @@
 
 mod checkbox;
 mod collapsible;
+mod context_menu;
 mod select;
 mod sidebar;
 mod switch;
@@ -9,6 +10,7 @@ mod toggle;
 
 pub use checkbox::*;
 pub use collapsible::*;
+pub use context_menu::*;
 pub use select::*;
 pub use sidebar::*;
 pub use switch::*;

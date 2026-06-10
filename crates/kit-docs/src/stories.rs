@@ -11,4 +11,5 @@ mod separator;
 mod switch;
 mod textarea;
 mod toggle;
+mod tooltip;
 mod typography;

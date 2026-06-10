@@ -6,6 +6,7 @@ mod checkbox;
 mod collapsible;
 mod input;
 mod label;
+mod navigation_menu;
 mod select;
 mod separator;
 mod switch;

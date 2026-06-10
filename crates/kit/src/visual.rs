@@ -1,5 +1,6 @@
 //! Components are reusable elements
 
+pub use self::alert_dialog::*;
 pub use self::badge::*;
 pub use self::breadcrumb::*;
 pub use self::button::*;
@@ -16,6 +17,7 @@ pub use self::textarea::*;
 pub use self::toggle::*;
 pub use self::typography::*;
 
+mod alert_dialog;
 mod badge;
 mod breadcrumb;
 mod button;

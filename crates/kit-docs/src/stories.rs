@@ -1,3 +1,4 @@
+mod alert_dialog;
 mod badge;
 mod breadcrumb;
 mod button;

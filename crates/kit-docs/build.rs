@@ -172,10 +172,10 @@ mod parser {
                 return Ok(None);
             };
 
-            let component_path = self
-                .config
-                .ui_components_dir
-                .join(format!("{}.rs", component_name.to_lowercase()));
+            let component_path = self.config.ui_components_dir.join(format!(
+                "{}.rs",
+                component_name.to_lowercase().replace(' ', "_")
+            ));
 
             if !component_path.exists() {
                 return Err(BuildError::ComponentNotFound(component_name.clone()));

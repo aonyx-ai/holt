@@ -2,6 +2,7 @@ mod badge;
 mod breadcrumb;
 mod button;
 mod card;
+mod carousel;
 mod checkbox;
 mod collapsible;
 mod input;

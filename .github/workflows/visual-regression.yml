@@ -45,7 +45,7 @@ jobs:
         uses: flox/install-flox-action@6e70b2624cea62b0f11ea4a28e719fe1c86c028b # v2.4.1
         with:
           # renovate: datasource=github-releases depName=flox/flox
-          version: 1.12.1
+          version: 1.15.0
 
       - name: Remove Flox installer (if it exists)
         if: steps.changed-files.outputs.any_changed == 'true'

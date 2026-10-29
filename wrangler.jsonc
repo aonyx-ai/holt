@@ -1,0 +1,16 @@
+{
+  // The site is static, so the Worker has no `main`: Cloudflare serves the
+  // assets directly, and no code of ours runs on a request.
+  "name": "holt-rs",
+  "compatibility_date": "2026-09-03",
+  // The Worker answers on the custom domain that den attaches to it. A
+  // workers.dev hostname would be a second public origin serving the same
+  // site.
+  "workers_dev": false,
+  "assets": {
+    "directory": "./docs/build",
+    // Docusaurus emits a 404.html, and an unknown path should get that page
+    // with a 404 status rather than an empty response.
+    "not_found_handling": "404-page",
+  },
+}

@@ -31,5 +31,5 @@ The static output will be in the `build/` directory.
 
 ## Deployment
 
-The site is automatically deployed to GitHub Pages when changes are pushed to
-`main`.
+The site is automatically deployed to Cloudflare Workers when changes are pushed
+to `main`.

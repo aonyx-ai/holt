@@ -268,7 +268,9 @@ pub fn SidebarRail(#[prop(optional, into)] class: String) -> impl IntoView {
         classes
     };
 
-    view! { <div class=classes on:click=move |_| context.set_open().update(|open| *open = !*open)></div> }
+    view! {
+        <div class=classes on:click=move |_| context.set_open().update(|open| *open = !*open)></div>
+    }
 }
 
 /// Renders the badge for menu items

@@ -59,8 +59,6 @@ pub enum SidebarInitialState {
 
 /// Renders the provider that shares the sidebar state with its descendants
 ///
-/// The provider detects the mobile size with a simple window width check.
-///
 /// # Examples
 ///
 /// ```no_run
@@ -111,7 +109,7 @@ pub fn SidebarProvider(
     }
 }
 
-/// Returns the keyboard shortcut for toggle
+/// Toggles the sidebar when the user presses Ctrl+B or Cmd+B
 ///
 /// # Examples
 ///

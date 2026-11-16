@@ -13,7 +13,9 @@ fn test_dir() -> PathBuf {
     dir
 }
 
-/// Fails because trunk command not found, but args were parsed
+/// Shows that the build command accepts `--profile`
+///
+/// The command fails because `trunk` is not installed, so the test checks only that the arguments parse.
 #[test]
 fn build_accepts_profile() {
     let mut cmd = cargo_bin_cmd!("holt");
@@ -46,9 +48,9 @@ fn help_shows_commands() {
         .stdout(predicate::str::contains("build"));
 }
 
-/// Writes a valid config file
+/// Shows that the serve command loads a valid config file
 ///
-/// Fails because trunk not found, but config was loaded (no config error)
+/// The command fails because `trunk` is not installed, so the test checks only that the failure is no config error.
 #[test]
 fn loads_config_file() {
     let dir = test_dir();
@@ -77,7 +79,6 @@ open = true
     fs::remove_dir_all(&dir).ok();
 }
 
-/// Writes an invalid TOML file
 #[test]
 fn rejects_invalid_config() {
     let dir = test_dir();
@@ -95,7 +96,9 @@ fn rejects_invalid_config() {
     fs::remove_dir_all(&dir).ok();
 }
 
-/// Fails because trunk not found, but config loading succeeded (no error about config)
+/// Shows that the serve command runs without a config file
+///
+/// The command fails because `trunk` is not installed, so the test checks only that the failure is no config error.
 #[test]
 fn runs_without_config_file() {
     let dir = test_dir();
@@ -111,7 +114,9 @@ fn runs_without_config_file() {
     fs::remove_dir_all(&dir).ok();
 }
 
-/// Fails because trunk command not found, but args were parsed
+/// Shows that the serve command accepts `--port`
+///
+/// The command fails because `trunk` is not installed, so the test checks only that the arguments parse.
 #[test]
 fn serve_accepts_port() {
     let mut cmd = cargo_bin_cmd!("holt");

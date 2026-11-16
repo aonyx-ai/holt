@@ -29,14 +29,7 @@ const BASE_PATH: &str = "/kit";
 
 /// Renders a route to a complete HTML page
 ///
-/// The function creates a new reactive owner for this render. It provides the full URL, including
-/// the base path, for the router. It creates the server meta context, whose output receives the
-/// meta tags from the `leptos_meta` components.
-///
-/// The function renders the `App` component to HTML. It builds the HTML shell with bare `<html>`
-/// and `<body>` tags for `inject_meta_context` to fill in. That call inserts the Leptos-rendered
-/// meta elements, html attributes, and body attributes. If Leptos did not set a title, the
-/// function injects the fallback title.
+/// The function injects `title` when the rendered page sets none.
 #[bon::builder]
 async fn render_route_to_html(route: &str, title: &str) -> String {
     let owner = Owner::new();
@@ -92,8 +85,7 @@ async fn render_route_to_html(route: &str, title: &str) -> String {
 
 /// Generates the static site on a tokio `LocalSet`
 ///
-/// The function initializes the executor so Leptos effects can spawn futures. It initializes the
-/// story registry for SSR. Leptos effects use `spawn_local`, which requires a `LocalSet` in tokio.
+/// Leptos effects use `spawn_local`, which requires a `LocalSet` in tokio.
 #[tokio::main]
 async fn main() {
     any_spawner::Executor::init_tokio().expect("Failed to initialize tokio executor");
@@ -109,10 +101,6 @@ async fn main() {
 }
 
 /// Generates the static pages and copies the build artifacts
-///
-/// The function creates the output directory and gets all stories to generate routes. It generates
-/// the index page and one page for each story. It copies the trunk build artifacts (CSS, JS, WASM)
-/// from `dist/` to the output directory.
 async fn generate_static_site() {
     let output_dir = std::env::args()
         .nth(1)

@@ -82,7 +82,6 @@ fn pressed_state() -> AnyView {
     .into_any()
 }
 
-/// Creates an effect to track when the toggle is pressed
 #[variant]
 fn interactive() -> AnyView {
     let pressed = RwSignal::new(false);

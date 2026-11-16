@@ -24,7 +24,6 @@ impl VariantGenerator {
         }
     }
 
-    /// Converts a snake_case function name to a Title Case variant name
     fn function_name_to_variant_name(ident: &Ident) -> String {
         let name = ident.to_string();
         name.split('_')
@@ -67,9 +66,6 @@ impl VariantGenerator {
         self.format_with_leptosfmt(&source).unwrap_or(source)
     }
 
-    /// Formats the source with `leptosfmt --rustfmt`
-    ///
-    /// Writes the source to stdin and waits for the command to complete.
     fn format_with_leptosfmt(&self, source: &str) -> Result<String, Box<dyn std::error::Error>> {
         let mut cmd = Command::new("leptosfmt");
         cmd.arg("--rustfmt").arg("--stdin");

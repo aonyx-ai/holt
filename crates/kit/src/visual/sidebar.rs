@@ -44,11 +44,7 @@ pub enum SidebarCollapsible {
 
 /// Renders the sidebar that displays on the left or right side of the layout
 ///
-/// A sidebar without a collapsible mode renders as a simple container. On mobile the sidebar
-/// renders a simplified view, because this codebase has no Sheet component. On desktop the sidebar
-/// renders an outer container. That container holds a gap div that reserves the width and a main
-/// sidebar container with the position and the classes of the variant. The main container holds an
-/// inner content container.
+/// On mobile the sidebar renders a simplified view, because this codebase has no Sheet component.
 ///
 /// # Examples
 ///
@@ -678,8 +674,6 @@ pub fn SidebarSeparator(#[prop(optional, into)] class: String) -> impl IntoView 
 }
 
 /// Renders a button that toggles the sidebar visibility
-///
-/// The button toggles the sidebar the same way for mobile views and for desktop views.
 ///
 /// # Examples
 ///

@@ -216,8 +216,8 @@ pub fn SelectTrigger(
 
 /// Renders the content area that shows when the select is open
 ///
-/// The content sets up floating positioning. It focuses the first item when it mounts, and it uses
-/// `request_animation_frame` to ensure the DOM is rendered before it does.
+/// The content focuses the first item when it mounts. It waits for `request_animation_frame`, so
+/// that the DOM exists before it focuses.
 ///
 /// # Examples
 ///
@@ -516,7 +516,7 @@ fn focus_first_item(container: &web_sys::Element) -> bool {
 
 /// Focuses the sibling item in the given direction
 ///
-/// Finds which item is currently focused first. Focus wraps around at both ends of the list.
+/// Focus wraps around at both ends of the list.
 fn focus_sibling_item(container: &web_sys::Element, direction: FocusDirection) -> bool {
     let items = container.query_selector_all("[role='option']");
     let Ok(items) = items else { return false };

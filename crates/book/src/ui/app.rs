@@ -89,9 +89,7 @@ fn KitNavbar() -> impl IntoView {
 
 /// Renders the storybook app
 ///
-/// The app provides the context that manages stylesheets, titles, meta tags, etc. It also provides
-/// the base path context for components that need it. It sets the document title and injects
-/// metadata in the `<head>` of the page.
+/// The `base` path prefixes every route. A non-empty `base` also shows the navbar of the kit.
 ///
 /// # Examples
 ///

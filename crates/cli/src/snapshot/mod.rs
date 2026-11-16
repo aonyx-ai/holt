@@ -207,10 +207,9 @@ pub async fn run(
     Ok(())
 }
 
-/// Handles a single variant outcome: prints the status and prompts for approval if needed
+/// Handles a single variant outcome and reports whether the variant passed
 ///
-/// A mismatch prompts for approval in interactive mode.
-/// Returns Ok(true) for passed, Ok(false) for failed
+/// Returns `Ok(true)` when the variant passed and `Ok(false)` when it failed.
 fn handle_outcome(
     outcome: &VariantOutcome,
     baseline_dir: &Path,

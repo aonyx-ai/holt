@@ -31,8 +31,6 @@ pub(crate) enum BuildError {
     ComponentNotFound { component: String },
 }
 
-/// Runs the main build script entry point
-/// Parses story files and generates source code for each component
 fn main() -> BuildResult<()> {
     setup_cargo_rerun_conditions();
 
@@ -158,8 +156,7 @@ mod parser {
 
         /// Parses one story file
         ///
-        /// Checks for a helper comment that specifies the component. A file without that comment is
-        /// skipped with a warning.
+        /// A file without an `@component` comment is skipped with a warning.
         fn try_parse_story_file(&self, path: &Path) -> BuildResult<Option<data::ParsedStory>> {
             if !is_valid_story_file(path) {
                 return Ok(None);

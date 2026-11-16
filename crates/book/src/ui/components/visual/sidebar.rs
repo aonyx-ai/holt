@@ -33,12 +33,6 @@ pub enum SidebarCollapsible {
 ///
 /// - **Mobile (<md):** fixed overlay with translate, backdrop, shadow
 /// - **Desktop (>=md):** static in-flow sidebar with collapsible width
-///
-/// The backdrop is only visible on mobile when the sidebar is open. A single sidebar element
-/// carries the responsive classes. On mobile it is a fixed overlay that uses `translate-x` to show
-/// and hide. On desktop it is static in-flow, with a width transition for the collapse. The
-/// desktop classes reset the fixed positioning and add a border on the side of the content. The
-/// collapsed state of the desktop sidebar depends on the `collapsible` mode.
 #[component]
 pub fn Sidebar(
     #[prop(optional, into)] class: String,

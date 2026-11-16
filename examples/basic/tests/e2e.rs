@@ -43,8 +43,6 @@ async fn variant_option_texts(client: &Client) -> Result<Vec<String>> {
 }
 
 /// Opens the story page of Square A and returns the rectangle of the red div
-///
-/// The preview area contains the red div for the default variant.
 async fn red_div_rect(client: &Client) -> Result<thirtyfour::ElementRect> {
     client
         .goto("/story/square-a")
@@ -61,7 +59,6 @@ async fn red_div_rect(client: &Client) -> Result<thirtyfour::ElementRect> {
         .context("failed to read the red div rectangle")
 }
 
-/// The sidebar should list both stories
 #[doco::test]
 async fn homepage_has_story_navigation_lists_square_a(client: Client) -> Result<()> {
     let texts = nav_link_texts(&client)
@@ -76,7 +73,6 @@ async fn homepage_has_story_navigation_lists_square_a(client: Client) -> Result<
     Ok(())
 }
 
-/// The sidebar should list both stories
 #[doco::test]
 async fn homepage_has_story_navigation_lists_square_b(client: Client) -> Result<()> {
     let texts = nav_link_texts(&client)
@@ -107,7 +103,9 @@ async fn homepage_screenshot(client: Client) -> Result<()> {
     Ok(())
 }
 
-/// The story heading uses `main` to skip the sidebar branding h1
+/// Shows that the story page heading is the name of the story
+///
+/// The selector starts at `main`, so that it skips the h1 of the sidebar branding.
 #[doco::test]
 async fn story_page_renders_variant_has_heading(client: Client) -> Result<()> {
     client
@@ -131,7 +129,6 @@ async fn story_page_renders_variant_has_heading(client: Client) -> Result<()> {
     Ok(())
 }
 
-/// The preview area contains the red div for the default variant, and it is 100px tall
 #[doco::test]
 async fn story_page_renders_variant_red_div_is_100px_tall(client: Client) -> Result<()> {
     let rect = red_div_rect(&client)
@@ -146,7 +143,6 @@ async fn story_page_renders_variant_red_div_is_100px_tall(client: Client) -> Res
     Ok(())
 }
 
-/// The preview area contains the red div for the default variant, and it is 100px wide
 #[doco::test]
 async fn story_page_renders_variant_red_div_is_100px_wide(client: Client) -> Result<()> {
     let rect = red_div_rect(&client)
@@ -161,7 +157,6 @@ async fn story_page_renders_variant_red_div_is_100px_wide(client: Client) -> Res
     Ok(())
 }
 
-/// The variant selector has the Blue option
 #[doco::test]
 async fn story_page_renders_variant_selector_has_blue(client: Client) -> Result<()> {
     let option_texts = variant_option_texts(&client)
@@ -172,7 +167,6 @@ async fn story_page_renders_variant_selector_has_blue(client: Client) -> Result<
     Ok(())
 }
 
-/// The variant selector has the Red option
 #[doco::test]
 async fn story_page_renders_variant_selector_has_red(client: Client) -> Result<()> {
     let option_texts = variant_option_texts(&client)
@@ -236,7 +230,6 @@ fn compare_baseline(name: &str, screenshot: &[u8]) -> Result<()> {
     Ok(())
 }
 
-/// Configures doco to serve the built example with Caddy
 #[doco::main]
 async fn main() -> Doco {
     let dist = Path::new("dist")

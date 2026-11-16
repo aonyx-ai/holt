@@ -7,9 +7,9 @@ mod sidebar;
 mod switch;
 mod toggle;
 
-pub use checkbox::*;
-pub use collapsible::*;
-pub use select::*;
-pub use sidebar::*;
-pub use switch::*;
-pub use toggle::*;
+pub use self::checkbox::*;
+pub use self::collapsible::*;
+pub use self::select::*;
+pub use self::sidebar::*;
+pub use self::switch::*;
+pub use self::toggle::*;

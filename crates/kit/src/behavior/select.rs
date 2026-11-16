@@ -6,30 +6,42 @@ use leptos::web_sys::KeyboardEvent;
 use leptos_floating::{Align, FloatingOptions, Side, use_floating};
 
 /// Select behavior context that manages state and interactions
-#[derive(Copy, Clone)]
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::behavior::SelectContext;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let value = RwSignal::new(None::<String>);
+///     let context = SelectContext::builder()
+///         .value(value)
+///         .disabled(Signal::stored(false))
+///         .build();
+///
+///     context.select_value("apple".to_string());
+///
+///     assert_eq!(value.get(), Some("apple".to_string()));
+/// });
+/// ```
+#[derive(Copy, Clone, bon::Builder, getset::CopyGetters)]
 pub struct SelectContext {
-    pub value: RwSignal<Option<String>>,
-    pub open: RwSignal<bool>,
-    pub disabled: Signal<bool>,
-    pub trigger_ref: NodeRef<leptos::html::Button>,
-    pub on_change: Option<Callback<Option<String>>>,
+    #[getset(get_copy = "pub")]
+    value: RwSignal<Option<String>>,
+    #[builder(skip = RwSignal::new(false))]
+    open: RwSignal<bool>,
+    #[getset(get_copy = "pub")]
+    disabled: Signal<bool>,
+    #[builder(skip = NodeRef::new())]
+    #[getset(get_copy = "pub")]
+    trigger_ref: NodeRef<leptos::html::Button>,
+    #[getset(get_copy = "pub")]
+    on_change: Option<Callback<Option<String>>>,
 }
 
 impl SelectContext {
-    pub fn new(
-        value: RwSignal<Option<String>>,
-        disabled: Signal<bool>,
-        on_change: Option<Callback<Option<String>>>,
-    ) -> Self {
-        Self {
-            value,
-            open: RwSignal::new(false),
-            disabled,
-            trigger_ref: NodeRef::new(),
-            on_change,
-        }
-    }
-
     pub fn is_open(&self) -> bool {
         self.open.get()
     }
@@ -75,7 +87,19 @@ impl SelectContext {
     }
 }
 
-/// Root select primitive that provides context
+/// Renders the root select primitive that provides context
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::behavior::{SelectRoot};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <SelectRoot>"Content"</SelectRoot> };
+/// });
+/// ```
 #[component]
 pub fn SelectRoot(
     #[prop(optional)] value: RwSignal<Option<String>>,
@@ -83,7 +107,11 @@ pub fn SelectRoot(
     #[prop(optional_no_strip)] on_change: Option<Callback<Option<String>>>,
     children: Children,
 ) -> impl IntoView {
-    let context = SelectContext::new(value, disabled, on_change);
+    let context = SelectContext::builder()
+        .value(value)
+        .disabled(disabled)
+        .maybe_on_change(on_change)
+        .build();
 
     provide_context(context);
 
@@ -94,12 +122,47 @@ pub fn SelectRoot(
     }
 }
 
-/// Hook to access select context
+/// Returns the select context
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::behavior::{SelectContext, use_select};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let value = RwSignal::new(Some("apple".to_string()));
+///     let context = SelectContext::builder()
+///         .value(value)
+///         .disabled(Signal::stored(false))
+///         .build();
+///     provide_context(context);
+///
+///     assert_eq!(use_select().get_value(), Some("apple".to_string()));
+/// });
+/// ```
 pub fn use_select() -> SelectContext {
     use_context::<SelectContext>().expect("use_select must be called within SelectRoot")
 }
 
-/// Trigger button that opens/closes the select
+/// Renders the trigger button that opens and closes the select
+///
+/// The first item takes focus when the select opens with the arrow key. The on-mount effect of
+/// `SelectContent` handles that focus.
+///
+/// # Examples
+///
+/// ``` no_run
+/// use holt_kit::behavior::{SelectRoot, SelectTrigger};
+/// use leptos::prelude::*;
+///
+/// let _view = view! {
+///     <SelectRoot>
+///         <SelectTrigger>"Pick one"</SelectTrigger>
+///     </SelectRoot>
+/// };
+/// ```
 #[component]
 pub fn SelectTrigger(
     #[prop(optional, into)] class: String,
@@ -128,7 +191,6 @@ pub fn SelectTrigger(
             KeyAction::OpenAndFocusFirst => {
                 ev.prevent_default();
                 context.open();
-                // Focus will be handled by SelectContent's on-mount effect
             }
         }
     };
@@ -152,7 +214,23 @@ pub fn SelectTrigger(
     }
 }
 
-/// Content area that shows when select is open
+/// Renders the content area that shows when the select is open
+///
+/// The content focuses the first item when it mounts. It waits for `request_animation_frame`, so
+/// that the DOM exists before it focuses.
+///
+/// # Examples
+///
+/// ``` no_run
+/// use holt_kit::behavior::{SelectContent, SelectRoot};
+/// use leptos::prelude::*;
+///
+/// let _view = view! {
+///     <SelectRoot>
+///         <SelectContent>"Options"</SelectContent>
+///     </SelectRoot>
+/// };
+/// ```
 #[component]
 pub fn SelectContent(
     #[prop(optional, into)] class: String,
@@ -165,7 +243,6 @@ pub fn SelectContent(
     let children = StoredValue::new(children);
     let content_ref = NodeRef::<Div>::new();
 
-    // Set up floating positioning
     let floating_options = FloatingOptions {
         side,
         align,
@@ -175,10 +252,8 @@ pub fn SelectContent(
 
     let floating = use_floating(context.trigger_ref, content_ref, floating_options);
 
-    // Focus first item when content mounts
     Effect::new(move |_| {
         if context.is_open() {
-            // Use request_animation_frame to ensure the DOM is rendered
             request_animation_frame(move || {
                 if let Some(el) = content_ref.get() {
                     let el: &web_sys::Element = &el;
@@ -245,15 +320,66 @@ pub fn SelectContent(
     }
 }
 
-/// Individual select item
+/// The value that a select item stands for
+///
+/// The newtype keeps the value of an item apart from the other string props of the item.
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::behavior::SelectItemValue;
+///
+/// let value = SelectItemValue::from("apple");
+///
+/// assert_eq!(value.as_str(), "apple");
+/// ```
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub struct SelectItemValue(String);
+
+impl SelectItemValue {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl From<String> for SelectItemValue {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
+impl From<&str> for SelectItemValue {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+
+/// Renders an individual select item
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::behavior::{SelectItem, SelectRoot};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SelectRoot>
+///             <SelectItem value="apple">"Apple"</SelectItem>
+///         </SelectRoot>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SelectItem(
-    #[prop(into)] value: String,
+    #[prop(into)] value: SelectItemValue,
     #[prop(optional, into)] class: String,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     children: Children,
 ) -> impl IntoView {
     let context = use_select();
+    let value = value.0;
     let item_value = value.clone();
     let select_value = value.clone();
     let data_value = value.clone();
@@ -281,7 +407,23 @@ pub fn SelectItem(
     }
 }
 
-/// Component to display current value or placeholder
+/// Renders the current value or the placeholder
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::behavior::{SelectRoot, SelectValue};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SelectRoot>
+///             <SelectValue placeholder=Some("Pick one".to_string()) />
+///         </SelectRoot>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SelectValue(
     #[prop(optional_no_strip, into)] placeholder: Option<String>,
@@ -372,6 +514,9 @@ fn focus_first_item(container: &web_sys::Element) -> bool {
     false
 }
 
+/// Focuses the sibling item in the given direction
+///
+/// Focus wraps around at both ends of the list.
 fn focus_sibling_item(container: &web_sys::Element, direction: FocusDirection) -> bool {
     let items = container.query_selector_all("[role='option']");
     let Ok(items) = items else { return false };
@@ -381,7 +526,6 @@ fn focus_sibling_item(container: &web_sys::Element, direction: FocusDirection) -
         return false;
     }
 
-    // Find which item is currently focused
     let document = web_sys::window()
         .and_then(|w| w.document())
         .expect("should have document");
@@ -435,83 +579,10 @@ mod tests {
     use crate::testing::{reactive_scope, track_callback};
 
     #[test]
-    fn class_prop_accepts_str_and_string() {
-        assert_class_prop!(
-            SelectTriggerProps,
-            SelectContentProps,
-            SelectItemProps,
-            SelectValueProps,
-        );
-    }
-
-    #[test]
-    fn on_change_fires_on_select_value() {
-        reactive_scope(|| {
-            let (on_change, last) = track_callback::<Option<String>>();
-            let value = RwSignal::new(None::<String>);
-            let disabled = Signal::stored(false);
-
-            let context = SelectContext::new(value, disabled, Some(on_change));
-
-            context.select_value("option1".to_string());
-            assert_eq!(value.get(), Some("option1".to_string()));
-            assert_eq!(last.get(), Some(Some("option1".to_string())));
-
-            context.select_value("option2".to_string());
-            assert_eq!(value.get(), Some("option2".to_string()));
-            assert_eq!(last.get(), Some(Some("option2".to_string())));
-        });
-    }
-
-    #[test]
-    fn on_change_not_fired_when_disabled() {
-        reactive_scope(|| {
-            let (on_change, last) = track_callback::<Option<String>>();
-            let value = RwSignal::new(None::<String>);
-            let disabled = Signal::stored(true);
-
-            let context = SelectContext::new(value, disabled, Some(on_change));
-
-            context.select_value("option1".to_string());
-            assert_eq!(value.get(), None);
-            assert_eq!(last.get(), None);
-        });
-    }
-
-    #[test]
-    fn works_without_on_change() {
-        reactive_scope(|| {
-            let value = RwSignal::new(None::<String>);
-            let disabled = Signal::stored(false);
-
-            let context = SelectContext::new(value, disabled, None);
-
-            context.select_value("test".to_string());
-            assert_eq!(value.get(), Some("test".to_string()));
-        });
-    }
-
-    #[test]
-    fn escape_closes_open_select() {
+    fn arrow_down_in_content_focuses_next() {
         assert_eq!(
-            handle_trigger_keydown("Escape", SelectOpenState::Open),
-            KeyAction::Close
-        );
-    }
-
-    #[test]
-    fn escape_on_closed_select_is_noop() {
-        assert_eq!(
-            handle_trigger_keydown("Escape", SelectOpenState::Closed),
-            KeyAction::None
-        );
-    }
-
-    #[test]
-    fn arrow_down_opens_select() {
-        assert_eq!(
-            handle_trigger_keydown("ArrowDown", SelectOpenState::Closed),
-            KeyAction::OpenAndFocusFirst
+            handle_content_keydown("ArrowDown"),
+            ContentKeyAction::FocusNext
         );
     }
 
@@ -524,22 +595,10 @@ mod tests {
     }
 
     #[test]
-    fn enter_and_space_toggle_trigger() {
+    fn arrow_down_opens_select() {
         assert_eq!(
-            handle_trigger_keydown("Enter", SelectOpenState::Closed),
-            KeyAction::Toggle
-        );
-        assert_eq!(
-            handle_trigger_keydown(" ", SelectOpenState::Closed),
-            KeyAction::Toggle
-        );
-    }
-
-    #[test]
-    fn arrow_down_in_content_focuses_next() {
-        assert_eq!(
-            handle_content_keydown("ArrowDown"),
-            ContentKeyAction::FocusNext
+            handle_trigger_keydown("ArrowDown", SelectOpenState::Closed),
+            KeyAction::OpenAndFocusFirst
         );
     }
 
@@ -552,12 +611,57 @@ mod tests {
     }
 
     #[test]
-    fn enter_and_space_in_content_select_item() {
+    fn class_prop_accepts_str_and_string() {
+        assert_class_prop!(
+            SelectTriggerProps,
+            SelectContentProps,
+            SelectItemProps,
+            SelectValueProps,
+        );
+    }
+
+    #[test]
+    fn content_key_action_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<ContentKeyAction>();
+    }
+
+    #[test]
+    fn enter_and_space_in_content_select_item_enter() {
         assert_eq!(
             handle_content_keydown("Enter"),
             ContentKeyAction::SelectFocused
         );
+    }
+
+    #[test]
+    fn enter_and_space_in_content_select_item_space() {
         assert_eq!(handle_content_keydown(" "), ContentKeyAction::SelectFocused);
+    }
+
+    #[test]
+    fn enter_and_space_toggle_trigger_enter() {
+        assert_eq!(
+            handle_trigger_keydown("Enter", SelectOpenState::Closed),
+            KeyAction::Toggle
+        );
+    }
+
+    #[test]
+    fn enter_and_space_toggle_trigger_space() {
+        assert_eq!(
+            handle_trigger_keydown(" ", SelectOpenState::Closed),
+            KeyAction::Toggle
+        );
+    }
+
+    #[test]
+    fn escape_closes_open_select() {
+        assert_eq!(
+            handle_trigger_keydown("Escape", SelectOpenState::Open),
+            KeyAction::Close
+        );
     }
 
     #[test]
@@ -569,16 +673,190 @@ mod tests {
     }
 
     #[test]
-    fn unhandled_keys_are_noop() {
+    fn escape_on_closed_select_is_noop() {
         assert_eq!(
-            handle_trigger_keydown("Tab", SelectOpenState::Closed),
+            handle_trigger_keydown("Escape", SelectOpenState::Closed),
             KeyAction::None
         );
+    }
+
+    #[test]
+    fn focus_direction_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<FocusDirection>();
+    }
+
+    #[test]
+    fn key_action_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<KeyAction>();
+    }
+
+    #[test]
+    fn on_change_fires_on_select_value_first_selection_reports_option() {
+        reactive_scope(|| {
+            let (on_change, last) = track_callback::<Option<String>>();
+            let value = RwSignal::new(None::<String>);
+            let context = SelectContext::builder()
+                .value(value)
+                .disabled(Signal::stored(false))
+                .on_change(on_change)
+                .build();
+
+            context.select_value("option1".to_string());
+
+            assert_eq!(last.get(), Some(Some("option1".to_string())));
+        });
+    }
+
+    #[test]
+    fn on_change_fires_on_select_value_first_selection_sets_value() {
+        reactive_scope(|| {
+            let (on_change, _last) = track_callback::<Option<String>>();
+            let value = RwSignal::new(None::<String>);
+            let context = SelectContext::builder()
+                .value(value)
+                .disabled(Signal::stored(false))
+                .on_change(on_change)
+                .build();
+
+            context.select_value("option1".to_string());
+
+            assert_eq!(value.get(), Some("option1".to_string()));
+        });
+    }
+
+    #[test]
+    fn on_change_fires_on_select_value_second_selection_reports_option() {
+        reactive_scope(|| {
+            let (on_change, last) = track_callback::<Option<String>>();
+            let value = RwSignal::new(None::<String>);
+            let context = SelectContext::builder()
+                .value(value)
+                .disabled(Signal::stored(false))
+                .on_change(on_change)
+                .build();
+
+            context.select_value("option1".to_string());
+            context.select_value("option2".to_string());
+
+            assert_eq!(last.get(), Some(Some("option2".to_string())));
+        });
+    }
+
+    #[test]
+    fn on_change_fires_on_select_value_second_selection_sets_value() {
+        reactive_scope(|| {
+            let (on_change, _last) = track_callback::<Option<String>>();
+            let value = RwSignal::new(None::<String>);
+            let context = SelectContext::builder()
+                .value(value)
+                .disabled(Signal::stored(false))
+                .on_change(on_change)
+                .build();
+
+            context.select_value("option1".to_string());
+            context.select_value("option2".to_string());
+
+            assert_eq!(value.get(), Some("option2".to_string()));
+        });
+    }
+
+    #[test]
+    fn on_change_not_fired_when_disabled_keeps_last_empty() {
+        reactive_scope(|| {
+            let (on_change, last) = track_callback::<Option<String>>();
+            let value = RwSignal::new(None::<String>);
+            let context = SelectContext::builder()
+                .value(value)
+                .disabled(Signal::stored(true))
+                .on_change(on_change)
+                .build();
+
+            context.select_value("option1".to_string());
+
+            assert_eq!(last.get(), None);
+        });
+    }
+
+    #[test]
+    fn on_change_not_fired_when_disabled_keeps_value_unset() {
+        reactive_scope(|| {
+            let (on_change, _last) = track_callback::<Option<String>>();
+            let value = RwSignal::new(None::<String>);
+            let context = SelectContext::builder()
+                .value(value)
+                .disabled(Signal::stored(true))
+                .on_change(on_change)
+                .build();
+
+            context.select_value("option1".to_string());
+
+            assert_eq!(value.get(), None);
+        });
+    }
+
+    #[test]
+    fn select_context_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SelectContext>();
+    }
+
+    #[test]
+    fn select_item_value_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SelectItemValue>();
+    }
+
+    #[test]
+    fn select_open_state_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SelectOpenState>();
+    }
+
+    #[test]
+    fn unhandled_keys_are_noop_content_a() {
+        assert_eq!(handle_content_keydown("a"), ContentKeyAction::None);
+    }
+
+    #[test]
+    fn unhandled_keys_are_noop_content_tab() {
+        assert_eq!(handle_content_keydown("Tab"), ContentKeyAction::None);
+    }
+
+    #[test]
+    fn unhandled_keys_are_noop_trigger_a() {
         assert_eq!(
             handle_trigger_keydown("a", SelectOpenState::Closed),
             KeyAction::None
         );
-        assert_eq!(handle_content_keydown("Tab"), ContentKeyAction::None);
-        assert_eq!(handle_content_keydown("a"), ContentKeyAction::None);
+    }
+
+    #[test]
+    fn unhandled_keys_are_noop_trigger_tab() {
+        assert_eq!(
+            handle_trigger_keydown("Tab", SelectOpenState::Closed),
+            KeyAction::None
+        );
+    }
+
+    #[test]
+    fn works_without_on_change() {
+        reactive_scope(|| {
+            let value = RwSignal::new(None::<String>);
+            let context = SelectContext::builder()
+                .value(value)
+                .disabled(Signal::stored(false))
+                .build();
+
+            context.select_value("test".to_string());
+
+            assert_eq!(value.get(), Some("test".to_string()));
+        });
     }
 }

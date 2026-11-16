@@ -4,7 +4,7 @@ use doco::{Doco, Mount, Server, WaitFor};
 
 static CADDYFILE: &str = include_str!("Caddyfile");
 
-// Force the library (and its #[doco::test] functions) to be linked in.
+/// Forces the library (and its `#[doco::test]` functions) to be linked in
 extern crate holt_kit_docs;
 
 #[doco::main]

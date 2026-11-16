@@ -18,14 +18,14 @@ pub struct BuildArgs {
     profile: BuildProfile,
 }
 
-/// Build for production
+/// Builds for production
 #[command]
 pub async fn build(args: BuildArgs, _ctx: Context) -> CommandResult {
-    let config = Config::load().map_err(|e| Error::msg(format!("Failed to load config: {e}")))?;
+    let config = Config::load().context("Failed to load config")?;
 
     let mut cmd = Command::new("trunk");
     cmd.arg("build");
-    cmd.current_dir(&config.book.path);
+    cmd.current_dir(config.book().path());
 
     match args.profile {
         BuildProfile::Debug => {}
@@ -34,11 +34,30 @@ pub async fn build(args: BuildArgs, _ctx: Context) -> CommandResult {
         }
     }
 
-    let status = cmd.status().await?;
+    let status = cmd.status().await.context("failed to run trunk")?;
 
     if !status.success() {
         return Err(Error::msg("trunk build failed"));
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn build_args_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<BuildArgs>();
+    }
+
+    #[test]
+    fn build_profile_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<BuildProfile>();
+    }
 }

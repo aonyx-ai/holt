@@ -8,8 +8,9 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-anyhow = "1"
+bon = "3.10.3"
 doco = "0.2.3"
+getset = "0.1.7"
 regex = "1"
 thiserror = "2"
 tokio = { version = "1", features = ["time"] }

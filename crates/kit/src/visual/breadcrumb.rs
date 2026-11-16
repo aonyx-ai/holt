@@ -2,7 +2,19 @@ use leptos::children::Children;
 use leptos::prelude::*;
 use tailwind_fuse::*;
 
-/// The main breadcrumb container
+/// Renders the main breadcrumb container
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::{Breadcrumb, BreadcrumbList};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <Breadcrumb><BreadcrumbList>"Home"</BreadcrumbList></Breadcrumb> };
+/// });
+/// ```
 #[component]
 pub fn Breadcrumb(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = tw_merge!("flex", &class);
@@ -15,6 +27,18 @@ pub fn Breadcrumb(#[prop(optional, into)] class: String, children: Children) -> 
 }
 
 /// Contains all breadcrumb items
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::BreadcrumbList;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <BreadcrumbList>"Home"</BreadcrumbList> };
+/// });
+/// ```
 #[component]
 pub fn BreadcrumbList(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = tw_merge!(
@@ -25,7 +49,19 @@ pub fn BreadcrumbList(#[prop(optional, into)] class: String, children: Children)
     view! { <ol class=classes>{children()}</ol> }
 }
 
-/// A single breadcrumb item
+/// Renders a single breadcrumb item
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::BreadcrumbItem;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <BreadcrumbItem>"Home"</BreadcrumbItem> };
+/// });
+/// ```
 #[component]
 pub fn BreadcrumbItem(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = tw_merge!("inline-flex items-center gap-1", &class);
@@ -33,7 +69,19 @@ pub fn BreadcrumbItem(#[prop(optional, into)] class: String, children: Children)
     view! { <li class=classes>{children()}</li> }
 }
 
-/// A link-styled breadcrumb item
+/// Renders a link-styled breadcrumb item
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::BreadcrumbLink;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <BreadcrumbLink href="/">"Home"</BreadcrumbLink> };
+/// });
+/// ```
 #[component]
 pub fn BreadcrumbLink(
     #[prop(optional, into)] class: String,
@@ -49,7 +97,19 @@ pub fn BreadcrumbLink(
     }
 }
 
-/// The current/active breadcrumb item
+/// Renders the current or active breadcrumb item
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::BreadcrumbPage;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <BreadcrumbPage>"Docs"</BreadcrumbPage> };
+/// });
+/// ```
 #[component]
 pub fn BreadcrumbPage(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = tw_merge!("font-medium text-foreground", &class);
@@ -61,7 +121,19 @@ pub fn BreadcrumbPage(#[prop(optional, into)] class: String, children: Children)
     }
 }
 
-/// The separator between breadcrumb items
+/// Renders the separator between breadcrumb items
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::BreadcrumbSeparator;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <BreadcrumbSeparator /> };
+/// });
+/// ```
 #[component]
 pub fn BreadcrumbSeparator(#[prop(optional, into)] class: String) -> impl IntoView {
     let classes = tw_merge!("mx-1 text-muted-foreground", &class);

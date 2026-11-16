@@ -1,4 +1,4 @@
-//! Test helpers for Leptos reactive logic.
+//! Test helpers for Leptos reactive logic
 //!
 //! Leptos signals, callbacks, and contexts require a reactive [`Owner`] to function. Outside of a
 //! running Leptos application there is no owner on the current thread, so tests must create one
@@ -9,7 +9,7 @@
 
 use leptos::prelude::*;
 
-/// Run a closure inside a Leptos reactive scope.
+/// Runs a closure inside a Leptos reactive scope
 ///
 /// Creates a temporary [`Owner`] and executes `f` within it. Any reactive primitives ([`RwSignal`],
 /// [`Signal`], [`Callback`], etc.) created inside `f` will be properly tracked and disposed when
@@ -17,6 +17,8 @@ use leptos::prelude::*;
 ///
 /// Use this whenever a test needs to create or interact with reactive state without spinning up a
 /// full Leptos application.
+///
+/// # Examples
 ///
 /// ```
 /// use holt_kit::testing::reactive_scope;
@@ -33,7 +35,7 @@ pub fn reactive_scope<R>(f: impl FnOnce() -> R) -> R {
     owner.with(f)
 }
 
-/// Create a callback that captures its argument into a readable signal.
+/// Creates a callback that captures its argument into a readable signal
 ///
 /// Returns `(callback, signal)`. Each call to `callback.run(value)` stores `Some(value)` in the
 /// signal, which can then be read with `signal.get()`.
@@ -42,6 +44,8 @@ pub fn reactive_scope<R>(f: impl FnOnce() -> R) -> R {
 /// `Callback` that sets it.
 ///
 /// Must be called inside a [`reactive_scope`].
+///
+/// # Examples
 ///
 /// ```
 /// use holt_kit::testing::{reactive_scope, track_callback};

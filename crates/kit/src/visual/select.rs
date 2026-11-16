@@ -3,13 +3,25 @@ use leptos_icons::Icon;
 use tailwind_fuse::*;
 
 use crate::behavior::{
-    SelectContent as SelectContentPrimitive, SelectItem as SelectItemPrimitive,
+    SelectContent as SelectContentPrimitive, SelectItem as SelectItemPrimitive, SelectItemValue,
     SelectRoot as SelectRootPrimitive, SelectTrigger as SelectTriggerPrimitive,
     SelectValue as SelectValuePrimitive,
 };
 use leptos_floating::{Align, Side};
 
-/// The main Select component
+/// Renders the main Select component
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::Select;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <Select>"Content"</Select> };
+/// });
+/// ```
 #[component]
 pub fn Select(
     #[prop(optional)] value: RwSignal<Option<String>>,
@@ -24,7 +36,19 @@ pub fn Select(
     }
 }
 
-/// Select trigger with Shadcn styling
+/// Renders the select trigger with Shadcn styling
+///
+/// # Examples
+///
+/// ``` no_run
+/// use holt_kit::visual::{Select, SelectTrigger};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <Select><SelectTrigger>"Pick one"</SelectTrigger></Select> };
+/// });
+/// ```
 #[component]
 pub fn SelectTrigger(
     #[prop(optional, into)] class: String,
@@ -44,7 +68,19 @@ pub fn SelectTrigger(
     }
 }
 
-/// Select content with positioning and styling
+/// Renders the select content with positioning and styling
+///
+/// # Examples
+///
+/// ``` no_run
+/// use holt_kit::visual::{Select, SelectContent};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <Select><SelectContent>"Options"</SelectContent></Select> };
+/// });
+/// ```
 #[component]
 pub fn SelectContent(
     #[prop(optional, into)] class: String,
@@ -65,10 +101,22 @@ pub fn SelectContent(
     }
 }
 
-/// Select item with hover and selection states
+/// Renders a select item with hover and selection states
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::{Select, SelectItem};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <Select><SelectItem value="apple">"Apple"</SelectItem></Select> };
+/// });
+/// ```
 #[component]
 pub fn SelectItem(
-    #[prop(into)] value: String,
+    #[prop(into)] value: SelectItemValue,
     #[prop(optional, into)] class: String,
     #[prop(into, default = Signal::stored(false))] disabled: Signal<bool>,
     children: Children,
@@ -83,7 +131,7 @@ pub fn SelectItem(
             <span class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
                 <Show when=move || {
                     let context = crate::behavior::use_select();
-                    context.get_value().is_some_and(|v| v == value)
+                    context.get_value().is_some_and(|v| v == value.as_str())
                 }>
                     <Icon icon=icondata::LuCheck attr:class="h-4 w-4" />
                 </Show>
@@ -93,7 +141,19 @@ pub fn SelectItem(
     }
 }
 
-/// Component to display selected value or placeholder
+/// Renders the selected value or the placeholder
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::{Select, SelectValue};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <Select><SelectValue placeholder="Pick one" /></Select> };
+/// });
+/// ```
 #[component]
 pub fn SelectValue(
     #[prop(optional, into)] placeholder: Option<String>,
@@ -104,7 +164,19 @@ pub fn SelectValue(
     view! { <SelectValuePrimitive placeholder=placeholder class=classes /> }
 }
 
-/// Label for select groups
+/// Renders the label for select groups
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::SelectLabel;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <SelectLabel>"Fruits"</SelectLabel> };
+/// });
+/// ```
 #[component]
 pub fn SelectLabel(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = tw_merge!("py-1.5 pl-8 pr-2 text-sm font-semibold", &class);
@@ -112,7 +184,19 @@ pub fn SelectLabel(#[prop(optional, into)] class: String, children: Children) ->
     view! { <div class=classes>{children()}</div> }
 }
 
-/// Separator between select items
+/// Renders the separator between select items
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::SelectSeparator;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <SelectSeparator /> };
+/// });
+/// ```
 #[component]
 pub fn SelectSeparator(#[prop(optional, into)] class: String) -> impl IntoView {
     let classes = tw_merge!("-mx-1 my-1 h-px bg-muted", &class);

@@ -12,23 +12,25 @@ static KIT_DIR: &str = "../kit/";
 
 type BuildResult<T> = Result<T, BuildError>;
 
-/// Errors that can occur during the build process.
+/// Errors that can occur during the build process
 #[derive(Debug, Error)]
-pub enum BuildError {
-    #[error("IO error: {0}")]
-    IoError(#[from] std::io::Error),
-    #[error("Environment variable error: {0}")]
-    EnvError(#[from] env::VarError),
-    #[error("Invalid story file: {0}")]
-    InvalidStory(String),
-    #[error("Component not found: {0}")]
-    ComponentNotFound(String),
-    #[error("No valid component found in story: {0}")]
-    NoValidComponent(String),
+pub(crate) enum BuildError {
+    #[error("failed to read or write a file")]
+    Io {
+        #[from]
+        source: std::io::Error,
+    },
+    #[error("failed to read an environment variable")]
+    Env {
+        #[from]
+        source: env::VarError,
+    },
+    #[error("invalid story file: {path}")]
+    InvalidStory { path: String },
+    #[error("component not found: {component}")]
+    ComponentNotFound { component: String },
 }
 
-/// Main build script entry point.
-/// Parses story files and generates source code for each component.
 fn main() -> BuildResult<()> {
     setup_cargo_rerun_conditions();
 
@@ -53,19 +55,21 @@ fn setup_cargo_rerun_conditions() {
 mod config {
     use super::*;
 
-    /// Configuration for the build process, including directory paths.
-    #[derive(Debug)]
+    /// Configuration for the build process, including directory paths
+    #[derive(Debug, getset::Getters)]
     pub struct BuildConfig {
-        pub stories_dir: PathBuf,
-        pub stories_output_dir: PathBuf,
-        pub ui_components_dir: PathBuf,
+        #[getset(get = "pub")]
+        stories_dir: PathBuf,
+        #[getset(get = "pub")]
+        stories_output_dir: PathBuf,
+        #[getset(get = "pub")]
+        ui_components_dir: PathBuf,
     }
 
     impl BuildConfig {
-        /// Creates a new build configuration from environment variables.
+        /// Creates a new build configuration from environment variables
         pub fn new() -> BuildResult<Self> {
-            let out_dir = PathBuf::from(env::var("OUT_DIR")?);
-            let stories_output_dir = out_dir.join("stories");
+            let stories_output_dir = PathBuf::from(env::var("OUT_DIR")?).join("stories");
 
             Ok(Self {
                 stories_dir: PathBuf::from("src/stories"),
@@ -77,10 +81,11 @@ mod config {
 }
 
 mod data {
-    /// Information about a UI component extracted from story files.
-    #[derive(Clone, Debug)]
+    /// Information about a UI component extracted from story files
+    #[derive(Clone, Debug, getset::Getters)]
     pub struct ComponentInfo {
-        pub source: String,
+        #[getset(get = "pub")]
+        source: String,
     }
 
     impl ComponentInfo {
@@ -89,17 +94,19 @@ mod data {
         }
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, bon::Builder, getset::Getters)]
     pub struct ParsedStory {
-        pub name: String,
-        pub info: ComponentInfo,
+        #[getset(get = "pub")]
+        name: String,
+        #[getset(get = "pub")]
+        info: ComponentInfo,
     }
 }
 
 mod imports {
 
     /// Extracts the component name from a helper comment in the format `// @component ComponentName`.
-    /// If found, returns Some(ComponentName). Otherwise returns None.
+    /// If found, returns Some(ComponentName). Otherwise returns None
     pub fn extract_component_from_comment(content: &str) -> Option<String> {
         for line in content.lines() {
             let line = line.trim();
@@ -117,36 +124,39 @@ mod imports {
 mod parser {
     use super::*;
 
-    /// Parses story files to extract component information.
+    /// Parses story files to extract component information
     pub struct StoryParser<'a> {
         config: &'a config::BuildConfig,
     }
 
     impl<'a> StoryParser<'a> {
-        /// Creates a new story parser with the given configuration.
+        /// Creates a new story parser with the given configuration
         pub fn new(config: &'a config::BuildConfig) -> Self {
             Self { config }
         }
 
         /// Parses all story files in the configured directory.
-        /// Returns a map of story names to their component information.
+        /// Returns a map of story names to their component information
         pub fn parse_stories(&self) -> BuildResult<HashMap<String, data::ComponentInfo>> {
             let mut stories = HashMap::new();
 
-            let entries = fs::read_dir(&self.config.stories_dir)?;
+            let entries = fs::read_dir(self.config.stories_dir())?;
 
             for entry in entries {
                 let entry = entry?;
                 let path = entry.path();
 
                 if let Some(story) = self.try_parse_story_file(&path)? {
-                    stories.insert(story.name, story.info);
+                    stories.insert(story.name().clone(), story.info().clone());
                 }
             }
 
             Ok(stories)
         }
 
+        /// Parses one story file
+        ///
+        /// A file without an `@component` comment is skipped with a warning.
         fn try_parse_story_file(&self, path: &Path) -> BuildResult<Option<data::ParsedStory>> {
             if !is_valid_story_file(path) {
                 return Ok(None);
@@ -155,12 +165,13 @@ mod parser {
             let story_name = path
                 .file_stem()
                 .and_then(|s| s.to_str())
-                .ok_or_else(|| BuildError::InvalidStory(path.display().to_string()))?
+                .ok_or_else(|| BuildError::InvalidStory {
+                    path: path.display().to_string(),
+                })?
                 .to_string();
 
             let story_contents = fs::read_to_string(path)?;
 
-            // Check for helper comment specifying the component
             let component_name = if let Some(comment_component) =
                 imports::extract_component_from_comment(&story_contents)
             {
@@ -174,26 +185,32 @@ mod parser {
 
             let component_path = self
                 .config
-                .ui_components_dir
+                .ui_components_dir()
                 .join(format!("{}.rs", component_name.to_lowercase()));
 
             if !component_path.exists() {
-                return Err(BuildError::ComponentNotFound(component_name.clone()));
+                return Err(BuildError::ComponentNotFound {
+                    component: component_name.clone(),
+                });
             }
 
             let component_source = fs::read_to_string(&component_path)?;
 
             let info = data::ComponentInfo::new(component_source);
 
-            Ok(Some(data::ParsedStory {
-                name: story_name,
-                info,
-            }))
+            Ok(Some(
+                data::ParsedStory::builder()
+                    .name(story_name)
+                    .info(info)
+                    .build(),
+            ))
         }
     }
 
+    /// Returns whether the path is a story file
+    ///
+    /// Only `.rs` files are story files, and `mod.rs` is excluded.
     pub fn is_valid_story_file(path: &Path) -> bool {
-        // Only process .rs files, excluding mod.rs
         if path.extension().is_none_or(|ext| ext != "rs") {
             return false;
         }
@@ -210,24 +227,24 @@ mod parser {
 mod generator {
     use super::*;
 
-    /// Generates source code files from parsed component information.
+    /// Generates source code files from parsed component information
     pub struct CodeGenerator<'a> {
         config: &'a config::BuildConfig,
     }
 
     impl<'a> CodeGenerator<'a> {
-        /// Creates a new code generator with the given configuration.
+        /// Creates a new code generator with the given configuration
         pub fn new(config: &'a config::BuildConfig) -> Self {
             Self { config }
         }
 
         /// Generates source code files for all stories.
-        /// Creates the output directory if it doesn't exist.
+        /// Creates the output directory if it doesn't exist
         pub fn generate_story_files(
             &self,
             stories: &HashMap<String, data::ComponentInfo>,
         ) -> BuildResult<()> {
-            fs::create_dir_all(&self.config.stories_output_dir)?;
+            fs::create_dir_all(self.config.stories_output_dir())?;
 
             for (story_name, component_info) in stories {
                 self.generate_story_file(story_name, component_info)?;
@@ -243,7 +260,7 @@ mod generator {
         ) -> BuildResult<()> {
             let file_path = self
                 .config
-                .stories_output_dir
+                .stories_output_dir()
                 .join(format!("{story_name}_source.rs"));
             let content = build_file_content(story_name, info);
 
@@ -258,7 +275,56 @@ mod generator {
         format!(
             "// Auto-generated source code for {} component\n\n\
              const {}: &str = r###\"\n```rust\n{}\n```\n\"###;\n\n",
-            story_name, const_name, info.source
+            story_name,
+            const_name,
+            info.source()
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn build_config_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<BuildConfig>();
+    }
+
+    #[test]
+    fn build_error_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<BuildError>();
+    }
+
+    #[test]
+    fn code_generator_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<CodeGenerator<'static>>();
+    }
+
+    #[test]
+    fn component_info_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<data::ComponentInfo>();
+    }
+
+    #[test]
+    fn parsed_story_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<data::ParsedStory>();
+    }
+
+    #[test]
+    fn story_parser_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<StoryParser<'static>>();
     }
 }

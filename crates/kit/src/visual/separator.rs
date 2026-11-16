@@ -1,6 +1,14 @@
 use leptos::prelude::*;
 
 /// Orientation options for the separator
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::Orientation;
+///
+/// assert!(Orientation::default() == Orientation::Horizontal);
+/// ```
 #[derive(Copy, Clone, PartialEq, Default)]
 pub enum Orientation {
     #[default]
@@ -8,7 +16,19 @@ pub enum Orientation {
     Vertical,
 }
 
-/// A separator or divider that can be used to separate content
+/// Renders a separator or divider that separates content
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::{Orientation, Separator};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <Separator orientation=Orientation::Vertical /> };
+/// });
+/// ```
 #[component]
 pub fn Separator(
     #[prop(optional, into)] class: String,
@@ -42,5 +62,12 @@ mod tests {
     #[test]
     fn class_prop_accepts_str_and_string() {
         assert_class_prop!(SeparatorProps);
+    }
+
+    #[test]
+    fn orientation_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<Orientation>();
     }
 }

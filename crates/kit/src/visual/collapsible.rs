@@ -71,4 +71,25 @@ mod tests {
             CollapsibleContentProps,
         );
     }
+
+    #[test]
+    fn collapsible_content_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<CollapsibleContentStyle>();
+    }
+
+    #[test]
+    fn collapsible_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<CollapsibleStyle>();
+    }
+
+    #[test]
+    fn collapsible_trigger_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<CollapsibleTriggerStyle>();
+    }
 }

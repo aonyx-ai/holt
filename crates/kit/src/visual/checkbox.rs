@@ -62,6 +62,20 @@ mod tests {
     use super::*;
 
     #[test]
+    fn checkbox_size_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<CheckboxSize>();
+    }
+
+    #[test]
+    fn checkbox_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<CheckboxStyle>();
+    }
+
+    #[test]
     fn class_prop_accepts_str_and_string() {
         assert_class_prop!(CheckboxProps);
     }

@@ -20,28 +20,54 @@ impl<'de> Deserialize<'de> for OpenBrowser {
     }
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, getset::Getters)]
 pub struct Config {
     #[serde(default)]
-    pub book: BookConfig,
+    #[getset(get = "pub")]
+    book: BookConfig,
     #[serde(default)]
-    pub serve: ServeConfig,
+    #[getset(get = "pub")]
+    serve: ServeConfig,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, getset::Getters)]
 pub struct BookConfig {
     #[serde(default = "default_book_path")]
-    pub path: PathBuf,
+    #[getset(get = "pub")]
+    path: PathBuf,
     #[serde(default = "default_stories_path")]
-    pub stories: PathBuf,
+    #[getset(get = "pub")]
+    stories: PathBuf,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, getset::CopyGetters)]
 pub struct ServeConfig {
     #[serde(default = "default_port")]
-    pub port: u16,
+    #[getset(get_copy = "pub")]
+    port: u16,
     #[serde(default)]
-    pub open: OpenBrowser,
+    #[getset(get_copy = "pub")]
+    open: OpenBrowser,
+}
+
+/// Errors that can occur while loading the configuration file
+#[derive(Debug, thiserror::Error)]
+pub enum ConfigError {
+    /// Failed to read the configuration file from disk
+    #[error("failed to read {}", path.display())]
+    Read {
+        path: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
+    /// Failed to parse the configuration file as TOML
+    #[error("failed to parse {}", path.display())]
+    Parse {
+        path: PathBuf,
+        #[source]
+        source: toml::de::Error,
+    },
 }
 
 fn default_book_path() -> PathBuf {
@@ -75,13 +101,59 @@ impl Default for ServeConfig {
 }
 
 impl Config {
-    pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn load() -> Result<Self, ConfigError> {
         let path = Path::new("holt.toml");
         if path.exists() {
-            let content = std::fs::read_to_string(path)?;
-            Ok(toml::from_str(&content)?)
+            let content = std::fs::read_to_string(path).map_err(|source| ConfigError::Read {
+                path: path.to_path_buf(),
+                source,
+            })?;
+            toml::from_str(&content).map_err(|source| ConfigError::Parse {
+                path: path.to_path_buf(),
+                source,
+            })
         } else {
             Ok(Config::default())
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn book_config_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<BookConfig>();
+    }
+
+    #[test]
+    fn config_error_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<ConfigError>();
+    }
+
+    #[test]
+    fn config_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<Config>();
+    }
+
+    #[test]
+    fn open_browser_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<OpenBrowser>();
+    }
+
+    #[test]
+    fn serve_config_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<ServeConfig>();
     }
 }

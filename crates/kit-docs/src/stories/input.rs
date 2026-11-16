@@ -59,5 +59,5 @@ fn with_label_and_help() -> AnyView {
 include!(concat!(env!("OUT_DIR"), "/stories/input_source.rs"));
 
 #[story(id = "input", name = "Input", extra_docs = INPUT_SOURCE)]
-/// `value` is two‑way bound (`bind:value`).
+/// `value` is two‑way bound (`bind:value`)
 const INPUT_STORY: () = &[default, sizes, disabled, with_label_and_help];

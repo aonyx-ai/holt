@@ -26,7 +26,7 @@ pub enum SidebarCollapsible {
     None,
 }
 
-/// Responsive sidebar that works with both CSR and SSR/hydration.
+/// Renders a responsive sidebar that works with both CSR and SSR/hydration
 ///
 /// Renders a single DOM structure with responsive CSS classes so SSR output
 /// contains everything needed for both mobile and desktop viewports.
@@ -43,19 +43,22 @@ pub fn Sidebar(
 ) -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
-    if collapsible == SidebarCollapsible::None {
-        let simple_classes = {
-            let mut classes =
-                "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground"
-                    .to_string();
-            if !class.is_empty() {
-                classes.push(' ');
-                classes.push_str(&class);
-            }
-            classes
-        };
+    match collapsible {
+        SidebarCollapsible::None => {
+            let simple_classes = {
+                let mut classes =
+                    "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground"
+                        .to_string();
+                if !class.is_empty() {
+                    classes.push(' ');
+                    classes.push_str(&class);
+                }
+                classes
+            };
 
-        return view! { <div class=simple_classes>{children()}</div> }.into_any();
+            return view! { <div class=simple_classes>{children()}</div> }.into_any();
+        }
+        SidebarCollapsible::OffCanvas | SidebarCollapsible::Icon => {}
     }
 
     let state = move || {
@@ -77,7 +80,6 @@ pub fn Sidebar(
         SidebarSide::Right => "right",
     };
 
-    // Overlay backdrop — only visible on mobile when sidebar is open
     let overlay_classes = move || {
         let base =
             "fixed inset-0 z-40 bg-black/50 md:hidden transition-opacity duration-200 ease-in-out";
@@ -88,28 +90,21 @@ pub fn Sidebar(
         }
     };
 
-    // Single sidebar element with responsive classes:
-    // Mobile: fixed overlay with translate-x to show/hide
-    // Desktop: static in-flow with width transition for collapse
     let sidebar_classes = {
         let class_extra = class;
         move || {
             let mut c = String::with_capacity(512);
 
-            // Base
             c.push_str("peer flex h-svh flex-col bg-sidebar text-sidebar-foreground");
 
-            // Mobile: fixed overlay
             c.push_str(" fixed inset-y-0 z-50 w-[var(--sidebar-width-mobile)] shadow-xl");
             c.push_str(" transition-transform duration-200 ease-in-out");
 
-            // Mobile side
             match side {
                 SidebarSide::Left => c.push_str(" left-0"),
                 SidebarSide::Right => c.push_str(" right-0"),
             }
 
-            // Mobile: hidden when closed
             if !context.is_open() {
                 match side {
                     SidebarSide::Left => c.push_str(" -translate-x-full"),
@@ -117,18 +112,15 @@ pub fn Sidebar(
                 }
             }
 
-            // Desktop: static in-flow, reset fixed positioning
             c.push_str(" md:static md:z-auto md:translate-x-0 md:shadow-none");
             c.push_str(" md:w-[var(--sidebar-width)] md:transition-[width] md:duration-200");
 
-            // Desktop: border
             match (variant, side) {
                 (SidebarVariant::Floating | SidebarVariant::Inset, _) => {}
                 (_, SidebarSide::Left) => c.push_str(" md:border-r"),
                 (_, SidebarSide::Right) => c.push_str(" md:border-l"),
             }
 
-            // Desktop: collapsed state
             if !context.is_open() {
                 match collapsible {
                     SidebarCollapsible::OffCanvas => {
@@ -196,7 +188,7 @@ pub fn SidebarTrigger(#[prop(optional, into)] class: String) -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
     let toggle_sidebar = move |_| {
-        context.set_open.update(|open| *open = !*open);
+        context.set_open().update(|open| *open = !*open);
     };
 
     let classes = {
@@ -238,4 +230,30 @@ pub fn SidebarInset(#[prop(optional, into)] class: String, children: Children) -
     };
 
     view! { <main class=classes>{children()}</main> }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sidebar_collapsible_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarCollapsible>();
+    }
+
+    #[test]
+    fn sidebar_side_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarSide>();
+    }
+
+    #[test]
+    fn sidebar_variant_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarVariant>();
+    }
 }

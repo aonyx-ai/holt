@@ -2,11 +2,13 @@ use leptos::children::Children;
 use leptos::prelude::*;
 use leptos::web_sys::window;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, bon::Builder, getset::CopyGetters)]
 pub struct SidebarContext {
-    pub is_open: ReadSignal<bool>,
-    pub set_open: WriteSignal<bool>,
-    pub is_mobile: ReadSignal<bool>,
+    is_open: ReadSignal<bool>,
+    #[getset(get_copy = "pub")]
+    set_open: WriteSignal<bool>,
+    #[getset(get_copy = "pub")]
+    is_mobile: ReadSignal<bool>,
 }
 
 impl SidebarContext {
@@ -66,11 +68,11 @@ pub fn SidebarProvider(
         }
     });
 
-    let context = SidebarContext {
-        is_open,
-        set_open,
-        is_mobile,
-    };
+    let context = SidebarContext::builder()
+        .is_open(is_open)
+        .set_open(set_open)
+        .is_mobile(is_mobile)
+        .build();
 
     provide_context(context);
 
@@ -81,5 +83,24 @@ pub fn SidebarProvider(
         >
             {children()}
         </div>
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sidebar_context_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarContext>();
+    }
+
+    #[test]
+    fn sidebar_initial_state_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarInitialState>();
     }
 }

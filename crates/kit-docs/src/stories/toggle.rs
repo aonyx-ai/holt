@@ -87,7 +87,6 @@ fn interactive() -> AnyView {
     let pressed = RwSignal::new(false);
     let count = RwSignal::new(0);
 
-    // Create an effect to track when toggle is pressed
     Effect::new(move |_| {
         if pressed.get() {
             count.update(|c| *c += 1);

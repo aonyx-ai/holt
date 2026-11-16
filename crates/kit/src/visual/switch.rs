@@ -39,7 +39,19 @@ enum SwitchThumbSize {
     Lg,
 }
 
-/// A styled switch component for toggling between checked and unchecked states
+/// Renders a styled switch for toggling between checked and unchecked states
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::Switch;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <Switch /> };
+/// });
+/// ```
 #[component]
 pub fn Switch(
     #[prop(optional, into)] class: String,
@@ -81,5 +93,33 @@ mod tests {
     #[test]
     fn class_prop_accepts_str_and_string() {
         assert_class_prop!(SwitchProps);
+    }
+
+    #[test]
+    fn switch_root_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SwitchRootStyle>();
+    }
+
+    #[test]
+    fn switch_size_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SwitchSize>();
+    }
+
+    #[test]
+    fn switch_thumb_size_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SwitchThumbSize>();
+    }
+
+    #[test]
+    fn switch_thumb_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SwitchThumbStyle>();
     }
 }

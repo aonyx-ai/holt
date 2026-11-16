@@ -42,7 +42,30 @@ pub enum SidebarCollapsible {
     None,
 }
 
-/// The sidebar component that displays on the left or right side of the layout
+/// Renders the sidebar that displays on the left or right side of the layout
+///
+/// A sidebar without a collapsible mode renders as a simple container. On mobile the sidebar
+/// renders a simplified view, because this codebase has no Sheet component. On desktop the sidebar
+/// renders an outer container. That container holds a gap div that reserves the width and a main
+/// sidebar container with the position and the classes of the variant. The main container holds an
+/// inner content container.
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::Sidebar;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <Sidebar>"Content"</Sidebar>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn Sidebar(
     #[prop(optional, into)] class: String,
@@ -53,27 +76,26 @@ pub fn Sidebar(
 ) -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
-    // Handle the case when collapsible is None
-    if collapsible == SidebarCollapsible::None {
-        let simple_classes = {
-            let mut classes =
-                "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground"
-                    .to_string();
-            if !class.is_empty() {
-                classes.push(' ');
-                classes.push_str(&class);
-            }
-            classes
-        };
+    match collapsible {
+        SidebarCollapsible::None => {
+            let simple_classes = {
+                let mut classes =
+                    "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground"
+                        .to_string();
+                if !class.is_empty() {
+                    classes.push(' ');
+                    classes.push_str(&class);
+                }
+                classes
+            };
 
-        return view! { <div class=simple_classes>{children()}</div> }.into_any();
+            return view! { <div class=simple_classes>{children()}</div> }.into_any();
+        }
+        SidebarCollapsible::OffCanvas | SidebarCollapsible::Icon => {}
     }
 
-    // Handle mobile view
-    let is_mobile = context.is_mobile.get();
+    let is_mobile = context.is_mobile().get();
     if is_mobile {
-        // For mobile, we don't have Sheet component in this codebase
-        // So we'll create a simplified mobile view
         let class_suffix = if class.is_empty() {
             String::new()
         } else {
@@ -112,7 +134,6 @@ pub fn Sidebar(
         .into_any();
     }
 
-    // Desktop view
     let state = move || {
         if context.is_open() {
             "expanded"
@@ -120,7 +141,7 @@ pub fn Sidebar(
             "collapsed"
         }
     };
-    let other_state = state.clone();
+    let other_state = state;
     let collapsible_value = move || {
         if other_state() == "collapsed" {
             match collapsible {
@@ -144,10 +165,8 @@ pub fn Sidebar(
         SidebarSide::Right => "right",
     };
 
-    // Outer container classes
     let outer_classes = "group peer hidden text-sidebar-foreground md:block";
 
-    // Gap div classes
     let gap_classes = move || {
         let base = "relative w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear".to_string();
         let mut classes = vec![base];
@@ -169,7 +188,6 @@ pub fn Sidebar(
         classes.join(" ")
     };
 
-    // Main sidebar container classes - pre-compute the class-dependent part
     let sidebar_base_classes = {
         let mut classes = vec![
             "fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex".to_string()
@@ -200,7 +218,6 @@ pub fn Sidebar(
         classes.join(" ")
     };
 
-    // Inner content classes
     let content_classes = "flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow";
 
     view! {
@@ -211,10 +228,8 @@ pub fn Sidebar(
             data-variant=variant_value
             data-side=side_value
         >
-            // Gap div
             <div class=gap_classes></div>
 
-            // Main sidebar container
             <div class=sidebar_base_classes>
                 <div data-sidebar="sidebar" class=content_classes>
                     {children()}
@@ -225,7 +240,24 @@ pub fn Sidebar(
     .into_any()
 }
 
-/// A rail can be used to toggle the sidebar
+/// Renders a rail that toggles the sidebar
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarRail;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarRail />
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarRail(#[prop(optional, into)] class: String) -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
@@ -240,10 +272,27 @@ pub fn SidebarRail(#[prop(optional, into)] class: String) -> impl IntoView {
         classes
     };
 
-    view! { <div class=classes on:click=move |_| context.set_open.update(|open| *open = !*open)></div> }
+    view! { <div class=classes on:click=move |_| context.set_open().update(|open| *open = !*open)></div> }
 }
 
-/// Badge component for menu items
+/// Renders the badge for menu items
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarMenuBadge;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarMenuBadge>"3"</SidebarMenuBadge>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarMenuBadge(
     #[prop(optional, into)] class: String,
@@ -261,7 +310,24 @@ pub fn SidebarMenuBadge(
     view! { <span class=classes>{children()}</span> }
 }
 
-/// The header component of the sidebar, shown at the top
+/// Renders the header of the sidebar, shown at the top
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarHeader;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarHeader>"Header"</SidebarHeader>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarHeader(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = {
@@ -278,7 +344,24 @@ pub fn SidebarHeader(#[prop(optional, into)] class: String, children: Children) 
     view! { <div class=classes>{children()}</div> }
 }
 
-/// The content area of the sidebar, typically containing groups and navigation items
+/// Renders the content area of the sidebar, typically containing groups and navigation items
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarContent;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarContent>"Content"</SidebarContent>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarContent(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = {
@@ -293,7 +376,24 @@ pub fn SidebarContent(#[prop(optional, into)] class: String, children: Children)
     view! { <div class=classes>{children()}</div> }
 }
 
-/// A group within the sidebar content, used to organize menu items
+/// Renders a group within the sidebar content that organizes menu items
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarGroup;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarGroup>"Group"</SidebarGroup>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarGroup(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = {
@@ -308,7 +408,24 @@ pub fn SidebarGroup(#[prop(optional, into)] class: String, children: Children) -
     view! { <div class=classes>{children()}</div> }
 }
 
-/// A label for a sidebar group
+/// Renders a label for a sidebar group
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarGroupLabel;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarGroupLabel>"Label"</SidebarGroupLabel>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarGroupLabel(
     #[prop(optional, into)] class: String,
@@ -326,7 +443,24 @@ pub fn SidebarGroupLabel(
     view! { <h3 class=classes>{children()}</h3> }
 }
 
-/// Content container for sidebar group items
+/// Renders the content container for sidebar group items
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarGroupContent;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarGroupContent>"Items"</SidebarGroupContent>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarGroupContent(
     #[prop(optional, into)] class: String,
@@ -344,7 +478,24 @@ pub fn SidebarGroupContent(
     view! { <div class=classes>{children()}</div> }
 }
 
-/// A menu component within the sidebar
+/// Renders a menu within the sidebar
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarMenu;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarMenu>"Items"</SidebarMenu>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarMenu(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = {
@@ -359,7 +510,24 @@ pub fn SidebarMenu(#[prop(optional, into)] class: String, children: Children) ->
     view! { <nav class=classes>{children()}</nav> }
 }
 
-/// A menu item within the sidebar menu
+/// Renders a menu item within the sidebar menu
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarMenuItem;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarMenuItem>"Item"</SidebarMenuItem>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarMenuItem(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = {
@@ -375,6 +543,14 @@ pub fn SidebarMenuItem(#[prop(optional, into)] class: String, children: Children
 }
 
 /// Whether a sidebar menu button is active
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::MenuButtonState;
+///
+/// assert!(MenuButtonState::default() == MenuButtonState::Inactive);
+/// ```
 #[derive(Copy, Clone, PartialEq, Default)]
 pub enum MenuButtonState {
     #[default]
@@ -388,7 +564,24 @@ impl MenuButtonState {
     }
 }
 
-/// A button within a sidebar menu item
+/// Renders a button within a sidebar menu item
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::{MenuButtonState, SidebarMenuButton};
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarMenuButton state=MenuButtonState::Active>"Item"</SidebarMenuButton>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarMenuButton(
     #[prop(optional, into)] class: String,
@@ -418,7 +611,24 @@ pub fn SidebarMenuButton(
     }
 }
 
-/// The footer component of the sidebar, shown at the bottom
+/// Renders the footer of the sidebar, shown at the bottom
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarFooter;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarFooter>"Footer"</SidebarFooter>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarFooter(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = {
@@ -435,7 +645,24 @@ pub fn SidebarFooter(#[prop(optional, into)] class: String, children: Children) 
     view! { <div class=classes>{children()}</div> }
 }
 
-/// A separator line within the sidebar
+/// Renders a separator line within the sidebar
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarSeparator;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarSeparator />
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarSeparator(#[prop(optional, into)] class: String) -> impl IntoView {
     let classes = {
@@ -450,18 +677,35 @@ pub fn SidebarSeparator(#[prop(optional, into)] class: String) -> impl IntoView 
     view! { <div class=classes></div> }
 }
 
-/// A button that toggles the sidebar visibility
+/// Renders a button that toggles the sidebar visibility
+///
+/// The button toggles the sidebar the same way for mobile views and for desktop views.
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarTrigger;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarTrigger />
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarTrigger(#[prop(optional, into)] class: String) -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
 
     let toggle_sidebar = move |_| {
-        if context.is_mobile.get() {
-            // For mobile views
-            context.set_open.update(|open| *open = !*open);
+        if context.is_mobile().get() {
+            context.set_open().update(|open| *open = !*open);
         } else {
-            // For desktop views
-            context.set_open.update(|open| *open = !*open);
+            context.set_open().update(|open| *open = !*open);
         }
     };
 
@@ -488,7 +732,24 @@ pub fn SidebarTrigger(#[prop(optional, into)] class: String) -> impl IntoView {
     }
 }
 
-/// A component to provide content for an inset sidebar layout
+/// Renders the content for an inset sidebar layout
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::visual::SidebarInset;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! {
+///         <SidebarProvider>
+///             <SidebarInset>"Content"</SidebarInset>
+///         </SidebarProvider>
+///     };
+/// });
+/// ```
 #[component]
 pub fn SidebarInset(#[prop(optional, into)] class: String, children: Children) -> impl IntoView {
     let classes = {
@@ -529,5 +790,40 @@ mod tests {
             SidebarTriggerProps,
             SidebarInsetProps,
         );
+    }
+
+    #[test]
+    fn menu_button_state_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<MenuButtonState>();
+    }
+
+    #[test]
+    fn sidebar_collapsible_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarCollapsible>();
+    }
+
+    #[test]
+    fn sidebar_side_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarSide>();
+    }
+
+    #[test]
+    fn sidebar_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarStyle>();
+    }
+
+    #[test]
+    fn sidebar_variant_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarVariant>();
     }
 }

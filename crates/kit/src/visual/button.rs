@@ -49,8 +49,6 @@ pub fn Button(
     #[prop(optional, into)] class: String,
     #[prop(optional)] variant: ButtonVariant,
     #[prop(optional)] size: ButtonSize,
-    // TODO: add support for behaviour like @radix-ui/react-slot?
-    // #[prop(optional)] as_child: bool,
     children: Children,
 ) -> impl IntoView {
     let final_class = ButtonStyle { variant, size }.with_class(&class);
@@ -70,6 +68,27 @@ pub fn Button(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn button_size_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<ButtonSize>();
+    }
+
+    #[test]
+    fn button_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<ButtonStyle>();
+    }
+
+    #[test]
+    fn button_variant_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<ButtonVariant>();
+    }
 
     #[test]
     fn class_prop_accepts_str_and_string() {

@@ -117,7 +117,7 @@ fn required_with_validation() -> AnyView {
 include!(concat!(env!("OUT_DIR"), "/stories/textarea_source.rs"));
 
 #[story(id = "textarea", name = "Textarea", extra_docs = TEXTAREA_SOURCE)]
-/// `value` is two‑way bound (`bind:value`).
+/// `value` is two‑way bound (`bind:value`)
 const TEXTAREA_STORY: () = &[
     default,
     sizes,

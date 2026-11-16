@@ -19,6 +19,7 @@ icondata = { version = "0.7.0", default-features = false, features = [
 ] }
 leptos_icons = "0.7.0"
 inventory = "0.3.20"
+bon = { version = "3.10.3", optional = true }
 console_error_panic_hook = { version = "0.1.7", optional = true }
 doco = { version = "0.2.3", optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
@@ -39,6 +40,7 @@ csr = [
   "console_error_panic_hook",
 ]
 ssr = [
+  "bon",
   "holt-book/ssr",
   "leptos/ssr",
   "leptos_router/ssr",
@@ -57,6 +59,8 @@ visual-regression = ["thirtyfour", "tokio", "ureq", "eframe", "image"]
 e2e = ["doco", "thirtyfour", "tokio", "futures"]
 
 [build-dependencies]
+bon = "3.10.3"
+getset = "0.1.7"
 thiserror = ">=1.0.37, <2"
 itertools = "0.14.0"
 

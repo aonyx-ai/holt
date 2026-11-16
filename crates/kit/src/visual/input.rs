@@ -23,7 +23,7 @@ pub enum InputSize {
 pub fn Input(
     #[prop(optional, into)] class: String,
     #[prop(optional)] size: InputSize,
-    /// Two‑way bound via `bind:value`.
+    /// Two‑way bound via `bind:value`
     #[prop(optional, default = RwSignal::new(String::new()))]
     value: RwSignal<String>,
     #[prop(optional, into)] disabled: Signal<bool>,
@@ -62,5 +62,19 @@ mod tests {
     #[test]
     fn class_prop_accepts_str_and_string() {
         assert_class_prop!(InputProps);
+    }
+
+    #[test]
+    fn input_size_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<InputSize>();
+    }
+
+    #[test]
+    fn input_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<InputStyle>();
     }
 }

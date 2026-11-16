@@ -1,11 +1,12 @@
+/// Copies the stylesheet of the book into the target directory
+///
+/// Resolves the target directory from `OUT_DIR`, e.g.
+/// `.../target/debug/build/holt-book-xxx/out` becomes `.../target`.
 fn main() {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let css_path = std::path::Path::new(&manifest_dir).join("assets/holt-book.css");
 
-    // Resolve target dir from OUT_DIR
-    // e.g. .../target/debug/build/holt-book-xxx/out -> .../target
-    let out_dir = std::env::var("OUT_DIR").unwrap();
-    let target_dir = std::path::Path::new(&out_dir)
+    let target_dir = std::path::PathBuf::from(std::env::var_os("OUT_DIR").unwrap())
         .ancestors()
         .find(|p| p.file_name().is_some_and(|n| n == "target"))
         .unwrap()

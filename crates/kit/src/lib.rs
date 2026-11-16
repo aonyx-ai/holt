@@ -1,4 +1,4 @@
-/// Compile-time check: the named Props builder accepts both `&str` and `String` for `class`.
+/// Compile-time check: the named Props builder accepts both `&str` and `String` for `class`
 #[cfg(test)]
 macro_rules! assert_class_prop {
     ($($Props:ty),+ $(,)?) => {

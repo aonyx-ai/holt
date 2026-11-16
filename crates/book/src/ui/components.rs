@@ -5,4 +5,4 @@ mod markdown;
 mod storybook;
 pub mod visual;
 
-pub use storybook::*;
+pub use self::storybook::*;

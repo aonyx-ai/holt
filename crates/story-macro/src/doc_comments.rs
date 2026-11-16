@@ -39,17 +39,10 @@ mod test {
     use crate::doc_comments::DocComments;
 
     #[test]
-    fn test_parse_doc_comments_with_single_line() {
-        let const_item: ItemConst = parse_quote! {
-            /// This is a test description
-            const TEST_VARIANTS: () = &[];
-        };
+    fn doc_comments_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
 
-        let description = DocComments::extract_from_item_const(&const_item);
-        assert_eq!(
-            description,
-            DocComments::Some("This is a test description".to_string())
-        );
+        assert_send_sync_and_unpin::<DocComments>();
     }
 
     #[test]
@@ -68,6 +61,20 @@ mod test {
                 "First line of description\nSecond line of description\nThird line of description"
                     .to_string()
             )
+        );
+    }
+
+    #[test]
+    fn test_parse_doc_comments_with_single_line() {
+        let const_item: ItemConst = parse_quote! {
+            /// This is a test description
+            const TEST_VARIANTS: () = &[];
+        };
+
+        let description = DocComments::extract_from_item_const(&const_item);
+        assert_eq!(
+            description,
+            DocComments::Some("This is a test description".to_string())
         );
     }
 }

@@ -32,8 +32,6 @@ pub enum BadgeVariant {
 pub fn Badge(
     #[prop(optional, into)] class: String,
     #[prop(optional)] variant: BadgeVariant,
-    // TODO: add support for behaviour like @radix-ui/react-slot?
-    // #[prop(optional)] as_child: bool,
     children: Children,
 ) -> impl IntoView {
     let final_class = BadgeStyle { variant }.with_class(class);
@@ -43,6 +41,20 @@ pub fn Badge(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn badge_style_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<BadgeStyle>();
+    }
+
+    #[test]
+    fn badge_variant_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<BadgeVariant>();
+    }
 
     #[test]
     fn class_prop_accepts_str_and_string() {

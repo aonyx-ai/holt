@@ -1,4 +1,4 @@
-//! CLI command for visual regression testing.
+//! CLI command for visual regression testing
 
 use crate::config::Config;
 use crate::snapshot::{self, HeadlessMode, SaveMode, SnapshotConfig, SnapshotMode};
@@ -8,7 +8,7 @@ use std::io::IsTerminal;
 #[derive(Debug, Args)]
 pub struct SnapshotArgs {
     /// Run in check mode: purely pass/fail, no saving, no prompts.
-    /// Exits non-zero on any failure. Implies --headless --no-save.
+    /// Exits non-zero on any failure. Implies --headless --no-save
     #[arg(
         long,
         num_args = 0,
@@ -18,7 +18,7 @@ pub struct SnapshotArgs {
     check: SnapshotMode,
 
     /// Run the browser in headless mode (no visible window).
-    /// Default: headless when stdout is not a terminal.
+    /// Default: headless when stdout is not a terminal
     #[arg(
         long,
         num_args = 0,
@@ -27,7 +27,7 @@ pub struct SnapshotArgs {
     )]
     headless: HeadlessMode,
 
-    /// Do not save screenshots.
+    /// Do not save screenshots
     #[arg(
         long = "no-save",
         num_args = 0,
@@ -43,7 +43,7 @@ impl SnapshotArgs {
             SnapshotMode::Check => HeadlessMode::Headless,
             SnapshotMode::Interactive => match self.headless {
                 HeadlessMode::Auto => {
-                    if std::io::stdout().is_terminal() {
+                    if crate::stdout().is_terminal() {
                         HeadlessMode::Visible
                     } else {
                         HeadlessMode::Headless
@@ -62,19 +62,32 @@ impl SnapshotArgs {
     }
 }
 
-/// Run visual regression tests
+/// Runs visual regression tests
 #[command]
 pub async fn snapshot(args: SnapshotArgs, _ctx: Context) -> CommandResult {
-    let config = Config::load().map_err(|e| Error::msg(format!("Failed to load config: {e}")))?;
+    let config = Config::load().context("Failed to load config")?;
 
-    let stories_path = config.book.path.join(&config.book.stories);
-    snapshot::run(SnapshotConfig {
-        book_path: &config.book.path,
-        stories_path: &stories_path,
-        headless: args.resolve_headless(),
-        save: args.resolve_save(),
-        mode: args.check,
-    })
-    .await
-    .map_err(Error::msg)
+    let stories_path = config.book().path().join(config.book().stories());
+    let snapshot_config = SnapshotConfig::builder()
+        .book_path(config.book().path())
+        .stories_path(&stories_path)
+        .headless(args.resolve_headless())
+        .save(args.resolve_save())
+        .mode(args.check)
+        .build();
+    snapshot::run(snapshot_config, &mut crate::stdout(), &mut crate::stderr())
+        .await
+        .map_err(Error::msg)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn snapshot_args_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SnapshotArgs>();
+    }
 }

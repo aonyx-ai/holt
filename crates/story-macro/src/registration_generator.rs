@@ -19,3 +19,28 @@ impl<'a> RegistrationGenerator<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::not_send_sync::{AmbiguousIfSend, AmbiguousIfSync};
+
+    #[test]
+    fn registration_generator_is_unpin() {
+        fn assert_unpin<T: Unpin>() {}
+
+        assert_unpin::<RegistrationGenerator<'static>>();
+    }
+
+    /// `RegistrationGenerator` is not `Send`, because it borrows a `StoryGenerator`, and that holds `syn` and `proc_macro2` values tied to the compiler thread
+    #[test]
+    fn trait_not_send_registration_generator() {
+        <RegistrationGenerator<'static> as AmbiguousIfSend<_>>::assert_not_send();
+    }
+
+    /// `RegistrationGenerator` is not `Sync`, because it borrows a `StoryGenerator`, and that holds `syn` and `proc_macro2` values tied to the compiler thread
+    #[test]
+    fn trait_not_sync_registration_generator() {
+        <RegistrationGenerator<'static> as AmbiguousIfSync<_>>::assert_not_sync();
+    }
+}

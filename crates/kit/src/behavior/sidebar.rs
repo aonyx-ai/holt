@@ -4,11 +4,35 @@ use leptos::web_sys::window;
 use leptos::{ev, prelude::*};
 
 /// The sidebar context keeps state and behavior
-#[derive(Clone)]
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::behavior::SidebarContext;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let (is_open, set_open) = signal(true);
+///     let (is_mobile, _) = signal(false);
+///     let context = SidebarContext::builder()
+///         .is_open(is_open)
+///         .set_open(set_open)
+///         .is_mobile(is_mobile)
+///         .build();
+///
+///     context.set_open().set(false);
+///
+///     assert!(!context.is_open());
+/// });
+/// ```
+#[derive(Copy, Clone, bon::Builder, getset::CopyGetters)]
 pub struct SidebarContext {
-    pub is_open: ReadSignal<bool>,
-    pub set_open: WriteSignal<bool>,
-    pub is_mobile: ReadSignal<bool>,
+    is_open: ReadSignal<bool>,
+    #[getset(get_copy = "pub")]
+    set_open: WriteSignal<bool>,
+    #[getset(get_copy = "pub")]
+    is_mobile: ReadSignal<bool>,
 }
 
 impl SidebarContext {
@@ -18,6 +42,14 @@ impl SidebarContext {
 }
 
 /// Initial open/closed state for the sidebar
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::behavior::SidebarInitialState;
+///
+/// assert!(SidebarInitialState::default() == SidebarInitialState::Open);
+/// ```
 #[derive(Copy, Clone, PartialEq, Default)]
 pub enum SidebarInitialState {
     #[default]
@@ -25,6 +57,21 @@ pub enum SidebarInitialState {
     Closed,
 }
 
+/// Renders the provider that shares the sidebar state with its descendants
+///
+/// The provider detects the mobile size with a simple window width check.
+///
+/// # Examples
+///
+/// ```no_run
+/// use holt_kit::behavior::SidebarProvider;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <SidebarProvider>"Content"</SidebarProvider> };
+/// });
+/// ```
 #[component]
 pub fn SidebarProvider(
     #[prop(optional)] initial_state: SidebarInitialState,
@@ -38,7 +85,6 @@ pub fn SidebarProvider(
     let is_open = open.unwrap_or(is_open_local);
     let set_open = set_open_prop.unwrap_or(set_open_local);
 
-    // Detect mobile size (simple window width check)
     let (is_mobile, set_is_mobile) = signal(false);
     Effect::new(move |_| {
         if let Some(win) = window() {
@@ -47,11 +93,11 @@ pub fn SidebarProvider(
         }
     });
 
-    let context = SidebarContext {
-        is_open,
-        set_open,
-        is_mobile,
-    };
+    let context = SidebarContext::builder()
+        .is_open(is_open)
+        .set_open(set_open)
+        .is_mobile(is_mobile)
+        .build();
 
     provide_context(context);
 
@@ -65,7 +111,20 @@ pub fn SidebarProvider(
     }
 }
 
-// Keyboard shortcut for toggle
+/// Returns the keyboard shortcut for toggle
+///
+/// # Examples
+///
+/// ``` no_run
+/// use holt_kit::behavior::{SidebarKeyboardShortcut, SidebarProvider};
+/// use leptos::prelude::*;
+///
+/// let _view = view! {
+///     <SidebarProvider>
+///         <SidebarKeyboardShortcut />
+///     </SidebarProvider>
+/// };
+/// ```
 #[component]
 pub fn SidebarKeyboardShortcut() -> impl IntoView {
     let context = use_context::<SidebarContext>().expect("SidebarProvider must be an ancestor");
@@ -73,11 +132,30 @@ pub fn SidebarKeyboardShortcut() -> impl IntoView {
     let handle_keydown = move |ev: KeyboardEvent| {
         if (ev.meta_key() || ev.ctrl_key()) && ev.key() == "b" {
             ev.prevent_default();
-            context.set_open.update(|open| *open = !*open);
+            context.set_open().update(|open| *open = !*open);
         }
     };
 
     window_event_listener(ev::keydown, handle_keydown);
 
     view! { <div class="hidden"></div> }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sidebar_context_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarContext>();
+    }
+
+    #[test]
+    fn sidebar_initial_state_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<SidebarInitialState>();
+    }
 }

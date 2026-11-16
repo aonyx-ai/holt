@@ -1,5 +1,5 @@
 mod sidebar;
 mod typography;
 
-pub use sidebar::*;
-pub use typography::*;
+pub use self::sidebar::*;
+pub use self::typography::*;

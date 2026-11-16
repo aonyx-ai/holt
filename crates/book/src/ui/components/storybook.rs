@@ -20,7 +20,7 @@ struct VisualTestParams {
     variant_index: Option<String>,
 }
 
-/// Main storybook layout component — wraps child routes via `<Outlet />`
+/// Renders the main storybook layout and wraps child routes via `<Outlet />`
 #[component]
 pub fn StorybookLayout() -> impl IntoView {
     view! {
@@ -45,7 +45,7 @@ pub fn StorybookLayout() -> impl IntoView {
     }
 }
 
-/// Mobile-only header with sidebar trigger and optional story name
+/// Renders the mobile-only header with the sidebar trigger and the optional story name
 #[component]
 pub fn MobileHeader(#[prop(optional)] story_name: Option<&'static str>) -> impl IntoView {
     view! {
@@ -56,10 +56,12 @@ pub fn MobileHeader(#[prop(optional)] story_name: Option<&'static str>) -> impl 
     }
 }
 
-/// Navigation component for the storybook sidebar
+/// Renders the navigation of the storybook sidebar
 #[component]
 fn StorybookNavigation() -> impl IntoView {
-    let base = use_context::<BasePath>().map(|b| b.0).unwrap_or_default();
+    let base = use_context::<BasePath>()
+        .map(|b| b.path())
+        .unwrap_or_default();
 
     view! {
         <nav class="space-y-1">
@@ -68,11 +70,11 @@ fn StorybookNavigation() -> impl IntoView {
                 {inventory::iter::<&'static Story>
                     .into_iter()
                     .map(|story| {
-                        let story_href = format!("{}/story/{}", base, story.id);
+                        let story_href = format!("{}/story/{}", base, story.id());
                         view! {
                             <li>
                                 <a href=story_href class="block px-2 py-1 rounded hover:bg-muted">
-                                    {story.name}
+                                    {story.name()}
                                 </a>
                             </li>
                         }
@@ -83,7 +85,7 @@ fn StorybookNavigation() -> impl IntoView {
     }
 }
 
-/// Component display area that shows the selected component and its variants
+/// Renders the display area that shows the selected component and its variants
 #[component]
 pub fn StorybookStory() -> impl IntoView {
     let params = use_params::<StoryParams>();
@@ -98,7 +100,7 @@ pub fn StorybookStory() -> impl IntoView {
         match id {
             Some(id) => inventory::iter::<&'static Story>
                 .into_iter()
-                .find(|story| story.id == id)
+                .find(|story| story.id() == id)
                 .map_or_else(
                     || {
                         view! {
@@ -111,7 +113,7 @@ pub fn StorybookStory() -> impl IntoView {
                     },
                     |story| {
                         view! {
-                            <MobileHeader story_name=story.name />
+                            <MobileHeader story_name=story.name() />
                             <div class="flex-1 overflow-auto p-4">
                                 <StoryVariantDisplay story=story />
                             </div>
@@ -130,18 +132,18 @@ pub fn StorybookStory() -> impl IntoView {
     }
 }
 
-/// Component for displaying story variants with selection
+/// Renders the story variants with selection
 #[component]
 fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
     let (selected_variant, set_selected_variant) = signal(0);
     let (active_tab, set_active_tab) = signal("preview");
 
-    let variants = story.variants;
+    let variants = story.variants();
 
     view! {
         <div class="flex flex-col space-y-6 max-w-full">
             <div class="space-y-2">
-                <H1 class="text-2xl font-bold">{story.name}</H1>
+                <H1 class="text-2xl font-bold">{story.name()}</H1>
             </div>
 
             <div class="flex items-center space-x-4">
@@ -163,7 +165,7 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                                     value=i.to_string()
                                     selected=move || selected_variant.get() == i
                                 >
-                                    {variant.name}
+                                    {variant.name()}
                                 </option>
                             }
                         })
@@ -213,7 +215,7 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                                 if active_tab.get() == "preview" {
                                     view! {
                                         <div class="flex items-center justify-center min-h-[200px] bg-muted/20 rounded-lg">
-                                            {(variant.render)()}
+                                            {(variant.render())()}
                                         </div>
                                     }
                                         .into_any()
@@ -221,7 +223,7 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
                                     view! {
                                         <div class="bg-muted/30 rounded-lg p-4">
                                             <pre class="text-sm overflow-x-auto">
-                                                <code>{variant.source}</code>
+                                                <code>{variant.source()}</code>
                                             </pre>
                                         </div>
                                     }
@@ -235,7 +237,7 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
             </div>
 
             {story
-                .description
+                .description()
                 .map(|desc| {
                     view! {
                         <div class="max-w-full">
@@ -250,7 +252,7 @@ fn StoryVariantDisplay(story: &'static Story) -> impl IntoView {
     }
 }
 
-/// Minimal component for visual regression testing - renders just the story variant
+/// Renders just the story variant for visual regression testing
 #[component]
 pub fn VisualTestStory() -> impl IntoView {
     let params = use_params::<VisualTestParams>();
@@ -272,8 +274,8 @@ pub fn VisualTestStory() -> impl IntoView {
         match (story_id, variant_index) {
             (Some(id), Some(index)) => inventory::iter::<&'static Story>
                 .into_iter()
-                .find(|story| story.id == id)
-                .and_then(|story| story.variants.get(index))
+                .find(|story| story.id() == id)
+                .and_then(|story| story.variants().get(index))
                 .map_or_else(
                     || view! { <div>"Story variant not found"</div> }.into_any(),
                     |variant| {
@@ -283,7 +285,7 @@ pub fn VisualTestStory() -> impl IntoView {
                                 data-story-id=id.clone()
                                 data-variant-index=index.to_string()
                             >
-                                {(variant.render)()}
+                                {(variant.render())()}
                             </div>
                         }
                         .into_any()
@@ -291,5 +293,24 @@ pub fn VisualTestStory() -> impl IntoView {
                 ),
             _ => view! { <div>"Invalid parameters"</div> }.into_any(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn story_params_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<StoryParams>();
+    }
+
+    #[test]
+    fn visual_test_params_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<VisualTestParams>();
     }
 }

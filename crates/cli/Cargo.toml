@@ -11,12 +11,15 @@ name = "holt"
 path = "src/main.rs"
 
 [dependencies]
+bon = "3.10.3"
 clawless = "0.5"
 doco = "0.2.3"
 eframe = "0.33"
+getset = "0.1.7"
 holt-regression = { path = "../regression", version = "0.2.1" }
 image = { version = "0.25", features = ["png"] }
 serde = { version = "1", features = ["derive"] }
+thiserror = "2"
 tokio = { version = "1", features = ["process", "rt-multi-thread", "macros"] }
 toml = "0.9"
 

@@ -5,7 +5,6 @@ use leptos::prelude::*;
 
 #[variant]
 fn default() -> AnyView {
-    // let checked = RwSignal::new(false);
     view! { <Switch /> }.into_any()
 }
 

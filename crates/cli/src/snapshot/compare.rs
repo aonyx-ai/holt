@@ -1,9 +1,10 @@
-//! Image comparison UI for reviewing visual differences.
+//! Image comparison UI for reviewing visual differences
 
 use eframe::egui;
 use holt_regression::StoryVariant;
+use image::ImageReader;
 use std::fs;
-use std::io::{self, Write as IoWrite};
+use std::io::{self, Cursor, Write};
 use std::path::Path;
 use std::process::Command;
 use std::sync::{Arc, Mutex, mpsc};
@@ -22,7 +23,7 @@ enum VerdictState {
     Sent,
 }
 
-/// egui app for comparing images.
+/// egui app for comparing images
 struct ImageCompareApp {
     title: String,
     baseline_image: egui::ColorImage,
@@ -41,18 +42,16 @@ enum Verdict {
     Reject,
 }
 
+#[bon::bon]
 impl ImageCompareApp {
+    #[builder]
     fn new(
-        _cc: &eframe::CreationContext<'_>,
         variant: &StoryVariant,
         baseline: &[u8],
         screenshot: &[u8],
         result_tx: mpsc::Sender<Verdict>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        use image::ImageReader;
-        use std::io::Cursor;
-
-        let title = format!("Visual Diff: {}/{}", variant.story_id, variant.name);
+        let title = format!("Visual Diff: {}/{}", variant.story_id(), variant.name());
 
         let baseline_img = ImageReader::new(Cursor::new(baseline))
             .with_guessed_format()?
@@ -155,8 +154,16 @@ impl eframe::App for ImageCompareApp {
                     });
 
                     let original_size = texture.size_vec2();
-                    let scale = (available_size.x / original_size.x)
-                        .min(available_size.y / original_size.y)
+                    let egui::Vec2 {
+                        x: available_width,
+                        y: available_height,
+                    } = available_size;
+                    let egui::Vec2 {
+                        x: original_width,
+                        y: original_height,
+                    } = original_size;
+                    let scale = (available_width / original_width)
+                        .min(available_height / original_height)
                         .min(1.0);
                     let display_size = original_size * scale;
 
@@ -166,19 +173,21 @@ impl eframe::App for ImageCompareApp {
     }
 }
 
-/// Terminal-based fallback for comparing images.
+/// Compares images in the terminal as a fallback
 fn prompt_user_approval_terminal(
     variant: &StoryVariant,
     _baseline: &[u8],
     screenshot: &[u8],
     baseline_path: &Path,
+    out: &mut impl Write,
 ) -> io::Result<bool> {
-    println!("\n  GUI not available, using terminal mode");
+    writeln!(out, "\n  GUI not available, using terminal mode")?;
 
     let temp_dir = std::env::temp_dir();
     let temp_path = temp_dir.join(format!(
         "visual-diff-{}-{}-new.png",
-        variant.story_id, variant.name
+        variant.story_id(),
+        variant.name()
     ));
     fs::write(&temp_path, screenshot)?;
 
@@ -189,9 +198,9 @@ fn prompt_user_approval_terminal(
         .canonicalize()
         .unwrap_or_else(|_| temp_path.clone());
 
-    println!("\n  Compare images:");
-    println!("    Baseline:       {}", baseline_abs.display());
-    println!("    New screenshot: {}", temp_abs.display());
+    writeln!(out, "\n  Compare images:")?;
+    writeln!(out, "    Baseline:       {}", baseline_abs.display())?;
+    writeln!(out, "    New screenshot: {}", temp_abs.display())?;
 
     #[cfg(target_os = "macos")]
     {
@@ -218,11 +227,13 @@ fn prompt_user_approval_terminal(
             .spawn();
     }
 
-    print!(
+    write!(
+        out,
         "\n  Screenshot differs for {}/{}. Accept new baseline? [y/N]: ",
-        variant.story_id, variant.name
-    );
-    io::stdout().flush()?;
+        variant.story_id(),
+        variant.name()
+    )?;
+    out.flush()?;
 
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
@@ -230,21 +241,23 @@ fn prompt_user_approval_terminal(
     Ok(input.trim().eq_ignore_ascii_case("y"))
 }
 
-/// Shows image comparison UI and prompts user for approval.
+/// Shows image comparison UI and prompts user for approval
 pub fn prompt_user_approval(
     variant: &StoryVariant,
     baseline: &[u8],
     screenshot: &[u8],
     baseline_path: &Path,
+    out: &mut impl Write,
+    err: &mut impl Write,
 ) -> io::Result<bool> {
     let use_gui = std::env::var("CI").is_err()
         && (cfg!(not(target_os = "linux")) || std::env::var("DISPLAY").is_ok());
 
     if !use_gui {
-        return prompt_user_approval_terminal(variant, baseline, screenshot, baseline_path);
+        return prompt_user_approval_terminal(variant, baseline, screenshot, baseline_path, out);
     }
 
-    println!("\n  Opening comparison window...");
+    writeln!(out, "\n  Opening comparison window...")?;
 
     let (tx, rx) = mpsc::channel();
     let variant_clone = variant.clone();
@@ -256,7 +269,8 @@ pub fn prompt_user_approval(
             .with_inner_size([1280.0, 800.0])
             .with_title(format!(
                 "Visual Diff: {}/{}",
-                variant_clone.story_id, variant_clone.name
+                variant_clone.story_id(),
+                variant_clone.name()
             )),
         ..Default::default()
     };
@@ -264,7 +278,7 @@ pub fn prompt_user_approval(
     let result_shared: Arc<Mutex<Option<Verdict>>> = Arc::new(Mutex::new(None));
     let result_clone = Arc::clone(&result_shared);
 
-    let result = std::thread::scope(|s| {
+    let result: Result<Option<Verdict>, eframe::Error> = std::thread::scope(|s| {
         let handle = s.spawn(move || {
             if let Ok(verdict) = rx.recv() {
                 *result_clone.lock().unwrap() = Some(verdict);
@@ -274,40 +288,75 @@ pub fn prompt_user_approval(
         let gui_result = eframe::run_native(
             "Image Compare",
             options,
-            Box::new(move |cc| {
-                match ImageCompareApp::new(
-                    cc,
-                    &variant_clone,
-                    &baseline_clone,
-                    &screenshot_clone,
-                    tx,
-                ) {
+            Box::new(move |_cc| {
+                match ImageCompareApp::builder()
+                    .variant(&variant_clone)
+                    .baseline(&baseline_clone)
+                    .screenshot(&screenshot_clone)
+                    .result_tx(tx)
+                    .build()
+                {
                     Ok(app) => Ok(Box::new(app)),
-                    Err(e) => {
-                        let err_msg = format!("Failed to create comparison window: {}", e);
-                        eprintln!("{}", err_msg);
-                        Err(err_msg.into())
-                    }
+                    Err(e) => Err(format!("Failed to create comparison window: {}", e).into()),
                 }
             }),
         );
 
-        if gui_result.is_err() {
-            return None;
-        }
+        gui_result?;
 
         let _ = handle.join();
-        result_shared.lock().unwrap().take()
+        Ok(result_shared.lock().unwrap().take())
     });
 
-    match result {
+    let verdict = match result {
+        Ok(verdict) => verdict,
+        Err(e) => {
+            writeln!(err, "{}", e)?;
+            None
+        }
+    };
+
+    match verdict {
         Some(verdict) => {
-            println!("  -> Comparison window closed");
+            writeln!(out, "  -> Comparison window closed")?;
             Ok(verdict == Verdict::Accept)
         }
         None => {
-            eprintln!("  GUI failed, falling back to terminal mode");
-            prompt_user_approval_terminal(variant, baseline, screenshot, baseline_path)
+            writeln!(err, "  GUI failed, falling back to terminal mode")?;
+            prompt_user_approval_terminal(variant, baseline, screenshot, baseline_path, out)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn compare_view_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<CompareView>();
+    }
+
+    #[test]
+    fn image_compare_app_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<ImageCompareApp>();
+    }
+
+    #[test]
+    fn verdict_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<Verdict>();
+    }
+
+    #[test]
+    fn verdict_state_is_send_sync_and_unpin() {
+        fn assert_send_sync_and_unpin<T: Send + Sync + Unpin>() {}
+
+        assert_send_sync_and_unpin::<VerdictState>();
     }
 }

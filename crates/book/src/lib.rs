@@ -11,6 +11,15 @@ pub use inventory::submit;
 #[cfg(feature = "ssr")]
 pub use crate::ui::app::{get_all_story_ids, get_static_routes};
 
+/// Mounts the book to the body of the page
+///
+/// Sets up logging and the panic hook first.
+///
+/// # Examples
+///
+/// ```no_run
+/// holt_book::run_book();
+/// ```
 #[cfg(feature = "csr")]
 pub fn run_book() {
     use leptos::mount::mount_to_body;
@@ -18,7 +27,6 @@ pub fn run_book() {
 
     init_story_registry();
 
-    // Set up logging
     let _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
 

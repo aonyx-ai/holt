@@ -1,4 +1,6 @@
 mod doc_comments;
+#[cfg(test)]
+mod not_send_sync;
 mod registration_generator;
 mod story_generator;
 mod story_macro_args;
@@ -13,7 +15,7 @@ use crate::{
     story_macro_args::StoryMacroArgs, variant_generator::VariantGenerator,
 };
 
-/// Story generation macro
+/// Generates a story
 ///
 /// This macro is used to generate a [Story][holt_book::Story] from a constant
 /// expression, as well as registering the story with the inventory.
@@ -75,13 +77,16 @@ use crate::{
 #[proc_macro_attribute]
 pub fn story(args: TS1, body: TS1) -> TS1 {
     let parsed_body: ItemConst = parse(body).expect("failed to parse body");
-    let parsed_args: Punctuated<Meta, Token![,]> = Punctuated::parse_terminated
+    let args: Punctuated<Meta, Token![,]> = Punctuated::parse_terminated
         .parse(args)
         .expect("failed to parse args");
 
-    let args = StoryMacroArgs::new(parsed_args);
+    let args = StoryMacroArgs::new(args);
 
-    let story_generator = StoryGenerator::new(args, parsed_body);
+    let story_generator = StoryGenerator::builder()
+        .args(args)
+        .original_body(parsed_body)
+        .build();
     let inventory_generator = RegistrationGenerator::new(&story_generator);
 
     let full_story_const = story_generator.full_story_const();
@@ -96,10 +101,10 @@ pub fn story(args: TS1, body: TS1) -> TS1 {
     output.into()
 }
 
-/// Story variant generation macro
+/// Generates a story variant
 ///
-/// This macro converts a function into a [holt_book::StoryVariant] constant,
-/// extracting the variant name from the function name and inlining the function
+/// This macro converts a function into a [holt_book::StoryVariant] constant.
+/// It extracts the variant name from the function name and inlines the function
 /// body into the render closure.
 ///
 /// # Examples
@@ -115,9 +120,9 @@ pub fn story(args: TS1, body: TS1) -> TS1 {
 /// ```
 ///
 /// If you want more control over the generated variant, you should create the
-/// [holt_book::StoryVariant] struct directly. Note that you'll need to name the
-/// variant `xxx_VARIANT` (like `DEFAULT_VARIANT` for the above) so that you can
-/// use it in the [story] macro as `default`.
+/// [holt_book::StoryVariant] struct directly. You must name the variant
+/// `xxx_VARIANT` (like `DEFAULT_VARIANT` for the above) so that you can use it
+/// in the [story] macro as `default`.
 #[proc_macro_attribute]
 pub fn variant(_args: TS1, body: TS1) -> TS1 {
     let parsed_body: ItemFn = parse(body).expect("failed to parse function");

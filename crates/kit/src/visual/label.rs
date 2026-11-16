@@ -2,7 +2,19 @@ use leptos::children::Children;
 use leptos::prelude::*;
 use tailwind_fuse::tw_merge;
 
-/// A label component that renders an accessible label associated with form controls
+/// Renders an accessible label associated with form controls
+///
+/// # Examples
+///
+/// ```
+/// use holt_kit::visual::Label;
+/// use holt_kit::testing::reactive_scope;
+/// use leptos::prelude::*;
+///
+/// reactive_scope(|| {
+///     let _view = view! { <Label>"Email"</Label> };
+/// });
+/// ```
 #[component]
 pub fn Label(
     #[prop(optional, into)] class: String,

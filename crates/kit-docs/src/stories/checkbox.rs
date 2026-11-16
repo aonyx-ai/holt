@@ -51,12 +51,12 @@ fn with_label() -> AnyView {
     .into_any()
 }
 
+/// Creates an effect to track when the checkbox is checked
 #[variant]
 fn interactive() -> AnyView {
     let checked = RwSignal::new(false);
     let count = RwSignal::new(0);
 
-    // Create an effect to track when checkbox is checked
     Effect::new(move |_| {
         if checked.get() {
             count.update(|c| *c += 1);

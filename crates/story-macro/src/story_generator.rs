@@ -1,8 +1,8 @@
 use std::panic;
 
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Expr, ExprArray, ItemConst};
+use syn::{Expr, ExprArray, Ident, ItemConst};
 
 use crate::{
     doc_comments::DocComments, story_macro_args::StoryMacroArgs,
@@ -19,7 +19,9 @@ pub(crate) struct StoryGenerator {
     variant_names: Vec<Ident>,
 }
 
+#[bon::bon]
 impl StoryGenerator {
+    #[builder]
     pub fn new(args: StoryMacroArgs, original_body: ItemConst) -> Self {
         let documentation = DocComments::extract_from_item_const(&original_body);
         let variant_names = parse_variant_names(&original_body);
@@ -58,14 +60,14 @@ impl StoryGenerator {
         quote! {
             const #documentation_const_name: Option<&'static str> = #full_documentation;
 
-            const #full_story_name: &'static holt_book::Story = &holt_book::Story {
-                id: #story_id,
-                name: #story_name,
-                description: #documentation_const_name,
-                variants: &[
+            const #full_story_name: &'static holt_book::Story = &holt_book::Story::builder()
+                .id(#story_id)
+                .name(#story_name)
+                .maybe_description(#documentation_const_name)
+                .variants(&[
                     #(#variant_consts),*
-                ],
-            };
+                ])
+                .build();
         }
     }
 
@@ -82,7 +84,7 @@ impl StoryGenerator {
     }
 }
 
-/// Parse story variant names from a const expression
+/// Parses story variant names from a const expression
 ///
 /// Takes a const expression representing a (reference to an) array of variant
 /// names, and returns a vector of Idents of the variant names.
@@ -100,11 +102,13 @@ fn parse_variant_names(body: &ItemConst) -> Vec<Ident> {
     extract_variant_names_from_array(array)
 }
 
+/// Extracts the variant names from an array expression
+///
+/// Each element should be a function name (identifier). Any other element panics.
 fn extract_variant_names_from_array(array: &ExprArray) -> Vec<Ident> {
     let mut variant_names = Vec::new();
 
     for elem in &array.elems {
-        // Each element should be a function name (identifier)
         if let Expr::Path(path) = elem
             && let Some(ident) = path.path.get_ident()
         {
@@ -120,10 +124,27 @@ fn extract_variant_names_from_array(array: &ExprArray) -> Vec<Ident> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::not_send_sync::{AmbiguousIfSend, AmbiguousIfSync};
     use syn::parse_quote;
 
-    #[test]
-    fn test_parse_variant_names_from_array() {
+    fn story_generator_with_description() -> StoryGenerator {
+        let args = StoryMacroArgs {
+            id: "test_id".to_string(),
+            name: "Test Story".to_string(),
+            extra_docs: None,
+        };
+        let body: ItemConst = parse_quote! {
+            /// Test description
+            const TEST_VARIANTS: () = &[default];
+        };
+
+        StoryGenerator::builder()
+            .args(args)
+            .original_body(body)
+            .build()
+    }
+
+    fn two_variant_names() -> Vec<Ident> {
         let const_item: ItemConst = parse_quote! {
             const TEST_VARIANTS: () = &[
                 default,
@@ -131,10 +152,14 @@ mod tests {
             ];
         };
 
-        let variant_names = parse_variant_names(&const_item);
-        assert_eq!(variant_names.len(), 2);
-        assert_eq!(variant_names[0].to_string(), "default");
-        assert_eq!(variant_names[1].to_string(), "secondary");
+        parse_variant_names(&const_item)
+    }
+
+    #[test]
+    fn story_generator_is_unpin() {
+        fn assert_unpin<T: Unpin>() {}
+
+        assert_unpin::<StoryGenerator>();
     }
 
     #[test]
@@ -148,34 +173,90 @@ mod tests {
             const TEST_VARIANTS: () = &[foobar];
         };
 
-        let generator = StoryGenerator::new(args, body);
+        let generator = StoryGenerator::builder()
+            .args(args)
+            .original_body(body)
+            .build();
         let full_name = generator.story_const_name();
 
         assert_eq!(full_name.to_string(), "STORY_TEST_VARIANTS");
     }
 
     #[test]
-    fn test_story_generator_new() {
-        let args = StoryMacroArgs {
-            id: "test_id".to_string(),
-            name: "Test Story".to_string(),
-            extra_docs: None,
-        };
-        let body: ItemConst = parse_quote! {
-            /// Test description
-            const TEST_VARIANTS: () = &[default];
-        };
+    fn test_parse_variant_names_from_array_keeps_first_name() {
+        let variant_names = two_variant_names();
 
-        let generator = StoryGenerator::new(args, body);
+        assert_eq!(variant_names[0].to_string(), "default");
+    }
+
+    #[test]
+    fn test_parse_variant_names_from_array_keeps_second_name() {
+        let variant_names = two_variant_names();
+
+        assert_eq!(variant_names[1].to_string(), "secondary");
+    }
+
+    #[test]
+    fn test_parse_variant_names_from_array_returns_two_names() {
+        let variant_names = two_variant_names();
+
+        assert_eq!(variant_names.len(), 2);
+    }
+
+    #[test]
+    fn test_story_generator_new_keeps_body_ident() {
+        let generator = story_generator_with_description();
+
+        assert_eq!(generator.original_body.ident, "TEST_VARIANTS");
+    }
+
+    #[test]
+    fn test_story_generator_new_keeps_id() {
+        let generator = story_generator_with_description();
 
         assert_eq!(generator.args.id, "test_id");
+    }
+
+    #[test]
+    fn test_story_generator_new_keeps_name() {
+        let generator = story_generator_with_description();
+
         assert_eq!(generator.args.name, "Test Story");
+    }
+
+    #[test]
+    fn test_story_generator_new_parses_documentation() {
+        let generator = story_generator_with_description();
+
         assert_eq!(
             generator.documentation,
             DocComments::Some("Test description".to_string())
         );
-        assert_eq!(generator.original_body.ident, "TEST_VARIANTS");
-        assert_eq!(generator.variant_names.len(), 1);
+    }
+
+    #[test]
+    fn test_story_generator_new_parses_variant_name() {
+        let generator = story_generator_with_description();
+
         assert_eq!(generator.variant_names[0].to_string(), "default");
+    }
+
+    #[test]
+    fn test_story_generator_new_parses_variant_names() {
+        let generator = story_generator_with_description();
+
+        assert_eq!(generator.variant_names.len(), 1);
+    }
+
+    /// `StoryGenerator` is not `Send`, because its fields hold `syn` and `proc_macro2` values, which are tied to the compiler thread
+    #[test]
+    fn trait_not_send_story_generator() {
+        <StoryGenerator as AmbiguousIfSend<_>>::assert_not_send();
+    }
+
+    /// `StoryGenerator` is not `Sync`, because its fields hold `syn` and `proc_macro2` values, which are tied to the compiler thread
+    #[test]
+    fn trait_not_sync_story_generator() {
+        <StoryGenerator as AmbiguousIfSync<_>>::assert_not_sync();
     }
 }

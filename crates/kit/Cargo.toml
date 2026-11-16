@@ -6,13 +6,15 @@ edition.workspace = true
 publish = false
 
 [dependencies]
-leptos = { workspace = true }
-leptos-floating = "0.1.0"
-tailwind_fuse = { version = "0.3.0", features = ["variant"] }
-leptos_icons = "0.7.0"
+bon = "3.10.3"
+getset = "0.1.7"
 icondata = { version = "0.7.0", default-features = false, features = [
   "lucide",
 ] }
+leptos = { workspace = true }
+leptos-floating = "0.1.0"
+leptos_icons = "0.7.0"
+tailwind_fuse = { version = "0.3.0", features = ["variant"] }
 web-sys = { version = "0.3.80", features = [
   "DomRect",
   "Element",
